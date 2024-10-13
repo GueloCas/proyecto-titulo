@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom";
-import { ProduccionTabla } from "../components/ProduccionTabla";
+import { ProduccionGrafico } from "../components/ProduccionGrafico";
 
-export function ProduccionInversorPage() {
+export function ProduccionGraficoPage() {
     const { id } = useParams();
 
     return (
         <div className="container-fluid px-4 pt-2">
-            <ProduccionTabla id={id} />
+            <ProduccionGrafico id={id} />
         </div>
     )
 }

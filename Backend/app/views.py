@@ -64,17 +64,26 @@ class ExcelUploadView(APIView):
 class InversorProduccionView(APIView):
     def get(self, request, *args, **kwargs):
         inversor_id = request.query_params.get('inversor_id')
-        """ hora = request.query_params.get('hora') """
+        hora = request.query_params.get('hora')
+        print(f"inversor_id: {inversor_id}, hora: {hora}")
         if not inversor_id:
             return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             inversor = Inversor.objects.get(pk=inversor_id)
-            producciones = Produccion.objects.filter(inversor=inversor).annotate(
-                hora_num=Cast(Substr('Hora', 2), IntegerField())  # Extrae desde el segundo carácter
-            ).order_by('hora_num')
+            if hora:
+                producciones = Produccion.objects.filter(inversor=inversor, Hora=hora)
+            else:
+                producciones = Produccion.objects.filter(inversor=inversor).annotate(
+                    hora_num=Cast(Substr('Hora', 2), IntegerField())  # Extrae desde el segundo carácter
+                ).order_by('hora_num')
             serializer = ProduccionSerializer(producciones, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
+            response_data = {
+                'nombre_inversor': inversor.nombre,  # Asumiendo que el campo es 'nombre'
+                'producciones': serializer.data
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
         
         except Inversor.DoesNotExist:
             return Response({"error": "No se encontró el inversor"}, status=status.HTTP_404_NOT_FOUND)

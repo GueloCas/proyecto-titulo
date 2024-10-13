@@ -5,5 +5,11 @@ const api = axios.create({
 });
 
 export const getInversores =  () => api.get('inversor/').then(response => response.data);
-export const getProduccionPorInversor =  (id) => api.get(`produccion-por-inversor/?inversor_id=${id}`).then(response => response.data);
+export const getProduccionPorInversor = (id, hora) => {
+    const url = hora 
+        ? `produccion-por-inversor/?inversor_id=${id}&hora=${hora}` 
+        : `produccion-por-inversor/?inversor_id=${id}`;
+    
+    return api.get(url).then(response => response.data);
+};
 export const createInversor =  (inversor) => api.post('inversores/', inversor).then(response => response.data);
