@@ -1,6 +1,32 @@
 import { Link } from "react-router-dom";
+import Papa from 'papaparse';
 
-export function ProduccionEstadisticas({ estadisticas, id }) {
+export function ProduccionEstadisticas({ estadisticas, id, nombreInversor }) {
+    const exportToCSV = () => {
+        // Define los encabezados y datos
+        const csvData = estadisticas.map(item => ({
+            [`${nombreInversor}-Hora`]: "H" + item.hora_num,
+            "Cantidad Minima": item.cantidad_minima,
+            "Cantidad Maxima": item.cantidad_maxima,
+            "Cantidad Promedio": item.cantidad_promedio
+        }));
+
+        // Convierte los datos a formato CSV
+        const csv = Papa.unparse(csvData);
+
+        // Crea un blob de los datos CSV
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+
+        // Crea un enlace temporal para descargar el archivo
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute("download", nombreInversor + ".csv");
+
+        // Simula un clic para descargar el archivo
+        link.click();
+    };
+
     return (
         <div className="table-responsive">
             <table className="table table-striped table-bordered">
@@ -32,6 +58,9 @@ export function ProduccionEstadisticas({ estadisticas, id }) {
                     ))}
                 </tbody>
             </table>
+            <button onClick={exportToCSV} className="btn btn-info">
+                Descargar CSV
+            </button>
         </div>
     );
 }

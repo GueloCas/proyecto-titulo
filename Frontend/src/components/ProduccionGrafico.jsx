@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { getProduccionPorInversorHora } from "../api/inversores.api";
 import { Link } from "react-router-dom";
-import ApexCharts from "apexcharts"; // Asegúrate de que está correctamente importado
-import { set } from "react-hook-form";
+import ApexCharts from "apexcharts"; 
 
 export function ProduccionGrafico(req) {
     const [produccion, setProduccion] = useState([]);
@@ -57,6 +56,9 @@ export function ProduccionGrafico(req) {
                 height: 350,
                 zoom: {
                     enabled: false
+                },
+                toolbar: {
+                    show: false  
                 }
             },
             dataLabels: {

@@ -51,9 +51,9 @@ export function ProduccionInversorPage() {
             </div>
     
             {tabla ? (
-                <ProduccionTabla produccion={produccion} diasUnicos={diasUnicos} horasUnicas={horasUnicas} id={id} />
+                <ProduccionTabla produccion={produccion} diasUnicos={diasUnicos} horasUnicas={horasUnicas} id={id} nombreInversor={nombreInversor} />
             ) : (
-                <ProduccionEstadisticas estadisticas={estadisticasHora} id={id} />
+                <ProduccionEstadisticas estadisticas={estadisticasHora} id={id} nombreInversor={nombreInversor}/>
             )}
         </div>
     );    
