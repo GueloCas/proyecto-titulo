@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import InversorViewSet, ProduccionViewSet, ExcelUploadView, InversorProduccionView
+from .views import InversorViewSet, ProduccionViewSet, ExcelUploadView, InversorProduccionView, InversorProduccionHoraView
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -19,5 +19,6 @@ urlpatterns = [
     path('docs/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/v1/upload-excel/', ExcelUploadView.as_view(), name='upload-excel'),
     path("api/v1/produccion-por-inversor/", InversorProduccionView.as_view(), name="produccion-por-inversor"),
+    path("api/v1/produccion-por-inversor-hora/", InversorProduccionHoraView.as_view(), name="produccion-por-inversor"),
 ]
 

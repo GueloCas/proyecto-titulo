@@ -9,7 +9,6 @@ export function InversoresList() {
     async function loadInversores() {
       const data = await getInversores();
       setInversores(data);
-      console.log(data);
     }
     loadInversores();
   }, [])
