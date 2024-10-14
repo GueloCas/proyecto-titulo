@@ -1,7 +1,12 @@
-import { InversoresList } from "../components/InversoresList" 
+import { InversoresList } from "../components/InversoresList"
 
 export function InversoresPage() {
   return (
-    <InversoresList />
+    <>
+      <div className="container px-4 pt-2">
+        <h1>Lista de inversores</h1>
+        <InversoresList />
+      </div>
+    </>
   )
 }
