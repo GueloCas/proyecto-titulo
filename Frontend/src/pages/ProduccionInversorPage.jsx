@@ -10,9 +10,7 @@ export function ProduccionInversorPage() {
     const [produccion, setProduccion] = useState([]);
     const [diasUnicos, setDiasUnicos] = useState([]);
     const [horasUnicas, setHorasUnicas] = useState([]);
-    const [estadisticasHora, setEstadisticasHora] = useState([]);
     const [nombreInversor, setNombreInversor] = useState("");
-    const [tabla, setTabla] = useState(true);
 
     useEffect(() => {
         async function loadProduccion() {
@@ -21,7 +19,6 @@ export function ProduccionInversorPage() {
             // `data` incluye 'nombre_inversor' y 'producciones'
             setNombreInversor(data.nombre_inversor);  // Guarda el nombre del inversor
             setProduccion(data.producciones);  // Guarda las producciones
-            setEstadisticasHora(data.estadisticas_por_hora);
 
             // Extraer días y horas únicos
             const dias = [...new Set(data.producciones.map(produccion => produccion.Dia))].sort();
@@ -34,27 +31,29 @@ export function ProduccionInversorPage() {
     }, [id]);
 
     return (
-        <div className="container-fluid px-4 pt-2">
+        <div className="container px-4 pt-2">
             <div className="mt-1 d-flex justify-content-between align-items-center">
-                <div className="d-flex justify-content-left align-items-center">
-                    <h1>Producción de inversor: {nombreInversor}</h1>
-                    <button 
-                        className="btn btn-outline-secondary ms-4"
-                        style={{ height: "38px" }} 
-                        onClick={() => setTabla(!tabla)}>
-                        {tabla ? "Ver Estadísticas" : "Ver Tabla"}
-                    </button>
+                <h1>Producción de inversor: {nombreInversor}</h1>
+                <div className="d-flex justify-content-right align-items-center">
+                    <Link to={`/ProduccionInversor/Estadisticas/${id}?inversor=${nombreInversor}`} className="text-decoration-none">
+                        <button
+                            className="btn btn-outline-secondary ms-4"
+                            style={{ height: "38px" }}
+                        >
+                            Ver Tabla Estadisticas
+                        </button>
+                    </Link>
+                    <Link to={`/ProduccionInversor/Grados/${id}?inversor=${nombreInversor}`} className="text-decoration-none">
+                        <button
+                            className="btn btn-outline-secondary ms-4"
+                            style={{ height: "38px" }}
+                        >
+                            Ver Tabla Grados
+                        </button>
+                    </Link>
                 </div>
-                <Link to={`/inversores`} className="text-decoration-none">
-                    <button className="btn btn-success">Volver</button>
-                </Link>
             </div>
-    
-            {tabla ? (
-                <ProduccionTabla produccion={produccion} diasUnicos={diasUnicos} horasUnicas={horasUnicas} id={id} nombreInversor={nombreInversor} />
-            ) : (
-                <ProduccionEstadisticas estadisticas={estadisticasHora} id={id} nombreInversor={nombreInversor}/>
-            )}
+            <ProduccionTabla produccion={produccion} diasUnicos={diasUnicos} horasUnicas={horasUnicas} id={id} nombreInversor={nombreInversor} />
         </div>
-    );    
+    );
 }
