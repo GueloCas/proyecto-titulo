@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import Papa from 'papaparse';
 
 export function ProduccionTabla({ produccion, diasUnicos, horasUnicas, id, nombreInversor }) {
-    
     const exportToCSV = () => {
         // Crear los encabezados: Hora/Día + días únicos
         const csvRows = [];
@@ -42,41 +41,58 @@ export function ProduccionTabla({ produccion, diasUnicos, horasUnicas, id, nombr
 
     return (
         <div>
-            <table className="mt-1 table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>Hora/Día</th>
-                        {diasUnicos.map(dia => (
-                            <th key={dia}>{dia}</th>
-                        ))}
-                        <th>Gráf.</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {horasUnicas.map(hora => (
-                        <tr key={hora}>
-                            <td>{hora}</td>
-                            {diasUnicos.map(dia => {
-                                const produccionDiaHora = produccion.find(p => p.Dia === dia && p.Hora === hora);
-                                return (
-                                    <td key={dia}>
-                                        {produccionDiaHora ? produccionDiaHora.cantidad : "-"}
-                                    </td>
-                                );
-                            })}
-                            <td style={{ backgroundColor: '#c0c0c0' }}>
-                                <Link to={`/ProduccionInversor/grafico/${id}?hora=${hora}`} className="text-dark text-decoration-none d-flex justify-content-center">
-                                    Ver 
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="ms-1 bi bi-graph-up text-dark" viewBox="0 0 16 16">
-                                        <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
-                                    </svg>
-                                </Link>
-                            </td>
+            <style>
+                {`
+                    .table-hover tbody tr td:hover {
+                        font-weight: bold; /* Cambia el texto a negrita */
+                        background-color: #f0f8ff; /* Cambia el color de fondo */
+                    }
+                `}
+            </style>
+            <div className="table-responsive" style={{ overflowX: 'auto' }}>
+                <table className="mt-1 mb-0 table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Hora/Día</th>
+                            {diasUnicos.map(dia => (
+                                <th key={dia}>{dia}</th>
+                            ))}
+                            <th>Gráf.</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-            <button onClick={exportToCSV} className="btn btn-info">
+                    </thead>
+                    <tbody>
+                        {horasUnicas.map(hora => (
+                            <tr key={hora}>
+                                <td>{hora}</td>
+                                {diasUnicos.map(dia => {
+                                    const produccionDiaHora = produccion.find(p => p.Dia === dia && p.Hora === hora);
+                                    return (
+                                        <td key={dia}>
+                                            {produccionDiaHora ? (
+                                                <Link
+                                                    to={`/ProduccionInversor/VLinguisticas?hora=${produccionDiaHora.Hora}&cantidad=${produccionDiaHora.cantidad}&dia=${produccionDiaHora.Dia}&inversor=${id}`}
+                                                    className="text-dark text-decoration-none d-flex justify-content-center"
+                                                >
+                                                    {produccionDiaHora.cantidad}
+                                                </Link>
+                                            ) : "-"}
+                                        </td>
+                                    );
+                                })}
+                                <td style={{ backgroundColor: '#c0c0c0' }}>
+                                    <Link to={`/ProduccionInversor/grafico/${id}?hora=${hora}`} className="text-dark text-decoration-none d-flex justify-content-center">
+                                        Ver
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="ms-1 bi bi-graph-up text-dark" viewBox="0 0 16 16">
+                                            <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
+                                        </svg>
+                                    </Link>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <button onClick={exportToCSV} className="btn btn-info mt-1">
                 Descargar CSV
             </button>
         </div>

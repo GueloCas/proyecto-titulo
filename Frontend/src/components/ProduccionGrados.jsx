@@ -1,32 +1,48 @@
+import { getProduccionPorInversorGrados } from "../api/inversores.api";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Papa from 'papaparse';
-import { useEffect, useState } from "react";
-import { getProduccionPorInversor } from "../api/inversores.api";
 
-export function ProduccionEstadisticas({ id }) {
+export function ProduccionGrados({ id }) {
     const [produccion, setProduccion] = useState([]);
     const [diasUnicos, setDiasUnicos] = useState([]);
-    const [horasUnicas, setHorasUnicas] = useState([]);
-    const [estadisticasHora, setEstadisticasHora] = useState([]);
-    const [nombreInversor, setNombreInversor] = useState("");
     const [diaActual, setDiaActual] = useState(0);  // Para controlar el día mostrado
 
     useEffect(() => {
         async function loadProduccion() {
-            const data = await getProduccionPorInversor(id);
+            const data = await getProduccionPorInversorGrados(id);
+            setProduccion(data);
+            console.log(data);
 
-            setNombreInversor(data.nombre_inversor);
-            setProduccion(data.producciones);
-            setEstadisticasHora(data.estadisticas_por_hora);
-
-            const dias = [...new Set(data.producciones.map(produccion => produccion.Dia))].sort();
-            const horas = [...new Set(data.producciones.map(produccion => produccion.Hora))];
-            
+            // Extraer días únicos
+            const dias = [...new Set(data.map(p => p.Dia))].sort();
             setDiasUnicos(dias);
-            setHorasUnicas(horas);
         }
         loadProduccion();
     }, [id]);
+
+    // Filtrar la producción por el día seleccionado
+    const produccionFiltrada = produccion.filter(p => p.Dia === diasUnicos[diaActual]);
+
+    // Función para exportar a CSV
+    const exportToCSV = () => {
+        const csvData = produccionFiltrada.map(item => ({
+            "Dia": item.Dia,
+            "Hora": item.Hora,
+            "Cantidad": item.cantidad,
+            "TLbaja": item.pertenencia.baja,
+            "TLmedia": item.pertenencia.media,
+            "TLalta": item.pertenencia.alta
+        }));
+
+        const csv = Papa.unparse(csvData);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.setAttribute("download", `produccion_grados_${id}.csv`);
+        link.click();
+    };
 
     // Función para navegar entre los días
     const handleDiaAnterior = () => {
@@ -37,26 +53,6 @@ export function ProduccionEstadisticas({ id }) {
         if (diaActual < diasUnicos.length - 1) setDiaActual(diaActual + 1);
     };
 
-    const exportToCSV = () => {
-        const csvData = estadisticasHora.map(item => ({
-            [`${nombreInversor}-Hora`]: "H" + item.hora_num,
-            "Cantidad Minima": item.cantidad_minima,
-            "Cantidad Maxima": item.cantidad_maxima,
-            "Cantidad Promedio": item.cantidad_promedio
-        }));
-
-        const csv = Papa.unparse(csvData);
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.href = url;
-        link.setAttribute("download", nombreInversor + ".csv");
-        link.click();
-    };
-
-    // Filtrar la producción por el día seleccionado
-    const produccionFiltrada = produccion.filter(p => p.Dia === diasUnicos[diaActual]);
-
     return (
         <div className="table-responsive pt-2">
             <div className="d-flex justify-content-center align-items-center mb-2">
@@ -64,11 +60,11 @@ export function ProduccionEstadisticas({ id }) {
                     Día Anterior
                 </button>
                 <span><strong>Día mostrado:</strong></span>
-                <select
+                <select 
+                    value={diasUnicos[diaActual]} 
+                    onChange={(e) => setDiaActual(diasUnicos.indexOf(e.target.value))}
                     className="form-select mx-3"
                     style={{ width: '20%' }}
-                    value={diasUnicos[diaActual]}
-                    onChange={(e) => setDiaActual(diasUnicos.indexOf(e.target.value))}
                 >
                     {diasUnicos.map((dia, index) => (
                         <option key={index} value={dia}>{dia}</option>
@@ -84,24 +80,23 @@ export function ProduccionEstadisticas({ id }) {
                     <tr>
                         <th>Hora</th>
                         <th>Producción</th>
-                        <th>Prom</th>
-                        <th>Max</th>
-                        <th>Min</th>
+                        <th>TLbaja</th>
+                        <th>TLmedia</th>
+                        <th>TLalta</th>
                         <th>Ver TL</th>
                     </tr>
                 </thead>
                 <tbody>
                     {produccionFiltrada.map((prod, index) => {
-                        const stat = estadisticasHora.find(s => s.hora_num === parseInt(prod.Hora.replace('H', '')));
                         return (
                             <tr key={index}>
                                 <td>{prod.Hora}</td>
                                 <td>{prod.cantidad}</td>
-                                <td>{stat.cantidad_promedio.toFixed(5)}</td>
-                                <td>{stat.cantidad_maxima.toFixed(2)}</td>
-                                <td>{stat.cantidad_minima.toFixed(2)}</td>
+                                <td>{prod.pertenencia.baja.toFixed(2)}</td>
+                                <td>{prod.pertenencia.media.toFixed(2)}</td>
+                                <td>{prod.pertenencia.alta.toFixed(2)}</td>
                                 <td style={{ backgroundColor: '#c0c0c0' }}>
-                                    <Link to={`/ProduccionInversor/VLinguisticas?hora=${prod.Hora}&cantidad=${prod.cantidad}&inversor=${id}&dia=${diaActual + 1}&min=${stat.cantidad_minima}&max=${stat.cantidad_maxima}`} className="text-dark text-decoration-none d-flex justify-content-center">
+                                    <Link to={`/ProduccionInversor/VLinguisticas?hora=${prod.Hora}&cantidad=${prod.cantidad}&inversor=${id}&dia=${diaActual + 1}`} className="text-dark text-decoration-none d-flex justify-content-center">
                                         Ver TL
                                     </Link>
                                 </td>
