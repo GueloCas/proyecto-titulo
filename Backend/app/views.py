@@ -18,13 +18,16 @@ class ProduccionViewSet(viewsets.ModelViewSet):
 class ExcelUploadView(APIView):
     def post(self, request, *args, **kwargs):
         file = request.FILES.get('file')
+        print(f"Tipo MIME del archivo: {file.content_type}") 
         
         if not file:
             return Response({"error": "No se envió ningún archivo"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             # Lee el archivo Excel usando pandas
-            df = pd.read_excel(file, header=None)
+            df = pd.read_excel(file, engine='openpyxl', header=None)
+    
+            print(df.head())
             
             # Recorre las columnas de la hoja de Excel
             for col_index in range(1, len(df.columns)):
