@@ -38,7 +38,7 @@ class ExcelUploadView(APIView):
                 print(f"Inversor creado con ID: {inversor.id}")
                 
                 # Iterar hacia abajo en la columna, comenzando desde la fila 1
-                for row_index in range(1, len(df)):
+                """for row_index in range(1, len(df)):
                     valor = df.iloc[row_index, col_index]  # Obtener el valor en la fila actual
 
                     if pd.notna(valor): # Si el valor no es nulo
@@ -52,7 +52,7 @@ class ExcelUploadView(APIView):
                             cantidad=valor,
                             inversor=inversor
                         )
-
+"""
             return Response({"message": "Archivo procesado correctamente"}, status=status.HTTP_200_OK)
         
         except Exception as e:
