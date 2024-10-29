@@ -27,6 +27,8 @@ class ExcelUploadView(APIView):
         try:
             # Lee el archivo Excel usando pandas
             df = pd.read_excel(file, header=None)
+
+            producciones = []
             
             # Recorre las columnas de la hoja de Excel
             for col_index in range(1, len(df.columns)):
@@ -38,7 +40,7 @@ class ExcelUploadView(APIView):
                 print(f"Inversor creado con ID: {inversor.id}")
                 
                 # Iterar hacia abajo en la columna, comenzando desde la fila 1
-                """for row_index in range(1, len(df)):
+                for row_index in range(1, len(df)):
                     valor = df.iloc[row_index, col_index]  # Obtener el valor en la fila actual
 
                     if pd.notna(valor): # Si el valor no es nulo
@@ -46,13 +48,16 @@ class ExcelUploadView(APIView):
                         fecha, hora = periodo.split(', ') # Separar la fecha y la hora
                         print(f"Fila {row_index}, inversor: {nombre_inversor}, fecha: {fecha}, hora: {hora}, valor: {valor}")
 
-                        Produccion.objects.create( # Crear un objeto Produccion
+                        produccion = Produccion( # Crear un objeto Produccion
                             Dia=fecha,
                             Hora=hora,
                             cantidad=valor,
                             inversor=inversor
                         )
-"""
+                        producciones.append(produccion)
+
+            Produccion.objects.bulk_create(producciones)
+
             return Response({"message": "Archivo procesado correctamente"}, status=status.HTTP_200_OK)
         
         except Exception as e:
