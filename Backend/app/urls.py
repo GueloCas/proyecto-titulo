@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import InversorViewSet, ProduccionViewSet, ExcelUploadView, InversorProduccionView, InversorProduccionHoraView, VariableLinguisticaHoraView, InversorMinMaxHoraView, InversorProduccionEstadisticasView, InversorProduccionGradoPertenenciaView
+from .views import InversorViewSet, ProduccionViewSet, ExcelUploadView, InversorProduccionView, InversorProduccionHoraView, VariableLinguisticaHoraView, InversorMinMaxHoraView, InversorProduccionEstadisticasView, InversorProduccionGradoPertenenciaView, ObtenerPercepcionesComputacionalesView, ObtenerPercepcionesDiariasView
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -24,6 +24,8 @@ urlpatterns = [
     path("api/v1/produccion-por-inversor-grados/", InversorProduccionGradoPertenenciaView.as_view(), name="produccion-por-inversor-grados"),
     path("api/v1/min-max-hora/", InversorMinMaxHoraView.as_view(), name="min-max-hora"),
     path('api/v1/variable-linguistica-hora/', VariableLinguisticaHoraView.as_view(), name='variable-linguistica-hora'),
-
+    path('api/v1/percepciones-computacionales/', ObtenerPercepcionesComputacionalesView.as_view(), name='percepciones-computacionales'),
+    path('api/v1/percepciones-computacionales-dia/', ObtenerPercepcionesDiariasView.as_view(), name='percepciones-computacionales-dia'),
+    
 ]
 

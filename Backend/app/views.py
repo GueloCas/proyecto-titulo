@@ -7,7 +7,7 @@ from django.db.models import IntegerField, Min, Max, Avg
 from django.db.models.functions import Cast, Substr
 import pandas as pd
 
-from app.utils.functions import calcular_pertenencia_baja, calcular_pertenencia_media, calcular_pertenencia_alta, obtenerTerminosLinguisticos, obtenerEstadisticasProduccionesPorHora
+from app.utils.functions import calcular_pertenencia_baja, calcular_pertenencia_media, calcular_pertenencia_alta, obtenerTerminosLinguisticos, obtenerPercepcionComputacionalSegundoGrado
 
 class InversorViewSet(viewsets.ModelViewSet):
     queryset = Inversor.objects.all()
@@ -70,12 +70,10 @@ class InversorProduccionView(APIView):
             inversor = Inversor.objects.get(pk=inversor_id)
 
             # Agrupar las producciones por hora y calcular estadísticas agregadas
-            estadisticas_por_hora = obtenerEstadisticasProduccionesPorHora(inversor)
+            estadisticas_por_hora = inversor.obtener_MinMaxProm_producciones()
 
-            # Serializar producciones completas
-            producciones = Produccion.objects.filter(inversor=inversor).annotate(
-                hora_num=Cast(Substr('Hora', 2), IntegerField())  # Extraer número de la hora para poder ordenar
-            ).order_by('hora_num')
+            producciones = inversor.obtener_producciones_ordenHora()
+            
             serializer = ProduccionSerializer(producciones, many=True)
 
             # Crear respuesta
@@ -105,10 +103,11 @@ class InversorProduccionEstadisticasView(APIView):
             inversor = Inversor.objects.get(pk=inversor_id)
 
             # Agrupar las producciones por hora y calcular estadísticas agregadas
-            estadisticas_por_hora = obtenerEstadisticasProduccionesPorHora(inversor)
+            estadisticas_por_hora = inversor.obtener_MinMaxProm_producciones()
 
             # Serializar producciones completas
-            producciones = Produccion.objects.filter(inversor=inversor).order_by('Dia')
+            producciones = inversor.obtener_producciones()
+
             serializer = ProduccionSerializer(producciones, many=True)
 
             # Crear respuesta
@@ -138,7 +137,9 @@ class InversorProduccionHoraView(APIView):
         
         try:
             inversor = Inversor.objects.get(pk=inversor_id)
-            producciones = Produccion.objects.filter(inversor=inversor, Hora=hora)
+            horasdas = inversor.obtener_MinMaxProm_producciones_hora(hora)
+            print(horasdas)
+            producciones = inversor.obtener_producciones_hora(hora)
             serializer = ProduccionSerializer(producciones, many=True)
 
             response_data = {
@@ -168,8 +169,7 @@ class InversorMinMaxHoraView(APIView):
         
         try:
             inversor = Inversor.objects.get(pk=inversor_id)
-            producciones = Produccion.objects.filter(inversor=inversor, Hora=hora)
-            serializer = ProduccionSerializer(producciones, many=True)
+            producciones = inversor.obtener_producciones_hora(hora)
 
             response_data = {
                 'nombre_inversor': inversor.nombre, 
@@ -241,10 +241,10 @@ class InversorProduccionGradoPertenenciaView(APIView):
             inversor = Inversor.objects.get(pk=inversor_id)
             
             # Obtener las estadísticas por hora del inversor
-            estadisticas_por_hora = obtenerEstadisticasProduccionesPorHora(inversor)
+            estadisticas_por_hora = inversor.obtener_MinMaxProm_producciones()
             
             # Obtener las producciones del inversor
-            producciones = Produccion.objects.filter(inversor=inversor)
+            producciones = inversor.obtener_producciones()
             
             TLlist = []
 
@@ -296,14 +296,125 @@ class InversorProduccionGradoPertenenciaView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-"""         TLbaja = [round(min_value, 5), round(min_value, 5), round(min_value+L8, 5), round(min_value+(L8*3), 5)]
-            TLmedia = [round(MEDIA-(L8*3), 5), round(MEDIA-L8, 5), round(MEDIA+L8, 5), round(MEDIA+(L8*3), 5)]
-            TLalta = [round(max_value-(L8*3), 5), round(max_value-L8, 5), round(max_value, 5), round(max_value, 5)]
+class ObtenerPercepcionesComputacionalesView(APIView): 
+    def get(self, request, *args, **kwargs):
+        # Obtener el día y la hora de los parámetros de la solicitud
+        dia = request.query_params.get('dia')
+        hora = request.query_params.get('hora')
 
-    TLbaja = [round(min_value, 1), round(min_value, 1), round(min_value+L8, 1), round(min_value+(L8*3), 1)]
-    TLmedia = [round(MEDIA-(L8*3), 1), round(MEDIA-L8, 1), round(MEDIA+L8, 1), round(MEDIA+(L8*3), 1)]
-    TLalta = [round(max_value-(L8*3), 1), round(max_value-L8, 1), round(max_value, 1), round(max_value, 1)]  
-    
-    TLbaja = [min_value, min_value,min_value+L8,min_value+(L8*3)]
-    TLmedia = [MEDIA-(L8*3), MEDIA-L8, MEDIA+L8, MEDIA+(L8*3)]
-    TLalta = [max_value-(L8*3), max_value-L8, max_value, max_value]"""
+        if not dia:
+            return Response({"error": "Se requiere el parámetro 'dia'"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Lista para almacenar las percepciones de cada inversor
+            percepciones = []
+            
+            inversores = Inversor.objects.all()
+
+            for inversor in inversores:
+                # Filtrar la producción para el día y hora especificados
+                produccion = Produccion.objects.filter(Dia=dia, inversor=inversor, Hora=hora).values('cantidad').first()
+                
+                # Validar si hay producción en ese día y hora
+                if produccion:
+                    cantidad = produccion['cantidad']
+                    
+                    # Obtener las estadísticas de la hora para calcular los términos lingüísticos
+                    estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(hora).first()
+                    if estadisticas_hora:
+                        TLbaja, TLmedia, TLalta = obtenerTerminosLinguisticos(
+                            estadisticas_hora['cantidad_minima'], 
+                            estadisticas_hora['cantidad_maxima']
+                        )
+
+                        # Calcular las pertenencias
+                        pertenencia_baja = calcular_pertenencia_baja(cantidad, TLbaja)
+                        pertenencia_media = calcular_pertenencia_media(cantidad, TLmedia)
+                        pertenencia_alta = calcular_pertenencia_alta(cantidad, TLalta)
+
+                        # Agregar los datos al diccionario de percepciones
+                        percepciones.append({
+                            'inversor': inversor.nombre,
+                            'pertenencia_baja': pertenencia_baja,
+                            'pertenencia_media': pertenencia_media,
+                            'pertenencia_alta': pertenencia_alta
+                        })
+            
+            percepcionesSegundoGrado = obtenerPercepcionComputacionalSegundoGrado(percepciones)
+
+            # Preparar los datos para la respuesta
+            response_data = {
+                'percepciones_segundo_grado': percepcionesSegundoGrado
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ObtenerPercepcionesDiariasView(APIView):
+    def get(self, request, *args, **kwargs):
+        # Obtener el día de los parámetros de la solicitud
+        dia = request.query_params.get('dia')
+
+        if not dia:
+            return Response({"error": "Se requiere el parámetro 'dia'"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Lista para almacenar las percepciones por hora
+            percepciones_diarias = []
+
+            inversores = Inversor.objects.all()
+
+            # Recorrer cada hora desde las 8 hasta las 22
+            for hora in range(8, 23):
+                hora_str = f'H{hora}'
+                percepciones = []  # Lista para almacenar las percepciones de cada inversor en la hora actual
+                produccion_encontrada = False  # Bandera para verificar si se encontró producción en la hora actual
+
+                for inversor in inversores:
+                    # Filtrar la producción para el día y hora especificados
+                    produccion = Produccion.objects.filter(Dia=dia, inversor=inversor, Hora=hora_str).values('cantidad').first()
+                    
+                    # Validar si hay producción en ese día y hora para el inversor actual
+                    if produccion:
+                        produccion_encontrada = True
+                        cantidad = produccion['cantidad']
+                        
+                        # Obtener las estadísticas de la hora para calcular los términos lingüísticos
+                        estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(hora_str).first()
+                        if estadisticas_hora:
+                            TLbaja, TLmedia, TLalta = obtenerTerminosLinguisticos(
+                                estadisticas_hora['cantidad_minima'], 
+                                estadisticas_hora['cantidad_maxima']
+                            )
+
+                            # Calcular las pertenencias
+                            pertenencia_baja = calcular_pertenencia_baja(cantidad, TLbaja)
+                            pertenencia_media = calcular_pertenencia_media(cantidad, TLmedia)
+                            pertenencia_alta = calcular_pertenencia_alta(cantidad, TLalta)
+
+                            # Agregar los datos al diccionario de percepciones
+                            percepciones.append({
+                                'inversor': inversor.nombre,
+                                'pertenencia_baja': pertenencia_baja,
+                                'pertenencia_media': pertenencia_media,
+                                'pertenencia_alta': pertenencia_alta
+                            })
+
+                # Si se encontró producción en al menos un inversor para la hora actual, calcula el segundo grado y agrega a la lista diaria
+                if produccion_encontrada:
+                    percepciones_segundo_grado = obtenerPercepcionComputacionalSegundoGrado(percepciones)
+                    percepciones_diarias.append({
+                        'hora': hora,
+                        'percepciones_segundo_grado': percepciones_segundo_grado
+                    })
+
+            # Preparar los datos para la respuesta
+            return Response(percepciones_diarias, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+

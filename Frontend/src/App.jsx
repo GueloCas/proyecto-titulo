@@ -7,6 +7,9 @@ import { ProduccionGradosPage } from "./pages/ProduccionGradosPage"
 import { ProduccionEstadisticasPage } from "./pages/ProduccionEstadisticasPage"
 import { Navegacion } from "./components/Navegacion"
 import ProduccionVLPage from "./pages/ProduccionVLPage"
+import { PercepcionesComputacionalesDiaHoraPage } from "./pages/PercepcionesComputacionalesDiaHoraPage"
+import { PercepcionesComputacionalesDiaPage } from "./pages/PercepcionesComputacionalesDiaPage"
+import { PercepcionesComputacionalesPage } from "./pages/PercepcionesComputacionalesPage"
 
 function App() {
   return (
@@ -20,6 +23,9 @@ function App() {
         <Route path="/ProduccionInversor/VLinguisticas" element={<ProduccionVLPage />} />
         <Route path="/ProduccionInversor/Estadisticas/:id" element={<ProduccionEstadisticasPage />} />
         <Route path="/ProduccionInversor/Grados/:id" element={<ProduccionGradosPage />} />
+        <Route path="/PercepcionesComputacionales" element={<PercepcionesComputacionalesPage />} />
+        <Route path="/PercepcionesComputacionalesDiaHora" element={<PercepcionesComputacionalesDiaHoraPage />} />
+        <Route path="/PercepcionesComputacionalesDia" element={<PercepcionesComputacionalesDiaPage />} />
       </Routes>
     </BrowserRouter>
   )
