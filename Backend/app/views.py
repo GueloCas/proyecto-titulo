@@ -1,13 +1,18 @@
 from .models import Inversor, Produccion
-from .serializer import InversorSerializer, ProduccionSerializer
+from django.contrib.auth.models import User
+from .serializer import InversorSerializer, ProduccionSerializer, UserSerializer
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 from django.db.models import IntegerField, Min, Max, Avg
 from django.db.models.functions import Cast, Substr
 import pandas as pd
 
-from app.utils.functions import calcular_pertenencia_baja, calcular_pertenencia_media, calcular_pertenencia_alta, obtenerTerminosLinguisticos, obtenerPercepcionComputacionalSegundoGrado
+from django.shortcuts import get_object_or_404
+
+from app.utils.functions import calcular_pertenencia_baja, calcular_pertenencia_media, calcular_pertenencia_alta, obtenerPercepcionComputacionalPrimerGrado, obtenerPercepcionComputacionalSegundoGrado
 
 class InversorViewSet(viewsets.ModelViewSet):
     queryset = Inversor.objects.all()
@@ -206,7 +211,7 @@ class VariableLinguisticaHoraView(APIView):
             min_value = float(min_value)
             max_value = float(max_value)
 
-            TLbaja, TLmedia, TLalta = obtenerTerminosLinguisticos(min_value, max_value)
+            TLbaja, TLmedia, TLalta = obtenerPercepcionComputacionalPrimerGrado(min_value, max_value)
 
             # Calcular el grado de pertenencia del valor
             pertenencia_baja = calcular_pertenencia_baja(valor, TLbaja)
@@ -267,7 +272,7 @@ class InversorProduccionGradoPertenenciaView(APIView):
                 # Verificar si se encontraron estadísticas para la hora actual
                 if estadisticas_hora:
                     # Obtener los términos lingüísticos basados en los valores mínimos y máximos de esa hora
-                    TLbaja, TLmedia, TLalta = obtenerTerminosLinguisticos(
+                    TLbaja, TLmedia, TLalta = obtenerPercepcionComputacionalPrimerGrado(
                         estadisticas_hora['cantidad_minima'], 
                         estadisticas_hora['cantidad_maxima']
                     )
@@ -300,7 +305,6 @@ class InversorProduccionGradoPertenenciaView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 class ObtenerPercepcionesComputacionalesView(APIView): 
     def get(self, request, *args, **kwargs):
         # Obtener el día y la hora de los parámetros de la solicitud
@@ -327,7 +331,7 @@ class ObtenerPercepcionesComputacionalesView(APIView):
                     # Obtener las estadísticas de la hora para calcular los términos lingüísticos
                     estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(hora).first()
                     if estadisticas_hora:
-                        TLbaja, TLmedia, TLalta = obtenerTerminosLinguisticos(
+                        TLbaja, TLmedia, TLalta = obtenerPercepcionComputacionalPrimerGrado(
                             estadisticas_hora['cantidad_minima'], 
                             estadisticas_hora['cantidad_maxima']
                         )
@@ -388,7 +392,7 @@ class ObtenerPercepcionesDiariasView(APIView):
                         # Obtener las estadísticas de la hora para calcular los términos lingüísticos
                         estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(hora_str).first()
                         if estadisticas_hora:
-                            TLbaja, TLmedia, TLalta = obtenerTerminosLinguisticos(
+                            TLbaja, TLmedia, TLalta = obtenerPercepcionComputacionalPrimerGrado(
                                 estadisticas_hora['cantidad_minima'], 
                                 estadisticas_hora['cantidad_maxima']
                             )
@@ -420,6 +424,33 @@ class ObtenerPercepcionesDiariasView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['POST'])
+def login(request):
+    user = get_object_or_404(User, username=request.data['username'])
+
+    if not user.check_password(request.data['password']):
+        return Response({"error": "Contraseña incorrecta"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    token, created = Token.objects.get_or_create(user=user)
+    serializer = UserSerializer(instance=user)
+
+    return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def register(request):
+    serializer = UserSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+
+        user = User.objects.get(username=serializer.data['username'])
+        user.set_password(serializer.data['password'])
+        user.save()
+
+        token = Token.objects.create(user=user)
+        return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_201_CREATED)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 

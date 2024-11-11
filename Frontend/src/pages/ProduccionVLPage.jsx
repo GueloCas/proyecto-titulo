@@ -3,8 +3,10 @@ import LogicaDifusaChart from '../components/LogicaDifusaChart';
 
 const ProduccionVLPage = () => {
     return (
-        <div>
-            <LogicaDifusaChart />
+        <div className="container">
+            <div className="page-inner">
+                <LogicaDifusaChart />
+            </div>
         </div>
     );
 };

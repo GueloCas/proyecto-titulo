@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getPercepcionesComputacionalesDia } from "../api/inversores.api";
+import { getPercepcionesComputacionalesDia } from "../api/percepciones.api";
+import { getClassAndContent, determinarClaseCPEstacion } from "../utils/tablaHelpers";
 
 export function PCTablaDia({ dia }) {
     const [data, setData] = useState(null);
@@ -34,79 +35,9 @@ export function PCTablaDia({ dia }) {
         }
     }, [dia]);
 
-    const getClassAndContent = (percepcion) => {
-        const { pertenencia_baja, pertenencia_media, pertenencia_alta } = percepcion;
-        
-        if (pertenencia_baja >= pertenencia_media && pertenencia_baja >= pertenencia_alta) {
-            return {
-                className: "baja-mayor font-size-09",
-                content: (
-                    <div>
-                        <strong>Baja: {pertenencia_baja.toFixed(2)}</strong><br />
-                        Media: {pertenencia_media.toFixed(2)}<br />
-                        Alta: {pertenencia_alta.toFixed(2)}
-                    </div>
-                ),
-            };
-        } else if (pertenencia_media >= pertenencia_baja && pertenencia_media >= pertenencia_alta) {
-            return {
-                className: "media-mayor font-size-09",
-                content: (
-                    <div>
-                        Baja: {pertenencia_baja.toFixed(2)}<br />
-                        <strong>Media: {pertenencia_media.toFixed(2)}</strong><br />
-                        Alta: {pertenencia_alta.toFixed(2)}
-                    </div>
-                ),
-            };
-        } else {
-            return {
-                className: "alta-mayor font-size-09",
-                content: (
-                    <div>
-                        Baja: {pertenencia_baja.toFixed(2)}<br />
-                        Media: {pertenencia_media.toFixed(2)}<br />
-                        <strong>Alta: {pertenencia_alta.toFixed(2)}</strong>
-                    </div>
-                ),
-            };
-        }
-    };
-
-    const determinarClaseCPEstacion = (percepcion) => {
-        if (percepcion.pertenencia_regular === 1) {
-            return "alta-mayor font-size-09";
-        } else if (percepcion.pertenencia_mala >= percepcion.pertenencia_normal && percepcion.pertenencia_mala !== 0) {
-            return "baja-mayor font-size-09";
-        } else if (percepcion.pertenencia_normal >= percepcion.pertenencia_excelente) {
-            return "media-mayor font-size-09";
-        } else {
-            return "alta-mayor font-size-09";
-        }
-    };
-
     return (
         <div>
-            <style>
-                {`
-                .baja-mayor {
-                    background-color: #fcc1b4 !important;
-                }
-                
-                .media-mayor {
-                    background-color: #fbe3a3 !important;
-                }
-                
-                .alta-mayor {
-                    background-color: #d3fcb4 !important;
-                }
-
-                .font-size-09 {
-                    font-size: 0.7rem;
-                }
-                `}
-            </style>
-            <h2>Tabla de percepciones computacionales</h2>
+            <h2>Tabla de percepciones computacionales 2° Grado</h2>
             {error && <div className="alert alert-danger">{error}</div>}
             {data && !error ? (
                 <div>
@@ -123,7 +54,7 @@ export function PCTablaDia({ dia }) {
                         <tbody>
                             {data.map((horaData, idx) => (
                                 <tr key={idx}>
-                                    <td className="font-size-09">{`${dia}, H${horaData.hora}`}</td>
+                                    <td className="fs-07">{`${dia}, H${horaData.hora}`}</td>
                                     {inversoresUnicos.map((inversor) => {
                                         const percepcion = horaData.percepciones_segundo_grado.find(
                                             (p) => p.inversor === inversor
@@ -135,14 +66,10 @@ export function PCTablaDia({ dia }) {
                                             return <td key={inversor}>-</td>;
                                         }
                                     })}
-                                    <td className={determinarClaseCPEstacion(horaData.percepciones_segundo_grado.at(-1))}>
-                                        <div>
-                                            M: {horaData.percepciones_segundo_grado.at(-1)?.pertenencia_mala}<br />
-                                            N: {horaData.percepciones_segundo_grado.at(-1)?.pertenencia_normal}<br />
-                                            E: {horaData.percepciones_segundo_grado.at(-1)?.pertenencia_excelente}<br />
-                                            R: {horaData.percepciones_segundo_grado.at(-1)?.pertenencia_regular}
-                                        </div>
-                                    </td>
+                                    {(() => {
+                                        const { className, content } = determinarClaseCPEstacion(horaData.percepciones_segundo_grado.at(-1));
+                                        return <td className={className}>{content}</td>;
+                                    })()}
                                 </tr>
                             ))}
                         </tbody>

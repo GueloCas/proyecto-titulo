@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getProduccionPorInversorHora } from "../api/inversores.api";
+import { getProduccionPorInversorHora } from "../api/produccion.api";
 import { Link } from "react-router-dom";
 import ApexCharts from "apexcharts"; 
 

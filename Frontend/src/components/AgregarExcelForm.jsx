@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios"; // Asegúrate de instalar axios
+import { useDropzone } from "react-dropzone"; // Importa useDropzone
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const AgregarExcelForm = () => {
@@ -7,10 +8,21 @@ const AgregarExcelForm = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleFileUpload = (e) => {
-    setSelectedFile(e.target.files[0]); // Almacena el archivo seleccionado
-  };
-
+  // Configuración de dropzone
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0) {
+        const file = acceptedFiles[0];
+        if (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || 
+            file.type === "application/vnd.ms-excel") {
+          setSelectedFile(file);
+        } else {
+          alert("Archivo no válido, selecciona un archivo Excel.");
+        }
+      }
+    }
+  });
+  
   const handleSubmit = async () => {
     if (!selectedFile) {
       alert("Por favor, selecciona un archivo");
@@ -18,9 +30,9 @@ const AgregarExcelForm = () => {
     }
 
     const formData = new FormData();
-    formData.append("file", selectedFile); // Envia el archivo como parte del form
+    formData.append("file", selectedFile);
 
-    setLoading(true); // Muestra el mensaje de cargando
+    setLoading(true);
 
     try {
       const response = await axios.post("http://localhost:8000/api/v1/upload-excel/", formData, {
@@ -29,33 +41,51 @@ const AgregarExcelForm = () => {
         },
       });
       console.log("Respuesta del servidor:", response.data);
-      navigate("/Inversores");
+      navigate("/inversores");
     } catch (error) {
       console.error("Error subiendo el archivo:", error);
     } finally {
-      setLoading(false); // Restablece el estado de loading después de recibir la respuesta
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container mt-2">
-      <h3 className="pt-3">Cargar archivo Excel</h3>
-      {!loading && ( // Muestra el input solo si no está cargando
-        <div className="input-group mb-3">
-          <input type="file" className="form-control" accept=".xlsx, .xls" onChange={handleFileUpload} />
-          <button className="btn text-light" onClick={handleSubmit} style={{ backgroundColor: '#a81a1a' }}>Subir Archivo</button>
-        </div>
-      )}
-      {loading &&
-        <div className="d-flex justify-content-center">
-          <div className="spinner-border" role="status">
-            <span className="visually-hidden">Loading...</span>
+    <div className="d-flex justify-content-center align-items-center">
+      <div className="card" style={{ width: "50rem" }}>
+        <div className="card-body text-center">
+          <h5 className="card-title">Seleccionar archivo</h5>
+          <div
+            {...getRootProps()} // Spread de las propiedades de dropzone
+            className="dropzone"
+            style={{
+              border: "2px dashed #ccc",
+              padding: "30px",
+              cursor: "pointer",
+              textAlign: "center",
+            }}
+          >
+            <input
+              {...getInputProps()}
+              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+            />
+            {selectedFile ? (
+              <p>{selectedFile.name}</p> // Muestra el nombre del archivo seleccionado
+            ) : (
+              <p>Arrastra y suelta un archivo o haz clic para seleccionarlo</p>
+            )}
           </div>
-        </div>} {/* Muestra el mensaje de carga si loading es true */}
+
+          <button
+            className="btn btn-danger mt-3"
+            onClick={handleSubmit}
+            disabled={!selectedFile || loading}
+          >
+            {loading ? "Cargando..." : "Subir"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
 
 export default AgregarExcelForm;
-
-

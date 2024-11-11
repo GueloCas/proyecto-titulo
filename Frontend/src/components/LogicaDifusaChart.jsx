@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ApexCharts from 'apexcharts';
-import { getProduccionPorInversorHora, getProduccionVLinguisticas } from '../api/inversores.api';
+import { getProduccionVLinguisticas } from '../api/percepciones.api';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { getProduccionPorInversorHora } from '../api/produccion.api';
 
 const LogicaDifusaChart = () => {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ const LogicaDifusaChart = () => {
     const [dataLabel, setDataLabel] = useState(cantidad);
     const [inputValue, setInputValue] = useState(cantidad);
 
-   console.log('Hora:', min);
+    console.log('Hora:', min);
 
     async function fetchMinMaxAndData() {
         try {
@@ -209,43 +210,44 @@ const LogicaDifusaChart = () => {
     };
 
     return (
-        <div className='container'>
-            <div className="mt-3 d-flex justify-content-between align-items-center">
-                <h1 className='mt-3'>Producción en hora: {hora}, día: {dia}</h1>
-                <Link to={`/ProduccionInversor/${id}`} className=" text-decoration-none">
-                    <button className="btn btn-success">Volver</button>
-                </Link>
+        <>
+            <div className='card p-4 mt-2 border-0 rounded-3 mb-4'>
+                <div className="d-flex justify-content-between align-items-center">
+                    <h1 className='mb-3 mt-2 fw-bold'>Producción en hora: {hora}, día: {dia}</h1>
+                    <Link to={`/ProduccionInversor/${id}`} className=" text-decoration-none">
+                        <button className="btn btn-success">Volver</button>
+                    </Link>
+                </div>
+                <div id="logicaDifusaChart"></div>
+                <div className="text-center">
+                    <span className="badge" style={{ backgroundColor: dataVL?.pertenencia.baja > 0 ? '#77B6EA' : '#ddd', margin: '0 5px', fontSize: '18px' }}>
+                        Baja: {dataVL?.pertenencia.baja.toFixed(2)}
+                    </span>
+                    <span className="badge" style={{ backgroundColor: dataVL?.pertenencia.media > 0 ? '#545454' : '#ddd', margin: '0 5px', fontSize: '18px' }}>
+                        Media: {dataVL?.pertenencia.media.toFixed(2)}
+                    </span>
+                    <span className="badge" style={{ backgroundColor: dataVL?.pertenencia.alta > 0 ? '#FF4560' : '#ddd', margin: '0 5px', fontSize: '18px' }}>
+                        Alta: {dataVL?.pertenencia.alta.toFixed(2)}
+                    </span>
+                </div>
+                <div className="mt-3 d-flex align-items-center justify-content-center">
+                    <input
+                        type="number"
+                        className="form-control w-25 me-2"
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        placeholder="Simular un valor"
+                        min={min} // Establece el valor mínimo
+                        max={max} // Establece el valor máximo
+                        step={0.1} // Establece el incremento
+                    />
+                    <button className="btn btn-primary" onClick={handleSubmit}>Enviar</button>
+                </div>
             </div>
-            <div id="logicaDifusaChart"></div>
-            <div className="text-center">
-                <span className="badge" style={{ backgroundColor: dataVL?.pertenencia.baja > 0 ? '#77B6EA' : '#ddd', margin: '0 5px', fontSize: '18px' }}>
-                    Baja: {dataVL?.pertenencia.baja.toFixed(2)}
-                </span>
-                <span className="badge" style={{ backgroundColor: dataVL?.pertenencia.media > 0 ? '#545454' : '#ddd', margin: '0 5px', fontSize: '18px' }}>
-                    Media: {dataVL?.pertenencia.media.toFixed(2)}
-                </span>
-                <span className="badge" style={{ backgroundColor: dataVL?.pertenencia.alta > 0 ? '#FF4560' : '#ddd', margin: '0 5px', fontSize: '18px' }}>
-                    Alta: {dataVL?.pertenencia.alta.toFixed(2)}
-                </span>
-            </div>
-            <div className="mt-3 d-flex align-items-center justify-content-center">
-                <input
-                    type="number"
-                    className="form-control w-25 me-2"
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    placeholder="Simular un valor"
-                    min={min} // Establece el valor mínimo
-                    max={max} // Establece el valor máximo
-                    step={0.1} // Establece el incremento
-                />
-                <button className="btn btn-primary" onClick={handleSubmit}>Enviar</button>
-            </div>
-
-            <div className="mt-3 d-flex">
-                <div className='w-50'>
+            <div className="d-flex gap-4">
+                <div className='card w-50 p-4 border-0 rounded-3'>
                     <h3>Valores de las Variables Lingüísticas</h3>
-                    <span>Min: {min}</span><br />
+                    <span>Min: {min}</span>
                     <span>Max: {max}</span>
                     {dataVL && (
                         <div>
@@ -255,9 +257,9 @@ const LogicaDifusaChart = () => {
                         </div>
                     )}
                 </div>
-                <div className='w-50'>
+                <div className='card w-50 p-4 border-0 rounded-3'>
                     <h3>Producción Seleccionada</h3>
-                    <span>Valor: {dataLabel}</span><br />
+                    <span>Valor: {dataLabel}</span>
                     <span>Grado de Pertenencia:</span>
                     {dataLabel !== undefined && dataVL && dataVL.pertenencia ? (
                         <div>
@@ -270,7 +272,7 @@ const LogicaDifusaChart = () => {
                     )}
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

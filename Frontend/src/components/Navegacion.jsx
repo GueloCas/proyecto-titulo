@@ -1,21 +1,28 @@
+import { useNavigate } from "react-router-dom";
+import { logout } from "../api/auth.api";
+
 export function Navegacion() {
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
+
     return (
-        <nav className="navbar navbar-expand-lg py-3" style={{ backgroundColor: '#1E3A5F' }}>
-            <div className="container-fluid justify-content-center w-auto">
-                <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul className="navbar-nav me-auto mb-2 mb-lg-0 ">
-                        <li className="nav-item"> 
-                            <a className="nav-link text-light border border-light border-opacity-50 rounded" href="/agregar-excel">Cargar Excel</a>
+        <div className="main-header">
+            <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom" style={{ backgroundColor: '#1E3A5F' }}>
+                <div className="container-fluid" id="navbarSupportedContent">
+                    <ul className="navbar-nav topbar-nav ms-md-auto align-items-end me-4">
+                        <li className="nav-item">
+                            <a className="nav-link text-light border border-light border-opacity-50 rounded" href="#">Guia de Uso</a>
                         </li>
-                        <li className="nav-item ps-2">
-                            <a className="nav-link text-light border border-light border-opacity-50 rounded" aria-current="page" href="/Inversores">Inversores</a>
-                        </li>
-                        <li className="nav-item ps-2">
-                            <a className="nav-link text-light border border-light border-opacity-50 rounded" aria-current="page" href="/PercepcionesComputacionales">Percepciones</a>
+                        <li className="nav-item">
+                            <button className="nav-link text-light border border-light border-opacity-50 rounded" onClick={handleLogout}>Cerrar Sesión</button>
                         </li>
                     </ul>
                 </div>
-            </div>
-        </nav>
-    )
+
+            </nav>
+        </div>
+    );
 }

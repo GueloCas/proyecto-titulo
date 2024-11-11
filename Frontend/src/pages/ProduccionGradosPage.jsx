@@ -9,6 +9,7 @@ export function ProduccionGradosPage() {
 
     return (
         <div className="container px-4 pt-2">
+            <div className="page-inner">
             <div className="mt-1 d-flex justify-content-between align-items-center">
                 <h1>Grados de Pertenencia de inversor: {nombreInversor}</h1>
                 <div className="d-flex justify-content-right align-items-center">
@@ -32,6 +33,7 @@ export function ProduccionGradosPage() {
             </div>
 
             <ProduccionGrados id={id}/>
+            </div>
         </div>
     );
 }

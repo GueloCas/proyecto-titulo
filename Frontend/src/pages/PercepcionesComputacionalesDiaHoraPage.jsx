@@ -33,54 +33,56 @@ export function PercepcionesComputacionalesDiaHoraPage() {
 
     return (
         <div className="container px-4 pt-2">
-            <div className="d-flex my-2 justify-content-between align-items-center">
-                <h1 className="mb-2">Percepciones Computacionales por Día y Hora</h1>
-                <div className="d-flex justify-content-right align-items-end">
-                    <Link to={`/PercepcionesComputacionalesDia`} className="text-decoration-none">
-                        <button
-                            className="btn btn-outline-secondary ms-4"
-                        >
-                            Ver por Día
-                        </button>
-                    </Link>
-                    <Link to={`/PercepcionesComputacionales`} className="text-decoration-none">
-                        <button
-                            className="btn btn-success ms-4"
-                        >
-                            Volver
-                        </button>
-                    </Link>
+            <div className="page-inner">
+                <div className="d-flex my-2 justify-content-between align-items-center">
+                    <h1 className="mb-3 mt-2 fw-bold">Percepciones Computacionales por Día y Hora</h1>
+                    <div className="d-flex justify-content-right align-items-end">
+                        <Link to={`/PercepcionesComputacionalesDia`} className="text-decoration-none">
+                            <button
+                                className="btn btn-outline-secondary ms-4"
+                            >
+                                Ver por Día
+                            </button>
+                        </Link>
+                        <Link to={`/PercepcionesComputacionales`} className="text-decoration-none">
+                            <button
+                                className="btn btn-success ms-4"
+                            >
+                                Volver
+                            </button>
+                        </Link>
+                    </div>
                 </div>
-            </div>
-            {mensajeError && <div className="alert alert-danger">{mensajeError}</div>}
-            <div className="d-flex mb-3 justify-content-start">
-                <div className="me-3">
-                    <select id="diaSelect" className="form-select form-select-sm" value={dia} onChange={handleDiaChange}>
-                        <option value="">Selecciona un día</option>
-                        {Array.from({ length: 31 }, (_, i) => {
-                            const day = String(i + 1).padStart(2, '0'); // Asegura que el día tenga 2 dígitos
-                            return (
-                                <option key={day} value={`${day}-${month}-${year}`}>
-                                    {day}-{month}-{year}
-                                </option>
-                            );
-                        })}
-                    </select>
+                {mensajeError && <div className="alert alert-danger">{mensajeError}</div>}
+                <div className="d-flex mb-3 justify-content-start">
+                    <div className="me-3">
+                        <select id="diaSelect" className="form-select form-select-sm" value={dia} onChange={handleDiaChange}>
+                            <option value="">Selecciona un día</option>
+                            {Array.from({ length: 31 }, (_, i) => {
+                                const day = String(i + 1).padStart(2, '0'); // Asegura que el día tenga 2 dígitos
+                                return (
+                                    <option key={day} value={`${day}-${month}-${year}`}>
+                                        {day}-{month}-{year}
+                                    </option>
+                                );
+                            })}
+                        </select>
+                    </div>
+                    <div>
+                        <select id="horaSelect" className="form-select form-select-sm" value={hora} onChange={handleHoraChange}>
+                            <option value="">Selecciona una hora</option>
+                            {Array.from({ length: 15 }, (_, i) => (
+                                <option key={i + 8} value={'H' + (i + 8)}>{i + 8}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className='d-flex align-items-end'>
+                        <button className="btn btn-primary ms-3 btn-sm" onClick={handleObtenerPC}>Obtener PC</button>
+                    </div>
                 </div>
-                <div>
-                    <select id="horaSelect" className="form-select form-select-sm" value={hora} onChange={handleHoraChange}>
-                        <option value="">Selecciona una hora</option>
-                        {Array.from({ length: 15 }, (_, i) => (
-                            <option key={i + 8} value={'H' + (i + 8)}>{i + 8}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className='d-flex align-items-end'>
-                    <button className="btn btn-primary ms-3 btn-sm" onClick={handleObtenerPC}>Obtener PC</button>
-                </div>
-            </div>
 
-            {mostrar && <PCTablaDiaHora dia={dia} hora={hora} />}
+                {mostrar && <PCTablaDiaHora dia={dia} hora={hora} />}
+            </div>
         </div>
     );
 }

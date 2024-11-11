@@ -35,8 +35,7 @@ def calcular_pertenencia_alta(valor, TL):
     else:
         return 1  # Totalmente alto
     
-def obtenerTerminosLinguisticos(min_value, max_value):
-
+def obtenerPercepcionComputacionalPrimerGrado(min_value, max_value):
     # Calcular L8 y MEDIA
     L8 = (max_value - min_value) / 8
     MEDIA = (min_value + max_value) / 2

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getPercepcionesComputacionales } from "../api/inversores.api";
+import { getPercepcionesComputacionales } from "../api/percepciones.api";
 
 export function PCTablaDiaHora({ dia, hora }) {
     const [data, setData] = useState(null); // Estado para almacenar los datos
@@ -25,21 +25,6 @@ export function PCTablaDiaHora({ dia, hora }) {
 
     return (
         <div>
-            <style>
-                {`
-                .baja-mayor {
-                    --bs-table-bg: #fcc1b4 !important;
-                }
-                
-                .media-mayor {
-                    --bs-table-bg: #fbe3a3 !important;
-                }
-                
-                .alta-mayor {
-                    --bs-table-bg: #d3fcb4 !important;
-                }
-                `}
-            </style>
             <h2>Tabla de percepciones computacionales</h2>
             {error && <div className="alert alert-danger">{error}</div>}
             {data && !error ? (
@@ -80,15 +65,15 @@ export function PCTablaDiaHora({ dia, hora }) {
                         </tbody>
                     </table>
 
-                    <div className="mt-3 d-flex">
-                        <div className='w-50'>{/* Muestra las estadísticas usando el último elemento de data */}
-                            <h3 className="mt-2">Estadísticas</h3>
+                    <div className="mt-3 d-flex gap-3">
+                        <div className='card w-50 p-4 border-0 rounded-3'>{/* Muestra las estadísticas usando el último elemento de data */}
+                            <h3>Estadísticas</h3>
                             <span>Media: {data[data.length - 1]?.value_mean}</span><br />
                             <span>Varianza: {data[data.length - 1]?.variance}</span><br />
                             <span>Desviación Estándar: {data[data.length - 1]?.standard_deviation}</span>
                         </div>
-                        <div className='w-50'>{/* Muestra las estadísticas usando el último elemento de data */}
-                            <h3 className="mt-2">CP Estación</h3>
+                        <div className='card w-50 p-4  border-0 rounded-3'>{/* Muestra las estadísticas usando el último elemento de data */}
+                            <h3>CP Estación</h3>
                             <span>Mala: {data[data.length - 1]?.pertenencia_mala}</span><br />
                             <span>Normal: {data[data.length - 1]?.pertenencia_normal}</span><br />
                             <span>Excelente: {data[data.length - 1]?.pertenencia_excelente}</span><br />

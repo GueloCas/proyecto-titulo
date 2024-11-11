@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { ProduccionTabla } from "../components/ProduccionTabla";
 import { ProduccionEstadisticas } from "../components/ProduccionEstadisticas";
 import { useEffect, useState } from "react";
-import { getProduccionPorInversor } from "../api/inversores.api";
+import { getProduccionPorInversor } from "../api/produccion.api";
 
 export function ProduccionInversorPage() {
     const { id } = useParams();
@@ -31,29 +31,31 @@ export function ProduccionInversorPage() {
     }, [id]);
 
     return (
-        <div className="container px-4 pt-2">
-            <div className="mt-1 d-flex justify-content-between align-items-center">
-                <h1>Producción de inversor: {nombreInversor}</h1>
-                <div className="d-flex justify-content-right align-items-center">
-                    <Link to={`/ProduccionInversor/Estadisticas/${id}?inversor=${nombreInversor}`} className="text-decoration-none">
-                        <button
-                            className="btn btn-outline-secondary ms-4"
-                            style={{ height: "38px" }}
-                        >
-                            Ver Tabla Estadisticas
-                        </button>
-                    </Link>
-                    <Link to={`/ProduccionInversor/Grados/${id}?inversor=${nombreInversor}`} className="text-decoration-none">
-                        <button
-                            className="btn btn-outline-secondary ms-4"
-                            style={{ height: "38px" }}
-                        >
-                            Ver Tabla Grados
-                        </button>
-                    </Link>
+        <div className="container">
+            <div className="page-inner">
+                <div className="mt-1 d-flex justify-content-between align-items-center">
+                    <h1>Producción de inversor: {nombreInversor}</h1>
+                    <div className="d-flex justify-content-right align-items-center">
+                        <Link to={`/ProduccionInversor/Estadisticas/${id}?inversor=${nombreInversor}`} className="text-decoration-none">
+                            <button
+                                className="btn btn-outline-secondary ms-4"
+                                style={{ height: "38px" }}
+                            >
+                                Ver Tabla Estadisticas
+                            </button>
+                        </Link>
+                        <Link to={`/ProduccionInversor/Grados/${id}?inversor=${nombreInversor}`} className="text-decoration-none">
+                            <button
+                                className="btn btn-outline-secondary ms-4"
+                                style={{ height: "38px" }}
+                            >
+                                Ver Tabla Grados
+                            </button>
+                        </Link>
+                    </div>
                 </div>
+                <ProduccionTabla produccion={produccion} diasUnicos={diasUnicos} horasUnicas={horasUnicas} id={id} nombreInversor={nombreInversor} />
             </div>
-            <ProduccionTabla produccion={produccion} diasUnicos={diasUnicos} horasUnicas={horasUnicas} id={id} nombreInversor={nombreInversor} />
         </div>
     );
 }
