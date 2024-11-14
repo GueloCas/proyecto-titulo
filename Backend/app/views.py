@@ -1,16 +1,16 @@
 from .models import Inversor, Produccion
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User # type: ignore
 from .serializer import InversorSerializer, ProduccionSerializer, UserSerializer
-from rest_framework import viewsets, status
-from rest_framework.views import APIView
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-from django.db.models import IntegerField, Min, Max, Avg
-from django.db.models.functions import Cast, Substr
-import pandas as pd
+from rest_framework import viewsets, status # type: ignore
+from rest_framework.views import APIView # type: ignore
+from rest_framework.decorators import api_view # type: ignore
+from rest_framework.response import Response # type: ignore
+from rest_framework.authtoken.models import Token # type: ignore
+from django.db.models import IntegerField, Min, Max, Avg # type: ignore
+from django.db.models.functions import Cast, Substr # type: ignore
+import pandas as pd # type: ignore
 
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404 # type: ignore
 
 from app.utils.functions import calcular_pertenencia_baja, calcular_pertenencia_media, calcular_pertenencia_alta, obtenerPercepcionComputacionalPrimerGrado, obtenerPercepcionComputacionalSegundoGrado
 
