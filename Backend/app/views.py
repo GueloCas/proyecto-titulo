@@ -1,6 +1,6 @@
-from .models import Inversor, Produccion
+from .models import Inversor, Produccion, Estacion
 from django.contrib.auth.models import User # type: ignore
-from .serializer import InversorSerializer, ProduccionSerializer, UserSerializer
+from .serializer import InversorSerializer, ProduccionSerializer, UserSerializer, EstacionSerializer
 from rest_framework import viewsets, status # type: ignore
 from rest_framework.views import APIView # type: ignore
 from rest_framework.decorators import api_view # type: ignore
@@ -14,6 +14,10 @@ from django.shortcuts import get_object_or_404 # type: ignore
 
 from app.utils.functions import calcular_pertenencia_baja, calcular_pertenencia_media, calcular_pertenencia_alta, obtenerPercepcionComputacionalPrimerGrado, obtenerPercepcionComputacionalSegundoGrado
 
+
+class EstacionViewSet(viewsets.ModelViewSet):
+    queryset = Estacion.objects.all()
+    serializer_class = EstacionSerializer
 class InversorViewSet(viewsets.ModelViewSet):
     queryset = Inversor.objects.all()
     serializer_class = InversorSerializer
@@ -31,30 +35,36 @@ class ExcelUploadView(APIView):
             return Response({"error": "No se envió ningún archivo"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            # Lee el archivo Excel usando pandas
-            df = pd.read_excel(file, header=None)
+            # Lee el archivo Excel y obtiene el nombre de la hoja
+            xls = pd.ExcelFile(file)
+            sheet_name = xls.sheet_names[0]
+            df = pd.read_excel(xls, sheet_name=sheet_name, header=None)
+
+            # Crear o recuperar la estación usando el nombre de la hoja
+            estacion, created = Estacion.objects.get_or_create(nombre=sheet_name)
+            print(f"Estación '{sheet_name}' {'creada' if created else 'recuperada'} con ID: {estacion.id}")
 
             producciones = []
             
             # Recorre las columnas de la hoja de Excel
             for col_index in range(1, len(df.columns)):
                 # Obtener el nombre del inversor (primera casilla de la columna)
-                nombre_inversor = df.iloc[0, col_index]  # Primer valor de la columna
+                nombre_inversor = df.iloc[0, col_index]
                 print(f"Nombre del Inversor en Columna {col_index + 1}: {nombre_inversor}")
 
-                inversor = Inversor.objects.create(nombre=nombre_inversor)
+                inversor = Inversor.objects.create(nombre=nombre_inversor, estacion=estacion)
                 print(f"Inversor creado con ID: {inversor.id}")
                 
                 # Iterar hacia abajo en la columna, comenzando desde la fila 1
                 for row_index in range(1, len(df)):
-                    valor = df.iloc[row_index, col_index]  # Obtener el valor en la fila actual
+                    valor = df.iloc[row_index, col_index]
 
-                    if pd.notna(valor): # Si el valor no es nulo
-                        periodo = df.iloc[row_index, 0] # Obtener el periodo de tiempo
-                        fecha, hora = periodo.split(', ') # Separar la fecha y la hora
+                    if pd.notna(valor):  # Si el valor no es nulo
+                        periodo = df.iloc[row_index, 0]  # Obtener el periodo de tiempo
+                        fecha, hora = periodo.split(', ')  # Separar la fecha y la hora
                         print(f"Fila {row_index}, inversor: {nombre_inversor}, fecha: {fecha}, hora: {hora}, valor: {valor}")
 
-                        produccion = Produccion( # Crear un objeto Produccion
+                        produccion = Produccion(  # Crear un objeto Produccion
                             Dia=fecha,
                             Hora=hora,
                             cantidad=valor,

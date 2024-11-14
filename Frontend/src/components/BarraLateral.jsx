@@ -116,7 +116,7 @@ export function BarraLateral() {
                             <div className={`collapse ${isShow('/inversores')}`} id="inversores">
                                 <ul className="nav nav-collapse">
                                     <li>
-                                        <a href="charts/charts.html">
+                                        <a href="/estaciones">
                                             <span className="sub-item">Ver Estaciones</span>
                                         </a>
                                     </li>

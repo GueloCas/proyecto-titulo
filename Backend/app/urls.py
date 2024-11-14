@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import InversorViewSet, ProduccionViewSet, ExcelUploadView, InversorProduccionView, InversorProduccionHoraView, VariableLinguisticaHoraView, InversorMinMaxHoraView, InversorProduccionEstadisticasView, InversorProduccionGradoPertenenciaView, ObtenerPercepcionesComputacionalesView, ObtenerPercepcionesDiariasView
+from .views import EstacionViewSet, InversorViewSet, ProduccionViewSet, ExcelUploadView, InversorProduccionView, InversorProduccionHoraView, VariableLinguisticaHoraView, InversorMinMaxHoraView, InversorProduccionEstadisticasView, InversorProduccionGradoPertenenciaView, ObtenerPercepcionesComputacionalesView, ObtenerPercepcionesDiariasView
 from .views import login, register
 
 from drf_yasg.views import get_schema_view
@@ -12,6 +12,7 @@ schema_view = get_schema_view(
 )
 
 router = routers.DefaultRouter()
+router.register(r'estacion', EstacionViewSet, 'estacion')
 router.register(r'inversor', InversorViewSet, 'inversor')
 router.register(r'produccion', ProduccionViewSet, 'produccion')
 

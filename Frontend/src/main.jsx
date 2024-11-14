@@ -3,6 +3,7 @@ import '../scss/custom.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from './pages/Root.jsx';  // La página raíz que contendrá las rutas principales
 import ErrorPage from './pages/ErrorPage.jsx';  // Página para manejar errores
+import { EstacionesPage } from "./pages/EstacionesPage";
 import { InversoresPage } from "./pages/InversoresPage";
 import { ProduccionInversorPage } from "./pages/ProduccionInversorPage";
 import { ProduccionGraficoPage } from "./pages/ProduccionGraficoPage";
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <App />,  // Página pública de inicio
+      },
+      {
+        path: "/estaciones",
+        element: <EstacionesPage />,
       },
       {
         path: "/inversores",
