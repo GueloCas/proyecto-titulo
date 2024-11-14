@@ -2,8 +2,15 @@ from django.db import models
 from django.db.models import IntegerField, Min, Max, Avg
 from django.db.models.functions import Cast, Substr
 
+
+class Estacion(models.Model):
+    nombre = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.nombre
 class Inversor(models.Model):
     nombre = models.CharField(max_length=200)
+    estacion = models.ForeignKey(Estacion, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.nombre
