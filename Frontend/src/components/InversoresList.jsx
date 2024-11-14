@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { getInversores } from "../api/inversores.api";
+import { deleteInversor, getInversores } from "../api/inversor.api";
 import { Link } from "react-router-dom";
 
 export function InversoresList() {
   const [inversores, setInversores] = useState([]);
-  const [inversorSeleccionado, setInversorSeleccionado] = useState(null);
 
   useEffect(() => {
     async function loadInversores() {
@@ -14,55 +13,58 @@ export function InversoresList() {
     loadInversores();
   }, []);
 
-  const handleInversorSeleccionado = (inversor) => {
-    setInversorSeleccionado(inversor);
-    setInversores([]); // Limpiar la lista de inversores
-  };
-
-  const handleSeleccionarOtroInversor = () => {
-    setInversorSeleccionado(null); // Restablecer el inversor seleccionado
-    loadInversores(); // Volver a cargar la lista de inversores
+  const handleDeleteInversor = (id) => {
+    return async () => {
+      await deleteInversor(id);
+      const data = await getInversores();
+      setInversores(data);
+    };
   };
 
   return (
-    <div className="d-grid gap-2 d-md-block">
-      {inversorSeleccionado ? ( // Si hay un inversor seleccionado
-        <div>
-          <h4>Inversor Seleccionado: {inversorSeleccionado.nombre}</h4>
-          <div className="d-flex mb-2">
-            <button
-              className="btn btn-warning me-2"
-              onClick={handleSeleccionarOtroInversor} // Lógica para seleccionar otro inversor
-            >
-              Seleccionar Otro
-            </button>
-            <Link to={`/ProduccionInversor/${inversorSeleccionado.id}`} className="btn btn-primary me-2">
-              Ver Producción
-            </Link>
-            <Link to={`/ProduccionInversor/Estadisticas/${inversorSeleccionado.id}?inversor=${inversorSeleccionado.nombre}`} className="btn btn-secondary me-2">
-              Ver Estadísticas
-            </Link>
-            <Link to={`/ProduccionInversor/Grados/${inversorSeleccionado.id}?inversor=${inversorSeleccionado.nombre}`} className="btn btn-success me-2">
-              Ver Grados
-            </Link>
-          </div>
-        </div>
+    <div className="row g-4">
+      {inversores.length === 0 ? (
+        <p>No existen inversores</p>
       ) : (
-        inversores.length === 0 ? (
-          <p>No existen inversores</p>
-        ) : (
-          inversores.map(inversor => (
-            <button
-              className="btn me-2"
-              type="button"
-              key={inversor.id}
-              style={{ backgroundColor: '#a81a1a', color: 'white' }}
-              onClick={() => handleInversorSeleccionado(inversor)} // Manejar la selección del inversor
-            >
-              {inversor.nombre}
-            </button>
-          ))
-        )
+        inversores.map((inversor) => (
+          <div key={inversor.id} className="col-md-3">
+            <div className="card rounded-3 border-0 mb-0">
+              <div className="card-body">
+                <h5 className="card-title">{inversor.nombre}</h5>
+                <div className="d-flex flex-wrap gap-2 mt-3">
+                  <Link
+                    to={`/ProduccionInversor/${inversor.id}`}
+                    className="btn btn-primary text-light rounded-3"
+                  >
+                    Ver Producción
+                  </Link>
+                  <Link
+                    to={`/ProduccionInversor/Estadisticas/${inversor.id}?inversor=${inversor.nombre}`}
+                    className="btn btn-secondary rounded-3"
+                  >
+                    Ver Estadísticas
+                  </Link>
+                  <button
+                    onClick={handleDeleteInversor(inversor.id)}
+                    className="btn btn-danger d-flex align-items-center gap-1"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="currentColor"
+                      className="bi bi-trash3-fill"
+                      viewBox="0 0 16 16"
+                    >
+                      <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                    </svg>
+                    Borrar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))
       )}
     </div>
   );

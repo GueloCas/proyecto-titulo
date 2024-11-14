@@ -1,4 +1,4 @@
-import { getProduccionPorInversorGrados } from "../api/inversores.api";
+import { getProduccionPorInversorGrados } from "../api/produccion.api";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Papa from 'papaparse';

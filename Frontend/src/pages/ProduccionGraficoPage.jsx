@@ -5,8 +5,10 @@ export function ProduccionGraficoPage() {
     const { id } = useParams();
 
     return (
-        <div className="container-fluid px-4 pt-2">
-            <ProduccionGrafico id={id} />
+        <div className="container">
+            <div className="page-inner">
+                <ProduccionGrafico id={id} />
+            </div>
         </div>
     )
 }

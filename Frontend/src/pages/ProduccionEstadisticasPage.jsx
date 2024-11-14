@@ -7,9 +7,10 @@ export function ProduccionEstadisticasPage() {
     const nombreInversor = queryParams.get('inversor');
 
     return (
-        <div className="container px-4 pt-2">
+        <div className="container">
+            <div className="page-inner">
             <div className="mt-1 d-flex justify-content-between align-items-center">
-                <h1>Estadisticas de inversor: {nombreInversor}</h1>
+                <h1 className="mb-3 mt-2 fw-bold">Estadisticas de inversor: {nombreInversor}</h1>
                 <div className="d-flex justify-content-right align-items-center">
                     <Link to={`/ProduccionInversor/${id}`} className="text-decoration-none">
                         <button
@@ -31,6 +32,7 @@ export function ProduccionEstadisticasPage() {
             </div>
 
             <ProduccionEstadisticas id={id}/>
+            </div>
         </div>
     );
 }

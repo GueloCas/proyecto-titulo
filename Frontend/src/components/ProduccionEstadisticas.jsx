@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Papa from 'papaparse';
 import { useEffect, useState } from "react";
-import { getProduccionPorInversor } from "../api/inversores.api";
+import { getProduccionPorInversor } from "../api/produccion.api";
 
 export function ProduccionEstadisticas({ id }) {
     const [produccion, setProduccion] = useState([]);
