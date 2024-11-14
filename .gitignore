@@ -1,0 +1,19 @@
+# Entorno de Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Configuración y archivos de entorno
+*.env
+
+# Django
+db.sqlite3
+/media/
+staticfiles/
+
+# IDEs y editores
+.idea/
+.vscode/
