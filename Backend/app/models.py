@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import IntegerField, Min, Max, Avg
+from django.db.models import IntegerField, Min, Max, Avg, Sum
 from django.db.models.functions import Cast, Substr
 
 
@@ -20,6 +20,10 @@ class Inversor(models.Model):
     
     def obtener_producciones_hora(self, hora):
         return Produccion.objects.filter(inversor=self, Hora=hora).order_by('Dia')
+    
+    def obtener_cantidad_total_diaria(self, dia):
+        total = Produccion.objects.filter(inversor=self, Dia=dia).aggregate(total=Sum('cantidad'))
+        return total['total'] if total['total'] is not None else 0
     
     def obtener_producciones_ordenHora(self):
         return Produccion.objects.filter(inversor=self).annotate(

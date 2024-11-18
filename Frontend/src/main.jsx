@@ -17,6 +17,11 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import App from "./App.jsx";
 import { AgregarExcelPage } from "./pages/AgregarExcelPage.jsx";
+import { MetricasEstacionPage } from "./pages/MetricasEstacionPage.jsx";
+import { MetricasMensualHoraPage } from "./pages/MetricasMensualHoraPage.jsx";
+import { MetricasEstacionGeneralMesPage } from "./pages/MetricasEstacionGeneralMesPage.jsx";
+import { MetricasEstacionGeneralDiaPage } from "./pages/MetricasEstacionGeneralDiaPage.jsx";
+import { MetricasEstacionHoraDiaPage } from "./pages/MetricasEstacionHoraDiaPage.jsx";
 
 const router = createBrowserRouter([
   
@@ -38,15 +43,15 @@ const router = createBrowserRouter([
         element: <InversoresPage />,
       },
       {
-        path: "/agregar-excel",
+        path: "/agregar-datos",
         element: <AgregarExcelPage />,
       },
       {
-        path: "/ProduccionInversor/:id",
+        path: "/inversor/:id/produccion",
         element: <ProduccionInversorPage />,
       },
       {
-        path: "/ProduccionInversor/grafico/:id",
+        path: "/inversor/:id/produccion/grafico",
         element: <ProduccionGraficoPage />,
       },
       {
@@ -60,6 +65,26 @@ const router = createBrowserRouter([
       {
         path: "/ProduccionInversor/Grados/:id",
         element: <ProduccionGradosPage />,
+      },
+      {
+        path: "/estadisticas/metricas-estacion",
+        element: <MetricasEstacionPage />,
+      },
+      {
+        path: "/estadisticas/metricas-estacion/mensual-hora",
+        element: <MetricasMensualHoraPage />,
+      },
+      {
+        path: "/estadisticas/metricas-estacion/general-mes",
+        element: <MetricasEstacionGeneralMesPage />,
+      },
+      {
+        path: "/estadisticas/metricas-estacion/general-dia",
+        element: <MetricasEstacionGeneralDiaPage />,
+      },
+      {
+        path: "/estadisticas/metricas-estacion/hora-dia",
+        element: <MetricasEstacionHoraDiaPage />,
       },
       {
         path: "/PercepcionesComputacionales",

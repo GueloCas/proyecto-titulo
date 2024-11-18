@@ -10,9 +10,9 @@ export function ProduccionEstadisticasPage() {
         <div className="container">
             <div className="page-inner">
             <div className="mt-1 d-flex justify-content-between align-items-center">
-                <h1 className="mb-3 mt-2 fw-bold">Estadisticas de inversor: {nombreInversor}</h1>
+                <h1 className="mb-3 fw-bold">Estadisticas de inversor: {nombreInversor}</h1>
                 <div className="d-flex justify-content-right align-items-center">
-                    <Link to={`/ProduccionInversor/${id}`} className="text-decoration-none">
+                    <Link to={`/inversor/${id}/produccion`} className="text-decoration-none">
                         <button
                             className="btn btn-outline-secondary ms-4"
                             style={{ height: "38px" }}

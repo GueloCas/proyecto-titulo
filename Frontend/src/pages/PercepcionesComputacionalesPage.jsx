@@ -4,7 +4,7 @@ export function PercepcionesComputacionalesPage() {
     return (
         <div className="container">
             <div className="page-inner">
-                <h1 className="mb-3 mt-2 fw-bold">Percepciones Computacionales</h1>
+                <h1 className="mb-3 fw-bold">Percepciones Computacionales</h1>
                 <div className="d-flex justify-content-right align-items-center pt-2">
                     <Link to={`/PercepcionesComputacionalesDiaHora`} className="text-decoration-none">
                         <button

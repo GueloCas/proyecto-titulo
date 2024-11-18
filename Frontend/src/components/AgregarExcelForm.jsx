@@ -14,7 +14,8 @@ const AgregarExcelForm = () => {
       if (acceptedFiles.length > 0) {
         const file = acceptedFiles[0];
         if (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || 
-            file.type === "application/vnd.ms-excel") {
+            file.type === "application/vnd.ms-excel" ||
+            file.type === "text/csv") {
           setSelectedFile(file);
         } else {
           alert("Archivo no válido, selecciona un archivo Excel.");
@@ -66,7 +67,7 @@ const AgregarExcelForm = () => {
           >
             <input
               {...getInputProps()}
-              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv"
             />
             {selectedFile ? (
               <p>{selectedFile.name}</p> // Muestra el nombre del archivo seleccionado

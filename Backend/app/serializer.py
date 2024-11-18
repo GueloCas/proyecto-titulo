@@ -8,9 +8,10 @@ class EstacionSerializer(serializers.ModelSerializer):
         model = Estacion
         fields = '__all__'
 class InversorSerializer(serializers.ModelSerializer):
+    nombre_estacion = serializers.CharField(source="estacion.nombre", read_only=True)  # 'estacion' es la relación hacia Estacion
     class Meta:
         model = Inversor
-        fields = '__all__'
+        fields = ['id', 'nombre', 'estacion', 'nombre_estacion']
 
 class ProduccionSerializer(serializers.ModelSerializer):
     class Meta:

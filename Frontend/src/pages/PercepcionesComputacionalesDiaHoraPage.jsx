@@ -35,7 +35,7 @@ export function PercepcionesComputacionalesDiaHoraPage() {
         <div className="container px-4 pt-2">
             <div className="page-inner">
                 <div className="d-flex my-2 justify-content-between align-items-center">
-                    <h1 className="mb-3 mt-2 fw-bold">Percepciones Computacionales por Día y Hora</h1>
+                    <h1 className="mb-3 fw-bold">Percepciones Computacionales por Día y Hora</h1>
                     <div className="d-flex justify-content-right align-items-end">
                         <Link to={`/PercepcionesComputacionalesDia`} className="text-decoration-none">
                             <button

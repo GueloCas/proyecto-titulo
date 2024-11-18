@@ -77,35 +77,15 @@ export function BarraLateral() {
                             </span>
                             <h4 className="text-section">DATOS</h4>
                         </li>
-                        <li className={`nav-item ${isActive('/agregar-excel')}`}>
-                            <a data-bs-toggle="collapse" href="#tables">
+                        <li className={`nav-item ${isActive('/agregar-datos')}`}>
+                            <Link to="/agregar-datos">
                                 <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" fill="currentColor" className="bi bi-file-earmark-bar-graph-fill" viewBox="0 0 16 16">
                                     <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1m.5 10v-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5m-2.5.5a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5zm-3 0a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5z" />
                                 </svg></i>
-                                <p>Cargar Datos</p>
-                                <span className="caret"></span>
-                            </a>
-                            <div className={`collapse ${isShow('/agregar-excel')}`} id="tables">
-                                <ul className="nav nav-collapse">
-                                    <li>
-                                        <a href="agregar-excel">
-                                            <span className="sub-item">Cargar Excel</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="tables/datatables.html">
-                                            <span className="sub-item">Cargar Csv</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="tables/datatables.html">
-                                            <span className="sub-item">Cargar Tabla</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                                <p>Agregar datos</p>
+                            </Link>
                         </li>
-                        <li className={`nav-item ${isActive('/inversores')}`}>
+                        <li className={`nav-item ${isActive('/inversores')} ${isActive('/estaciones')}`}>
                             <a data-bs-toggle="collapse" href="#inversores">
                                 <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" fill="currentColor" className="bi bi-grid-fill" viewBox="0 0 16 16">
                                     <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5z" />
@@ -113,7 +93,7 @@ export function BarraLateral() {
                                 <p>Inversores</p>
                                 <span className="caret"></span>
                             </a>
-                            <div className={`collapse ${isShow('/inversores')}`} id="inversores">
+                            <div className={`collapse ${isShow('/inversores')} ${isShow('/estaciones')}`} id="inversores">
                                 <ul className="nav nav-collapse">
                                     <li>
                                         <a href="/estaciones">
@@ -129,18 +109,18 @@ export function BarraLateral() {
                             </div>
                         </li>
                         <li className="nav-item">
-                            <a data-bs-toggle="collapse" href="#monitoreo">
-                                <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" fill="currentColor" className="bi bi-display" viewBox="0 0 16 16">
-                                    <path d="M0 4s0-2 2-2h12s2 0 2 2v6s0 2-2 2h-4q0 1 .25 1.5H11a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1h.75Q6 13 6 12H2s-2 0-2-2zm1.398-.855a.76.76 0 0 0-.254.302A1.5 1.5 0 0 0 1 4.01V10c0 .325.078.502.145.602q.105.156.302.254a1.5 1.5 0 0 0 .538.143L2.01 11H14c.325 0 .502-.078.602-.145a.76.76 0 0 0 .254-.302 1.5 1.5 0 0 0 .143-.538L15 9.99V4c0-.325-.078-.502-.145-.602a.76.76 0 0 0-.302-.254A1.5 1.5 0 0 0 13.99 3H2c-.325 0-.502.078-.602.145" />
+                            <a data-bs-toggle="collapse" href="#estadisticas">
+                                <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" fill="currentColor" className="bi bi-graph-up-arrow" viewBox="0 0 16 16">
+                                    <path d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5" />
                                 </svg></i>
-                                <p>Monitoreo</p>
+                                <p>Estadísticas</p>
                                 <span className="caret"></span>
                             </a>
-                            <div className="collapse" id="monitoreo">
+                            <div className="collapse" id="estadisticas">
                                 <ul className="nav nav-collapse">
                                     <li>
-                                        <a href="charts/charts.html">
-                                            <span className="sub-item">Grafico por Hora</span>
+                                        <a href="/estadisticas/metricas-estacion">
+                                            <span className="sub-item">Métricas por Estación</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -171,7 +151,7 @@ export function BarraLateral() {
                         </li>
                         <li className="nav-item mt-auto">
                             <Link to="/">
-                                <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" fill="currentColor" class="bi bi-house-fill" viewBox="0 0 16 16">
+                                <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" fill="currentColor" className="bi bi-house-fill" viewBox="0 0 16 16">
                                     <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z" />
                                     <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293z" />
                                 </svg></i>

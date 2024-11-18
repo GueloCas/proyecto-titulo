@@ -10,7 +10,7 @@ export function Navegacion() {
 
     return (
         <div className="main-header">
-            <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom" style={{ backgroundColor: '#1E3A5F' }}>
+            <nav className="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom py-0" style={{ backgroundColor: '#1E3A5F' }}>
                 <div className="container-fluid" id="navbarSupportedContent">
                     <ul className="navbar-nav topbar-nav ms-md-auto align-items-end me-4">
                         <li className="nav-item">

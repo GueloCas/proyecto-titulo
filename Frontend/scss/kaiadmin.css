@@ -3171,7 +3171,7 @@ label {
 }
 
 .card-round {
-  border-radius: 10px;
+  border-radius: 10px !important;
 }
 
 /*     Progress Card    */
@@ -10907,6 +10907,22 @@ body[data-background-color="dark2"] .jvm-zoom-btn {
   background-color: #007bff; /* Cambia el color de fondo al pasar el mouse */
   color: white;  /* Cambia el color del texto a blanco */
 }
+
+.promedio-maximo {
+  font-weight: bold;
+  color: green; /* Cambia el color si lo prefieres */
+}
+
+.promedio-minimo {
+  font-weight: bold;
+  color: red; /* Puedes elegir un color diferente para el valor mínimo */
+}
+
+.promedio-igual {
+  font-weight: bold;
+  color: black; /* Negros para igual */
+}
+
 
 
 /*# sourceMappingURL=kaiadmin.css.map */

@@ -33,16 +33,10 @@ export function EstacionesList() {
                 <h5 className="card-title">{estacion.nombre}</h5>
                 <div className="d-flex flex-wrap gap-2 mt-3">
                   <Link
-                    to={`/ProduccionEstacion/${estacion.id}`}
+                    to={`/inversores?buscar=${estacion.nombre}`}
                     className="btn btn-primary text-light rounded-3"
                   >
-                    Ver Producción
-                  </Link>
-                  <Link
-                    to={`/ProduccionEstacion/Estadisticas/${estacion.id}?estacion=${estacion.nombre}`}
-                    className="btn btn-secondary rounded-3"
-                  >
-                    Ver Estadísticas
+                    Ver Inversores
                   </Link>
                   <button
                     onClick={handleDeleteEstacion(estacion.id)}
