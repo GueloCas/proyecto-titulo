@@ -8,13 +8,27 @@ const GuiaSubirArchivo = () => {
 
   const pages = [
     {
-      imageUrl: 'https://via.placeholder.com/150',
-      text: 'Esta es la página 1. Aquí va el contenido.',
+      title: 'Formato de los datos para archivos Excel',
+      imageUrl: '../Formato Excel DATOS.png',
+      text: 'Para subir los datos de las estaciones a la plataforma, es necesario que el archivo Excel tenga el formato mostrado en la imagen. Asegúrate de que los datos estén en el orden correcto y que no haya celdas vacías.',
       buttonText: 'Siguiente'
     },
     {
-      imageUrl: 'https://via.placeholder.com/150',
-      text: 'Esta es la página 2. Aquí va el contenido de la segunda página.',
+      title: 'Formato de los nombres de las estaciones',
+      imageUrl: '../Formato excel Nombre de estaciones.png',
+      text: 'El nombre de la hoja de Excel será el nombre de la estación.',
+      buttonText: 'Siguiente'
+    },
+    {
+      title: 'Formato de los datos para archivos CSV',
+      imageUrl: '../Formato CSV DATOS.png',
+      text: 'Para subir los datos de las estaciones a la plataforma, es necesario que el archivo CSV tenga el formato mostrado en la imagen. Asegúrate de que los datos estén en el orden correcto y que no haya celdas vacías.',
+      buttonText: 'Siguiente'
+    },
+    {
+      title: 'Formato del nombre de la estación para archivos CSV',
+      imageUrl: '../Formato CSV nombre de estacion.png',
+      text: 'El nombre del archivo CSV será el nombre de estación.',
       buttonText: 'Finalizar'
     }
   ];
@@ -27,15 +41,35 @@ const GuiaSubirArchivo = () => {
     MySwal.fire({
       html: (
         <div>
-          <img src={pages[pageIndex].imageUrl} alt="Contenido" style={{ width: '100%', marginBottom: '15px' }} />
-          <p>{pages[pageIndex].text}</p>
+          <h2>{pages[pageIndex].title}</h2>
+          <img 
+            src={pages[pageIndex].imageUrl} 
+            alt="Contenido" 
+            style={{
+              width: '80%', // Ajusta el ancho
+              height: 'auto', // Mantiene la proporción de la imagen
+              marginBottom: '15px'
+            }}
+          />
+          <p style={{
+            wordWrap: 'break-word',   // Asegura el salto de palabra
+            whiteSpace: 'normal',     // Asegura que el texto salte de línea cuando sea necesario
+            marginBottom: '15px',     // Espaciado entre párrafos
+            fontSize: '16px',         // Tamaño de texto ajustable
+            lineHeight: '1.6',        // Espaciado entre líneas para mejorar la legibilidad
+            color: '#333',            // Color de texto (ajustable según el diseño)
+            }}>
+            {pages[pageIndex].text}
+          </p>
         </div>
       ),
       showConfirmButton: true,
       confirmButtonText: pages[pageIndex].buttonText,
       allowOutsideClick: true,
       showCancelButton: true,
-      cancelButtonText: 'Atrás'
+      cancelButtonText: 'Atrás',
+      width: '50%',
+      heightAuto: true,
     }).then((result) => {
       if (result.isConfirmed) {
         if (pageIndex < pages.length - 1) {
