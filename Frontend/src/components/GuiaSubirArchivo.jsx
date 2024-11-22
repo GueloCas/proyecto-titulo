@@ -46,7 +46,7 @@ const GuiaSubirArchivo = () => {
             src={pages[pageIndex].imageUrl} 
             alt="Contenido" 
             style={{
-              width: '80%', // Ajusta el ancho
+              width: '70%', // Ajusta el ancho
               height: 'auto', // Mantiene la proporción de la imagen
               marginBottom: '15px'
             }}
