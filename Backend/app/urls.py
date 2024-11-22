@@ -3,6 +3,7 @@ from rest_framework import routers
 from .views import EstacionViewSet, InversorViewSet, ProduccionViewSet, InversorProduccionView, InversorProduccionHoraView, VariableLinguisticaHoraView, InversorMinMaxHoraView, InversorProduccionEstadisticasView, InversorProduccionGradoPertenenciaView, ObtenerPercepcionesComputacionalesView, ObtenerPercepcionesDiariasView
 from .views_nuevo.subir_datos_views import ExcelUploadView
 from .views_nuevo.estadisticas_views import MetricasEstacionView, MetricasEstacionGeneralMesView, MetricasEstacionGeneralDiaView, MetricasEstacionHoraDiaView
+from .views_nuevo.descripciones_views import CalcularDescripcionesLinguisticasInversor, CalcularDescripcionesLinguisticasEstacion
 from .views import login, register
 
 from drf_yasg.views import get_schema_view
@@ -35,6 +36,9 @@ urlpatterns = [
     path("api/v1/metricas-estacion-general-mes/", MetricasEstacionGeneralMesView.as_view(), name="metricas-estacion-general-mes"),
     path("api/v1/metricas-estacion-general-dia/", MetricasEstacionGeneralDiaView.as_view(), name='metricas-estacion-general-dia'),
     path("api/v1/metricas-estacion-hora-dia/", MetricasEstacionHoraDiaView.as_view(), name='metricas-estacion-hora-dia'),
+
+    path('api/v1/descripciones-linguisticas-inversor/', CalcularDescripcionesLinguisticasInversor.as_view(), name='descripciones-linguisticas-inversor'),
+    path('api/v1/descripciones-linguisticas-estacion/', CalcularDescripcionesLinguisticasEstacion.as_view(), name='descripciones-linguisticas-estacion'),
     
     path('api/v1/login/', login, name='login'),
     path('api/v1/register/', register, name='register'),

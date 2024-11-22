@@ -11,6 +11,7 @@ export function MetricasEstacionHoraDiaPage() {
     const [selectedDia, setSelectedDia] = useState(""); // Selección del día (1-31)
     const [selectedHora, setSelectedHora] = useState(""); // Se agrega el selector de hora
     const [mensajeError, setMensajeError] = useState("");
+    const [mostrarMetricas, setMostrarMetricas] = useState(false);
 
     useEffect(() => {
         async function loadEstaciones() {
@@ -47,23 +48,51 @@ export function MetricasEstacionHoraDiaPage() {
     const dias = Array.from({ length: 31 }, (_, i) => i + 1);
     const horas = Array.from({ length: 16 }, (_, i) => i + 8); // Horas de 8 a 23
 
+    const isFormValid = selectedEstacion && selectedAnio && selectedMes && selectedDia && selectedHora;
+
+    const handleSearch = () => {
+        if (isFormValid) {
+            setMostrarMetricas(true);
+        } else {
+            setMensajeError("Por favor, seleccione todos los campos.");
+        }
+    };
+
     return (
         <div className="container">
             <div className="page-inner">
-                <div className="d-flex justify-content-between align-items-center mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-1">
                     <h1 className="mb-0 fw-bold">Métricas de Estación - Diario General</h1>
                     <Link to="/estadisticas/metricas-estacion"><button className="btn btn-primary">Volver</button></Link>
                 </div>
+
+                {/* Breadcrumb */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-4">
+                        <li className="breadcrumb-item">
+                            <Link to="/dashboard">Dashboard</Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to="/informes">Metricas Estación</Link>
+                        </li>
+                        <li className="breadcrumb-item active" aria-current="page">
+                            Dia - Hora
+                        </li>
+                    </ol>
+                </nav>
+
                 {/* Mostrar mensaje de error */}
                 {mensajeError && <div className="alert alert-danger">{mensajeError}</div>}
 
                 {/* Selectores de Estación, Año, Mes y Día */}
-                
-                        <div className="row justify-content-center">
-                            <div className="col-md-2">
+                <div className="card border-0 px-4 pt-3 mx-auto" style={{ maxWidth: '1200px' }}>
+                    <div className="d-flex justify-content-center mb-4">
+                        <div className="d-flex flex-wrap justify-content-center">
+                            <div className="px-2">
                                 <label className="form-label">Estación</label>
                                 <select
                                     className="form-select"
+                                    style={{ width: '200px' }}  // Definir el ancho aquí
                                     value={selectedEstacion}
                                     onChange={(e) => setSelectedEstacion(e.target.value)}
                                 >
@@ -76,10 +105,11 @@ export function MetricasEstacionHoraDiaPage() {
                                 </select>
                             </div>
 
-                            <div className="col-md-2">
+                            <div className="px-2">
                                 <label className="form-label">Año</label>
                                 <select
                                     className="form-select"
+                                    style={{ width: '200px' }}  // Definir el ancho aquí
                                     value={selectedAnio}
                                     onChange={(e) => setSelectedAnio(e.target.value)}
                                 >
@@ -92,10 +122,11 @@ export function MetricasEstacionHoraDiaPage() {
                                 </select>
                             </div>
 
-                            <div className="col-md-2">
+                            <div className="px-2">
                                 <label className="form-label">Mes</label>
                                 <select
                                     className="form-select"
+                                    style={{ width: '200px' }}  // Definir el ancho aquí
                                     value={selectedMes}
                                     onChange={(e) => setSelectedMes(e.target.value)}
                                 >
@@ -108,10 +139,11 @@ export function MetricasEstacionHoraDiaPage() {
                                 </select>
                             </div>
 
-                            <div className="col-md-2">
+                            <div className="px-2">
                                 <label className="form-label">Día</label>
                                 <select
                                     className="form-select"
+                                    style={{ width: '200px' }}
                                     value={selectedDia}
                                     onChange={(e) => setSelectedDia(e.target.value)}
                                 >
@@ -124,10 +156,11 @@ export function MetricasEstacionHoraDiaPage() {
                                 </select>
                             </div>
 
-                            <div className="col-md-2">
+                            <div className="px-2">
                                 <label className="form-label">Hora</label>
                                 <select
                                     className="form-select"
+                                    style={{ width: '200px' }}  // Definir el ancho aquí
                                     value={selectedHora}
                                     onChange={(e) => setSelectedHora(e.target.value)}
                                 >
@@ -139,16 +172,31 @@ export function MetricasEstacionHoraDiaPage() {
                                     ))}
                                 </select>
                             </div>
+
+                            <div className="px-2 d-flex align-items-end">
+                                <button
+                                    className={`btn ${isFormValid ? 'btn-success' : 'btn-secondary'} w-100`}
+                                    onClick={handleSearch}
+                                    disabled={!isFormValid}
+                                    style={{ width: '200px' }}  // Definir el ancho aquí
+                                >
+                                    Buscar
+                                </button>
+                            </div>
                         </div>
+                    </div>
+                </div>
 
                 {/* Componente de métricas, pasando los valores seleccionados */}
-                <MetricasEstacionHoraDia
-                    estacionId={selectedEstacion}
-                    anio={selectedAnio}
-                    mes={selectedMes}  // Se pasa el mes
-                    dia={selectedDia}  // Se pasa el día
-                    hora={selectedHora}  // Se mantiene la hora vacía
-                />
+                {mostrarMetricas && (
+                    <MetricasEstacionHoraDia
+                        estacionId={selectedEstacion}
+                        anio={selectedAnio}
+                        mes={selectedMes}  // Se pasa el mes
+                        dia={selectedDia}  // Se pasa el día
+                        hora={selectedHora}  // Se mantiene la hora vacía
+                    />
+                )}
             </div>
         </div>
     );

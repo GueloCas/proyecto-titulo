@@ -10923,6 +10923,30 @@ body[data-background-color="dark2"] .jvm-zoom-btn {
   color: black; /* Negros para igual */
 }
 
+/* Contenedor para los selectores */
+.selectors-container {
+  transition: all 0.5s ease;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.selectors-container.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  max-width: 800px;
+}
+
+.selectors-container.top {
+  position: static;
+  transform: none;
+  width: 100%;
+}
+
 
 
 /*# sourceMappingURL=kaiadmin.css.map */

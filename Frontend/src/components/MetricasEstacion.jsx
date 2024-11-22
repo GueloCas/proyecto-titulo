@@ -55,6 +55,10 @@ export function MetricasEstacion({ estacionId, anio, mes, hora }) {
     }
   }, [estacionId, anio, mes, hora]); // Se vuelve a ejecutar cuando cambia cualquiera de estos valores
 
+  if (!estacionId && !anio && !mes && !hora) {
+    return <div className="alert alert-info">Por favor, selecciona los valores a buscar.</div>;
+  }
+
   return (
     <div>
       {/* Mostrar mensaje de error */}
@@ -81,10 +85,10 @@ export function MetricasEstacion({ estacionId, anio, mes, hora }) {
               return (
                 <tr key={inversor.id}>
                   <td>{inversor.nombre}</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
+                  <td>Sin Información</td>
+                  <td>Sin Información</td>
+                  <td>Sin Información</td>
+                  <td>Sin Información</td>
                 </tr>
               );
             }

@@ -12,6 +12,7 @@ export function PCTablaDia({ dia }) {
             try {
                 setError(null);
                 const responseData = await getPercepcionesComputacionalesDia(dia);
+                console.log(responseData);
                 setData(responseData);
 
                 // Extraer los nombres únicos de inversores

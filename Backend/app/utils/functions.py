@@ -80,4 +80,24 @@ def obtenerPercepcionComputacionalSegundoGrado(percepcionesComputacionalesPrimer
 
     return percepcionesComputacionalesSegundoGrado
 
+def obtenerClasificacionDescripcionLinguistica(p, w):
+    print(p, w)
+    if p == 0:
+        return 'NINGUNA hora fue ' + w
+    elif p > 0 and p < 0.1:
+        return 'POCAS horas fueron ' + w
+    elif p >= 0.1 and p < 0.3:
+        return 'ALGUNAS de las horas fueron ' + w
+    elif p >= 0.3 and p < 0.5:
+        return 'CERCA DE LA MITAD de las horas fueron ' + w
+    elif p == 0.5:
+        return 'LA MITAD de las horas fueron ' + w
+    elif p > 0.5 and p <= 0.6:
+        return 'VARIAS horas fueron ' + w
+    elif p > 0.6 and p <= 0.8:
+        return 'MUCHAS horas fueron ' + w
+    elif p > 0.8 and p < 1:
+        return 'LA MAYORÍA de las horas fueron ' + w
+    elif p == 1:
+        return 'TODAS las horas fueron ' + w
 

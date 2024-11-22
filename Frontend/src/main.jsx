@@ -22,6 +22,11 @@ import { MetricasMensualHoraPage } from "./pages/MetricasMensualHoraPage.jsx";
 import { MetricasEstacionGeneralMesPage } from "./pages/MetricasEstacionGeneralMesPage.jsx";
 import { MetricasEstacionGeneralDiaPage } from "./pages/MetricasEstacionGeneralDiaPage.jsx";
 import { MetricasEstacionHoraDiaPage } from "./pages/MetricasEstacionHoraDiaPage.jsx";
+import { ResumenesPage } from "./pages/ResumenesPage.jsx";
+import { DescripcionesInversorPage } from "./pages/DescripcionesInversorPage.jsx";
+import { DescripcionesEstacionPage } from "./pages/DescripcionesEstacionPage.jsx";
+import { InformesPage } from "./pages/InformesPage.jsx";
+import { InformesEstacionPage } from "./pages/InformesEstacionPage.jsx";
 
 const router = createBrowserRouter([
   
@@ -98,7 +103,26 @@ const router = createBrowserRouter([
         path: "/PercepcionesComputacionalesDia",
         element: <PercepcionesComputacionalesDiaPage />,
       },
-      
+      {
+        path: "/resumenes",
+        element: <ResumenesPage />,
+      },
+      {
+        path: "/resumenes/descripciones-inversor",
+        element: <DescripcionesInversorPage />,
+      },
+      {
+        path: "/resumenes/descripciones-estacion",
+        element: <DescripcionesEstacionPage />,
+      },
+      {
+        path: "/informes",
+        element: <InformesPage />,
+      },
+      {
+        path: "/informes/informes-estacion",
+        element: <InformesEstacionPage />,
+      },
     ],
   },
   {
