@@ -108,7 +108,7 @@ export function BarraLateral() {
                                 </ul>
                             </div>
                         </li>
-                        <li className="nav-item">
+                        <li className={`nav-item ${isActive('/estadisticas/metricas-estacion')} ${isActive('/estadisticas/metricas-estacion/general-dia')} ${isActive('/estadisticas/metricas-estacion/hora-dia')} ${isActive('/estadisticas/metricas-estacion/general-mes')} ${isActive('/estadisticas/metricas-estacion/hora-mes')}`}>
                             <a data-bs-toggle="collapse" href="#estadisticas">
                                 <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" fill="currentColor" className="bi bi-bar-chart-line-fill" viewBox="0 0 16 16">
                                     <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1z" />
@@ -116,7 +116,7 @@ export function BarraLateral() {
                                 <p>Estadísticas</p>
                                 <span className="caret"></span>
                             </a>
-                            <div className="collapse" id="estadisticas">
+                            <div className={`collapse ${isShow('/estadisticas/metricas-estacion')} ${isShow('/estadisticas/metricas-estacion/general-dia')} ${isShow('/estadisticas/metricas-estacion/hora-dia')} ${isShow('/estadisticas/metricas-estacion/general-mes')} ${isShow('/estadisticas/metricas-estacion/hora-mes')}`} id="estadisticas">
                                 <ul className="nav nav-collapse">
                                     <li>
                                         <a href="/estadisticas/metricas-estacion">
@@ -126,7 +126,7 @@ export function BarraLateral() {
                                 </ul>
                             </div>
                         </li>
-                        <li className="nav-item">
+                        <li className={`nav-item ${isActive('/percepciones-primer-grado')} ${isActive('/percepciones-primer-grado/dia')} ${isActive('/percepciones-primer-grado/hora')} ${isActive('/percepciones-segundo-grado')} ${isActive('/percepciones-segundo-grado/dia')} ${isActive('/percepciones-segundo-grado/dia-hora')}`}>
                             <a data-bs-toggle="collapse" href="#percepciones">
                                 <i><svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" fill="currentColor" className="bi bi-database-fill-gear" viewBox="0 0 16 16">
                                     <path d="M8 1c-1.573 0-3.022.289-4.096.777C2.875 2.245 2 2.993 2 4s.875 1.755 1.904 2.223C4.978 6.711 6.427 7 8 7s3.022-.289 4.096-.777C13.125 5.755 14 5.007 14 4s-.875-1.755-1.904-2.223C11.022 1.289 9.573 1 8 1" />
@@ -135,15 +135,15 @@ export function BarraLateral() {
                                 <p>Percepciones</p>
                                 <span className="caret"></span>
                             </a>
-                            <div className="collapse" id="percepciones">
+                            <div className={`collapse ${isShow('/percepciones-primer-grado')} ${isShow('/percepciones-primer-grado/dia')} ${isShow('/percepciones-primer-grado/hora')} ${isShow('/percepciones-segundo-grado')} ${isShow('/percepciones-segundo-grado/dia')} ${isShow('/percepciones-segundo-grado/dia-hora')}`} id="percepciones">
                                 <ul className="nav nav-collapse">
                                     <li>
-                                        <a href="charts/charts.html">
+                                        <a href="/percepciones-primer-grado">
                                             <span className="sub-item">1° Grado</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/PercepcionesComputacionales">
+                                        <a href="/percepciones-segundo-grado">
                                             <span className="sub-item">2° Grado</span>
                                         </a>
                                     </li>

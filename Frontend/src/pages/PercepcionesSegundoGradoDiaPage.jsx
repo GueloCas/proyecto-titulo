@@ -1,21 +1,22 @@
-import { useEffect, useState } from "react";
-import { getEstaciones } from "../api/estacion.api";
-import { MetricasEstacion } from "../components/MetricasEstacion";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { PCTablaDia } from '../components/PCTablaDia';
+import { Link } from 'react-router-dom';
+import { getEstaciones } from '../api/estacion.api';
 
-export function MetricasMensualHoraPage() {
+export function PercepcionesSegundoGradoDiaPage() {
     const [estaciones, setEstaciones] = useState([]);
     const [selectedEstacion, setSelectedEstacion] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
-    const [selectedMes, setSelectedMes] = useState("");
-    const [selectedHora, setSelectedHora] = useState(""); // Nuevo estado para la hora
+    const [selectedMes, setSelectedMes] = useState(""); // Se mantiene el selector de mes
+    const [selectedDia, setSelectedDia] = useState(""); // Selección del día (1-31)
     const [mensajeError, setMensajeError] = useState("");
-    const [mostrarMetricas, setMostrarMetricas] = useState(false); // Estado para mostrar el componente MetricasEstacion
+    const [mostrar, setMostrar] = useState(false);
 
     useEffect(() => {
         async function loadEstaciones() {
             try {
                 const data = await getEstaciones();
+                console.log(data);
                 setEstaciones(data);
             } catch (error) {
                 setMensajeError("Hubo un error al cargar las estaciones.");
@@ -24,8 +25,10 @@ export function MetricasMensualHoraPage() {
         loadEstaciones();
     }, []);
 
-    // Opciones de año y mes
+    // Opciones de año
     const anios = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
+
+    // Opciones de meses (1-12)
     const meses = [
         { value: "01", label: "Enero" },
         { value: "02", label: "Febrero" },
@@ -41,15 +44,14 @@ export function MetricasMensualHoraPage() {
         { value: "12", label: "Diciembre" }
     ];
 
-    // Opciones de hora
-    const horas = Array.from({ length: 16 }, (_, i) => i + 8); // Horas de 8 a 23
+    // Opciones de días (1-31)
+    const dias = Array.from({ length: 31 }, (_, i) => i + 1);
 
-    // Habilitar el botón de búsqueda solo si todos los campos están seleccionados
-    const isFormValid = selectedEstacion && selectedAnio && selectedMes && selectedHora;
+    const isFormValid = selectedEstacion && selectedAnio && selectedMes && selectedDia;
 
     const handleSearch = () => {
         if (isFormValid) {
-            setMostrarMetricas(true);
+            setMostrar(true);
         } else {
             setMensajeError("Por favor, seleccione todos los campos.");
         }
@@ -58,9 +60,24 @@ export function MetricasMensualHoraPage() {
     return (
         <div className="container">
             <div className="page-inner">
-                <div className="d-flex justify-content-between align-items-center mb-1">
-                    <h1 className="mb-0 fw-bold">Métricas de Estación - Mensual por Hora</h1>
-                    <Link to="/estadisticas/metricas-estacion"><button className="btn btn-primary">Volver</button></Link>
+                <div className="d-flex mb-1 justify-content-between align-items-center">
+                    <h1 className="mb-0 fw-bold">Percepciones Segundo Grado por Día</h1>
+                    <div className="d-flex justify-content-right align-items-end">
+                        <Link to={`/percepciones-segundo-grado/dia-hora`} className="text-decoration-none">
+                            <button
+                                className="btn btn-outline-secondary ms-4"
+                            >
+                                Ver por Día y Hora
+                            </button>
+                        </Link>
+                        <Link to={`/percepciones-segundo-grado`} className="text-decoration-none">
+                            <button
+                                className="btn btn-success ms-4"
+                            >
+                                Volver
+                            </button>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Breadcrumb */}
@@ -70,18 +87,16 @@ export function MetricasMensualHoraPage() {
                             <Link to="/dashboard">Dashboard</Link>
                         </li>
                         <li className="breadcrumb-item">
-                            <Link to="/informes">Metricas Estación</Link>
+                            <Link to="/percepciones-segundo-grado">Percepciones 2°</Link>
                         </li>
                         <li className="breadcrumb-item active" aria-current="page">
-                            Mensual - Hora
+                            Por Día
                         </li>
                     </ol>
                 </nav>
 
-                {/* Mostrar mensaje de error */}
                 {mensajeError && <div className="alert alert-danger">{mensajeError}</div>}
 
-                {/* Selectores de Estación, Año, Mes, Hora y Botón Buscar */}
                 <div className="card border-0 px-4 pt-3 mx-auto" style={{ maxWidth: '1000px' }}>
                     <div className="d-flex justify-content-center mb-4">
                         <div className="d-flex flex-wrap justify-content-center">
@@ -137,17 +152,17 @@ export function MetricasMensualHoraPage() {
                             </div>
 
                             <div className="px-2">
-                                <label className="form-label">Hora</label>
+                                <label className="form-label">Día</label>
                                 <select
                                     className="form-select"
-                                    style={{ width: '200px' }}  // Definir el ancho aquí
-                                    value={selectedHora}
-                                    onChange={(e) => setSelectedHora(e.target.value)}
+                                    style={{ width: '200px' }}
+                                    value={selectedDia}
+                                    onChange={(e) => setSelectedDia(e.target.value)}
                                 >
-                                    <option value="" disabled>Seleccione una hora</option>
-                                    {horas.map((hora) => (
-                                        <option key={hora} value={hora}>
-                                            {hora}:00
+                                    <option value="" disabled>Seleccione un día</option>
+                                    {dias.map((dia) => (
+                                        <option key={dia} value={dia}>
+                                            {dia}
                                         </option>
                                     ))}
                                 </select>
@@ -167,13 +182,12 @@ export function MetricasMensualHoraPage() {
                     </div>
                 </div>
 
-                {/* Mostrar el componente MetricasEstacion solo si todo está seleccionado */}
-                {mostrarMetricas && (
-                    <MetricasEstacion
+                {mostrar && (
+                    <PCTablaDia
                         estacionId={selectedEstacion}
                         anio={selectedAnio}
                         mes={selectedMes}
-                        hora={selectedHora}  // Pasar la hora seleccionada como prop
+                        dia={selectedDia} 
                     />
                 )}
             </div>

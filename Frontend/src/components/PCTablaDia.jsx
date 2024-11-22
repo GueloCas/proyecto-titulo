@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { getPercepcionesComputacionalesDia } from "../api/percepciones.api";
+import { getPercepcionesSegundoGradoDia } from "../api/percepciones.api";
 import { getClassAndContent, determinarClaseCPEstacion } from "../utils/tablaHelpers";
 
-export function PCTablaDia({ dia }) {
+export function PCTablaDia({ estacionId, anio, mes, dia }) {
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
     const [inversoresUnicos, setInversoresUnicos] = useState([]);
@@ -11,7 +11,7 @@ export function PCTablaDia({ dia }) {
         async function obtenerPC(dia) {
             try {
                 setError(null);
-                const responseData = await getPercepcionesComputacionalesDia(dia);
+                const responseData = await getPercepcionesSegundoGradoDia(estacionId, dia);
                 console.log(responseData);
                 setData(responseData);
 
@@ -55,7 +55,7 @@ export function PCTablaDia({ dia }) {
                         <tbody>
                             {data.map((horaData, idx) => (
                                 <tr key={idx}>
-                                    <td className="fs-07">{`${dia}, H${horaData.hora}`}</td>
+                                    <td className="fs-07">{`H${horaData.hora}`}</td>
                                     {inversoresUnicos.map((inversor) => {
                                         const percepcion = horaData.percepciones_segundo_grado.find(
                                             (p) => p.inversor === inversor

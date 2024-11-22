@@ -5,7 +5,7 @@ import { ProduccionGrados } from "../components/ProduccionGrados";
 export function ProduccionGradosPage() {
     const { id } = useParams();
     const queryParams = new URLSearchParams(location.search);
-    const nombreInversor = queryParams.get('inversor');
+    const nombreInversor = queryParams.get('inversor') ?? 'Inversor';
 
     return (
         <div className="container px-4 pt-2">

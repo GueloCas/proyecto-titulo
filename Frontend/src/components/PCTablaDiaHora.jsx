@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { getPercepcionesComputacionales } from "../api/percepciones.api";
+import { getPercepcionesSegundoGradoDiaHora } from "../api/percepciones.api";
 
-export function PCTablaDiaHora({ dia, hora }) {
+export function PCTablaDiaHora({ estacionId, anio, mes, dia, hora }) {
     const [data, setData] = useState(null); // Estado para almacenar los datos
     const [error, setError] = useState(null); // Estado para almacenar errores
 
@@ -9,7 +9,7 @@ export function PCTablaDiaHora({ dia, hora }) {
         async function obtenerPC(dia, hora) {
             try {
                 setError(null); // Resetea el error
-                const responseData = await getPercepcionesComputacionales(dia, hora);
+                const responseData = await getPercepcionesSegundoGradoDiaHora(estacionId, dia, hora);
                 setData(responseData.percepciones_segundo_grado); // Almacena los datos en el estado
                 console.log(responseData.percepciones_segundo_grado);
             } catch (err) {

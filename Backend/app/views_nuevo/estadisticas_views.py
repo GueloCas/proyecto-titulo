@@ -3,10 +3,12 @@ from rest_framework import status
 from rest_framework.views import APIView 
 from rest_framework.response import Response 
 
-class MetricasEstacionView(APIView):
+class MetricasEstacionHoraMesView(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener el parámetro 'estacion' desde los parámetros de la consulta
         id_estacion = request.query_params.get('estacion')
+        hora = request.query_params.get('hora')
+        hora_formateada = f"H{hora}" 
 
         # Si no se proporciona el parámetro 'estacion', se retorna un error
         if not id_estacion:
@@ -19,6 +21,10 @@ class MetricasEstacionView(APIView):
             # Si no se encuentran inversores para la estación proporcionada, retornar un mensaje de error
             if not inversores.exists():
                 return Response({"error": "No se encontraron inversores para la estación indicada"}, status=status.HTTP_404_NOT_FOUND)
+            
+            total_mensual_estacion = 0
+            mejor_inversor_estacion = {"nombre": None, "total": float('-inf')}
+            peor_inversor_estacion = {"nombre": None, "total": float('inf')}
 
             # Lista para almacenar los datos de los inversores
             datos_inversores = []
@@ -26,7 +32,14 @@ class MetricasEstacionView(APIView):
             # Recorrer cada inversor y obtener los datos de producción
             for inversor in inversores:
                 # Llamar al método 'obtener_MinMaxProm_producciones' del inversor
-                datos_produccion = inversor.obtener_MinMaxProm_producciones()
+                datos_produccion = inversor.obtener_MinMaxProm_producciones_hora(hora_formateada)
+                total_produccion = datos_produccion[0]['cantidad_promedio']
+                total_mensual_estacion += total_produccion
+
+                if total_produccion > mejor_inversor_estacion["total"]:
+                    mejor_inversor_estacion = {"nombre": inversor.nombre, "total": total_produccion}
+                if total_produccion < peor_inversor_estacion["total"]:
+                    peor_inversor_estacion = {"nombre": inversor.nombre, "total": total_produccion}
 
                 # Agregar los datos de cada inversor y su producción a la lista
                 datos_inversores.append({
@@ -34,6 +47,19 @@ class MetricasEstacionView(APIView):
                     'nombre': inversor.nombre,
                     'produccion': datos_produccion,  # Aquí se añaden los datos obtenidos por el método
                 })
+            
+            promedio_inversor_estacion = total_mensual_estacion / len(inversores)
+            
+            return Response({
+                "estacion": {
+                    "id_estacion": id_estacion,
+                    "total_mensual": total_mensual_estacion,
+                    "promedio_inversor": promedio_inversor_estacion,
+                    "mejor_inversor": mejor_inversor_estacion,
+                    "peor_inversor": peor_inversor_estacion,
+                },
+                "inversores": datos_inversores,
+            })
 
             # Retornar los datos de los inversores junto con sus producciones
             return Response({'inversores': datos_inversores}, status=status.HTTP_200_OK)

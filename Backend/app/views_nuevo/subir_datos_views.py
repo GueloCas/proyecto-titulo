@@ -103,11 +103,14 @@ class CSVUploadView(APIView):
             inversores = {}
             for col_index in range(0, len(df.columns)):  # Comenzar desde la columna 2 porque las dos primeras son Fecha y Hora
                 nombre_inversor = df.iloc[0, col_index]  # Tomamos el nombre del inversor desde la primera fila
+                print(nombre_inversor)
                 
                 # Validar que el nombre no esté vacío o sea NaN
                 if pd.notna(nombre_inversor) and nombre_inversor.strip():
                     inversor, _ = Inversor.objects.get_or_create(nombre=nombre_inversor.strip(), estacion=estacion)
-                    inversores[col_index - 2] = inversor
+                    inversores[col_index] = inversor
+
+            print(inversores)
 
             for row_index in range(1, len(df)):
                 fecha = df.iloc[row_index, 0]

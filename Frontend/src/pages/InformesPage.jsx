@@ -6,11 +6,13 @@ const cardData = [
     to: "informes-inversor",
     title: "Informes por Inversor",
     description: "Congrats and best wishes for success in your brand new life! I knew that you would do this!",
+    button: "Ver Informes",
   },
   {
     to: "informes-estacion",
     title: "Informes por Estación",
     description: "Congrats and best wishes for success in your brand new life! I knew that you would do this!",
+    button: "Ver Informes",
   },
 ];
 

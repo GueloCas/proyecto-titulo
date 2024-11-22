@@ -21,6 +21,13 @@ class Inversor(models.Model):
     def obtener_producciones_hora(self, hora):
         return Produccion.objects.filter(inversor=self, Hora=hora).order_by('Dia')
     
+    def obtener_producciones_dia(self, dia):
+        return Produccion.objects.filter(inversor=self, Dia=dia).order_by('Hora')
+    
+    def obtener_cantidad_total_hora(self, hora):
+        total = Produccion.objects.filter(inversor=self, Hora=hora).aggregate(total=Sum('cantidad'))
+        return total['total'] if total['total'] is not None else 0
+    
     def obtener_cantidad_total_diaria(self, dia):
         total = Produccion.objects.filter(inversor=self, Dia=dia).aggregate(total=Sum('cantidad'))
         return total['total'] if total['total'] is not None else 0
@@ -47,6 +54,13 @@ class Inversor(models.Model):
             cantidad_maxima=Max('cantidad'),
             cantidad_promedio=Avg('cantidad')
         ).order_by('hora_num')
+    
+    def obtener_MinMaxProm_producciones_dia(self, dia):
+        return Produccion.objects.filter(inversor=self, Dia=dia).values('Hora').annotate(
+            cantidad_minima=Min('cantidad'),
+            cantidad_maxima=Max('cantidad'),
+            cantidad_promedio=Avg('cantidad')
+        ).order_by('Hora')
 
 class Produccion(models.Model):
     Dia = models.CharField(max_length=50)  # Puede ser DateField

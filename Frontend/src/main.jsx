@@ -10,15 +10,14 @@ import { ProduccionGraficoPage } from "./pages/ProduccionGraficoPage";
 import { ProduccionGradosPage } from "./pages/ProduccionGradosPage";
 import { ProduccionEstadisticasPage } from "./pages/ProduccionEstadisticasPage";
 import ProduccionVLPage from "./pages/ProduccionVLPage";
-import { PercepcionesComputacionalesDiaHoraPage } from "./pages/PercepcionesComputacionalesDiaHoraPage";
-import { PercepcionesComputacionalesDiaPage } from "./pages/PercepcionesComputacionalesDiaPage";
-import { PercepcionesComputacionalesPage } from "./pages/PercepcionesComputacionalesPage";
+import { PercepcionesSegundoGradoDiaHoraPage } from "./pages/PercepcionesSegundoGradoDiaHoraPage";
+import { PercepcionesSegundoGradoDiaPage } from "./pages/PercepcionesSegundoGradoDiaPage";
+import { PercepcionesSegundoGradoPage } from "./pages/PercepcionesSegundoGradoPage.jsx";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import App from "./App.jsx";
 import { AgregarExcelPage } from "./pages/AgregarExcelPage.jsx";
 import { MetricasEstacionPage } from "./pages/MetricasEstacionPage.jsx";
-import { MetricasMensualHoraPage } from "./pages/MetricasMensualHoraPage.jsx";
 import { MetricasEstacionGeneralMesPage } from "./pages/MetricasEstacionGeneralMesPage.jsx";
 import { MetricasEstacionGeneralDiaPage } from "./pages/MetricasEstacionGeneralDiaPage.jsx";
 import { MetricasEstacionHoraDiaPage } from "./pages/MetricasEstacionHoraDiaPage.jsx";
@@ -27,6 +26,10 @@ import { DescripcionesInversorPage } from "./pages/DescripcionesInversorPage.jsx
 import { DescripcionesEstacionPage } from "./pages/DescripcionesEstacionPage.jsx";
 import { InformesPage } from "./pages/InformesPage.jsx";
 import { InformesEstacionPage } from "./pages/InformesEstacionPage.jsx";
+import { MetricasEstacionHoraMesPage } from "./pages/MetricasEstacionHoraMesPage.jsx";
+import { PercepcionesPrimerGradoPage } from "./pages/PercepcionesPrimerGradoPage.jsx";
+import { PercepcionesPrimerGradoDiaPage } from "./pages/PercepcionesPrimerGradoDiaPage.jsx";
+import { PercepcionesPrimerGradoHoraPage } from "./pages/PercepcionesPrimerGradoHoraPage.jsx";
 
 const router = createBrowserRouter([
   
@@ -76,8 +79,8 @@ const router = createBrowserRouter([
         element: <MetricasEstacionPage />,
       },
       {
-        path: "/estadisticas/metricas-estacion/mensual-hora",
-        element: <MetricasMensualHoraPage />,
+        path: "/estadisticas/metricas-estacion/hora-mes",
+        element: <MetricasEstacionHoraMesPage />,
       },
       {
         path: "/estadisticas/metricas-estacion/general-mes",
@@ -92,16 +95,28 @@ const router = createBrowserRouter([
         element: <MetricasEstacionHoraDiaPage />,
       },
       {
-        path: "/PercepcionesComputacionales",
-        element: <PercepcionesComputacionalesPage />,
+        path: "/percepciones-segundo-grado",
+        element: <PercepcionesSegundoGradoPage />,
       },
       {
-        path: "/PercepcionesComputacionalesDiaHora",
-        element: <PercepcionesComputacionalesDiaHoraPage />,
+        path: "/percepciones-segundo-grado/dia-hora",
+        element: <PercepcionesSegundoGradoDiaHoraPage />,
       },
       {
-        path: "/PercepcionesComputacionalesDia",
-        element: <PercepcionesComputacionalesDiaPage />,
+        path: "/percepciones-segundo-grado/dia",
+        element: <PercepcionesSegundoGradoDiaPage />,
+      },
+      {
+        path: "/percepciones-primer-grado",
+        element: <PercepcionesPrimerGradoPage />,
+      },
+      {
+        path: "/percepciones-primer-grado/dia",
+        element: <PercepcionesPrimerGradoDiaPage />,
+      },
+      {
+        path: "/percepciones-primer-grado/hora",
+        element: <PercepcionesPrimerGradoHoraPage />,
       },
       {
         path: "/resumenes",
