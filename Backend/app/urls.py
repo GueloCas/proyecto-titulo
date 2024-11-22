@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 from .views import EstacionViewSet, InversorViewSet, ProduccionViewSet, InversorProduccionView, InversorProduccionHoraView, VariableLinguisticaHoraView, InversorMinMaxHoraView, InversorProduccionEstadisticasView, InversorProduccionGradoPertenenciaView, ObtenerPercepcionesComputacionalesView, ObtenerPercepcionesDiariasView
-from .views_nuevo.subir_datos_views import ExcelUploadView
+from .views_nuevo.subir_datos_views import ExcelUploadView, CSVUploadView
 from .views_nuevo.estadisticas_views import MetricasEstacionView, MetricasEstacionGeneralMesView, MetricasEstacionGeneralDiaView, MetricasEstacionHoraDiaView
 from .views import login, register
 
@@ -22,6 +22,7 @@ urlpatterns = [
     path("api/v1/", include(router.urls)),
     path('docs/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/v1/upload-excel/', ExcelUploadView.as_view(), name='upload-excel'),
+    path('api/v1/upload-csv/', CSVUploadView.as_view(), name='upload-csv'),
     path("api/v1/produccion-por-inversor/", InversorProduccionView.as_view(), name="produccion-por-inversor"),
     path("api/v1/produccion-por-inversor-estadisticas/", InversorProduccionEstadisticasView.as_view(), name="produccion-por-inversor-estadisticas"),
     path("api/v1/produccion-por-inversor-hora/", InversorProduccionHoraView.as_view(), name="produccion-por-inversor-hora"),

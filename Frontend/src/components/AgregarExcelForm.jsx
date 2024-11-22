@@ -18,7 +18,7 @@ const AgregarExcelForm = () => {
             file.type === "text/csv") {
           setSelectedFile(file);
         } else {
-          alert("Archivo no válido, selecciona un archivo Excel.");
+          alert("Archivo no válido, selecciona un archivo Excel o CSV.");
         }
       }
     }
@@ -29,18 +29,35 @@ const AgregarExcelForm = () => {
       alert("Por favor, selecciona un archivo");
       return;
     }
-
+  
     const formData = new FormData();
     formData.append("file", selectedFile);
-
+  
     setLoading(true);
-
+  
     try {
-      const response = await axios.post("http://localhost:8000/api/v1/upload-excel/", formData, {
+      // Verifica el tipo del archivo y define la URL correspondiente
+      const fileType = selectedFile.type;
+      let uploadUrl = "";
+  
+      if (fileType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || fileType === "application/vnd.ms-excel") {
+        uploadUrl = "http://localhost:8000/api/v1/upload-excel/";
+      } else if (fileType === "text/csv") {
+        uploadUrl = "http://localhost:8000/api/v1/upload-csv/";
+      } else {
+        alert("Formato de archivo no válido. Selecciona un archivo Excel o CSV.");
+        setLoading(false);
+        return;
+      }
+  
+      // Envía el archivo a la URL seleccionada
+      console.log(uploadUrl);
+      const response = await axios.post(uploadUrl, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+  
       console.log("Respuesta del servidor:", response.data);
       navigate("/inversores");
     } catch (error) {
@@ -49,6 +66,7 @@ const AgregarExcelForm = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="d-flex justify-content-center align-items-center">
