@@ -121,7 +121,7 @@ class CSVUploadView(APIView):
                 for col_index in range(2, len(df.columns)):
                     valor = df.iloc[row_index, col_index]
                     if pd.notna(valor):
-                        inversor = inversores.get(col_index - 2)
+                        inversor = inversores.get(col_index - 4)
                         if inversor:  # Validar que el inversor exista
                             produccion = Produccion(
                                 Dia=fecha,
