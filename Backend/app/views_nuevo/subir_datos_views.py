@@ -17,6 +17,8 @@ class ExcelUploadView(APIView):
             if file.content_type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
                 return Response({"error": "Archivo no es un Excel válido"}, status=status.HTTP_400_BAD_REQUEST)
             
+            print (request.user)
+
             xls = pd.ExcelFile(file)
             for sheet_name in xls.sheet_names:
                 df = pd.read_excel(xls, sheet_name=sheet_name, header=None)
