@@ -5,28 +5,32 @@ export function MetricasEstacionGeneralMes({ estacionId, anio, mes }) {
     const [metricas, setMetricas] = useState([]);
     const [estacion, setEstacion] = useState(null);
     const [mensajeError, setMensajeError] = useState("");
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (estacionId && anio && mes) {
             async function loadMetricas() {
-                setLoading(true);
+                setMetricas(null);
                 try {
                     const data = await getMetricasEstacionGeneralMes(estacionId, anio, mes);
                     setEstacion(data.estacion);
                     setMetricas(data.inversores || []);
                 } catch (error) {
                     setMensajeError("Hubo un error al cargar las métricas.");
-                } finally {
-                    setLoading(false);
                 }
             }
             loadMetricas();
         }
     }, [estacionId, anio, mes]);
     
-    if (loading) {
-        return <div>Cargando...</div>;
+    if (!metricas) {
+        return (
+            <div className="text-center mt-4 d-flex justify-content-center align-items-center">
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+                <span className="ms-2">Cargando...</span>
+            </div>
+        );
     }
 
     return (

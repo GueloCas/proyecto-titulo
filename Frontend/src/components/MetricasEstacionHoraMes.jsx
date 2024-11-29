@@ -16,9 +16,9 @@ export function MetricasEstacionHoraMes({ estacionId, anio, mes, hora }) {
   useEffect(() => {
     if (estacionId && anio && mes && hora) {
       async function loadMetricas() {
+        setMetricas(null);
         try {
           const data = await getMetricasEstacionHoraMes(estacionId, hora);
-          console.log(data);
           setEstacion(data.estacion);
           setMetricas(data.inversores || []);
 
@@ -58,8 +58,15 @@ export function MetricasEstacionHoraMes({ estacionId, anio, mes, hora }) {
     }
   }, [estacionId, anio, mes, hora]); // Se vuelve a ejecutar cuando cambia cualquiera de estos valores
 
-  if (!estacionId && !anio && !mes && !hora) {
-    return <div className="alert alert-info">Por favor, selecciona los valores a buscar.</div>;
+  if (!metricas) {
+    return (
+      <div className="text-center mt-4 d-flex justify-content-center align-items-center">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <span className="ms-2">Cargando...</span>
+      </div>
+    );
   }
 
   return (

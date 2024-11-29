@@ -9,10 +9,10 @@ export function PCTablaDia({ estacionId, anio, mes, dia }) {
 
     useEffect(() => {
         async function obtenerPC(dia) {
+            setData(null);
             try {
                 setError(null);
                 const responseData = await getPercepcionesSegundoGradoDia(estacionId, dia);
-                console.log(responseData);
                 setData(responseData);
 
                 // Extraer los nombres únicos de inversores
@@ -36,8 +36,19 @@ export function PCTablaDia({ estacionId, anio, mes, dia }) {
         }
     }, [dia]);
 
+    if (!data) {
+        return (
+            <div className="text-center mt-4 d-flex justify-content-center align-items-center">
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+                <span className="ms-2">Cargando...</span>
+            </div>
+        );
+    }
+
     return (
-        <div>
+        <div className="mt-4">
             <h2>Tabla de percepciones computacionales 2° Grado</h2>
             {error && <div className="alert alert-danger">{error}</div>}
             {data && !error ? (

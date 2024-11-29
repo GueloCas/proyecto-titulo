@@ -26,7 +26,6 @@ class CalcularDescripcionesLinguisticasInversor(APIView):
                 mes_actual = "Aug"  # Cambiar esto según sea necesario
                 anio_actual = 2022
                 dia_formateado = f"{dia:02d}-{mes_actual}-{anio_actual}"
-                print(dia_formateado)
 
                 for hora in range(8, 23):  # Ciclo por horas del día
                     hora_str = f'H{hora}'

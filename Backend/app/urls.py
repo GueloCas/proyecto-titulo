@@ -5,6 +5,7 @@ from .views_nuevo.subir_datos_views import ExcelUploadView, CSVUploadView
 from .views_nuevo.estadisticas_views import MetricasEstacionHoraMesView, MetricasEstacionGeneralMesView, MetricasEstacionGeneralDiaView, MetricasEstacionHoraDiaView
 from .views_nuevo.descripciones_views import CalcularDescripcionesLinguisticasInversor, CalcularDescripcionesLinguisticasEstacion
 from .views_nuevo.percepciones_views import ObtenerPercepcionesSegundoGradoDiaHoraView, ObtenerPercepcionesSegundoGradoDiaView, ObtenerPercepcionesPrimerGradoDiaView, ObtenerPercepcionesPrimerGradoHoraView
+from .views_nuevo.informes_views import GenerarInformeInversorView
 from .views import login, register
 
 from drf_yasg.views import get_schema_view
@@ -44,6 +45,8 @@ urlpatterns = [
 
     path('api/v1/descripciones-linguisticas-inversor/', CalcularDescripcionesLinguisticasInversor.as_view(), name='descripciones-linguisticas-inversor'),
     path('api/v1/descripciones-linguisticas-estacion/', CalcularDescripcionesLinguisticasEstacion.as_view(), name='descripciones-linguisticas-estacion'),
+
+    path('api/v1/informe-inversor/', GenerarInformeInversorView.as_view(), name='informe-inversor'),
     
     path('api/v1/login/', login, name='login'),
     path('api/v1/register/', register, name='register'),

@@ -229,14 +229,14 @@ strong,
   margin-bottom: 25px;
 }
 
-.text-primary,
-.text-primary a {
-  color: #1572E8 !important;
+.text-primary-kai,
+.text-primary-kai a {
+  color: #1E3A5F !important;
 }
 
-.text-primary:hover,
-.text-primary a:hover {
-  color: #1572E8 !important;
+.text-primary-kai:hover,
+.text-primary-kai a:hover {
+  color: #1E3A5F !important;
 }
 
 .text-secondary,
@@ -1017,7 +1017,7 @@ body {
   text-align: center;
   vertical-align: middle;
   float: left;
-  font-size: 16px;
+  font-size: 20px;
   line-height: 30px;
 }
 
@@ -2683,7 +2683,7 @@ body[data-background-color="dark"] .border-top {
 /*     Card     */
 .card,
 .card-light {
-  border-radius: 10px;
+  border-radius: 15px;
   background-color: #ffffff;
   margin-bottom: 30px;
   -webkit-box-shadow: 2px 6px 15px 0px rgba(69, 65, 78, 0.1);

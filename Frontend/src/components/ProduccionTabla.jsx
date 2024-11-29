@@ -1,7 +1,32 @@
 import { Link } from "react-router-dom";
 import Papa from 'papaparse';
+import { useEffect, useState } from "react";
+import { getProduccionPorInversor } from "../api/produccion.api";
 
-export function ProduccionTabla({ produccion, diasUnicos, horasUnicas, id, nombreInversor }) {
+export function ProduccionTabla({ inversor, anio, mes }) {
+    const [produccion, setProduccion] = useState([]);
+    const [nombreInversor, setNombreInversor] = useState("");
+    const [diasUnicos, setDiasUnicos] = useState([]);
+    const [horasUnicas, setHorasUnicas] = useState([]);
+
+    useEffect(() => {
+        async function loadProduccion() {
+            const data = await getProduccionPorInversor(inversor);
+
+            // `data` incluye 'nombre_inversor' y 'producciones'
+            setNombreInversor(data.nombre_inversor);  // Guarda el nombre del inversor
+            setProduccion(data.producciones);  // Guarda las producciones
+
+            // Extraer días y horas únicos
+            const dias = [...new Set(data.producciones.map(produccion => produccion.Dia))].sort();
+            const horas = [...new Set(data.producciones.map(produccion => produccion.Hora))];
+
+            setDiasUnicos(dias);
+            setHorasUnicas(horas);
+        }
+        loadProduccion();
+    }, [inversor]);
+
     const exportToCSV = () => {
         // Crear los encabezados: Hora/Día + días únicos
         const csvRows = [];
@@ -49,8 +74,8 @@ export function ProduccionTabla({ produccion, diasUnicos, horasUnicas, id, nombr
                     }
                 `}
             </style>
-            <div className="table-responsive" style={{ overflowX: 'auto' }}>
-                <table className="mt-1 mb-0 table table-striped table-bordered table-hover">
+            <div className="table-responsive mt-4" style={{ overflowX: 'auto' }}>
+                <table className="mb-0 table table-striped table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>Hora/Día</th>
@@ -70,7 +95,7 @@ export function ProduccionTabla({ produccion, diasUnicos, horasUnicas, id, nombr
                                         <td key={dia}>
                                             {produccionDiaHora ? (
                                                 <Link
-                                                    to={`/ProduccionInversor/VLinguisticas?hora=${produccionDiaHora.Hora}&cantidad=${produccionDiaHora.cantidad}&dia=${produccionDiaHora.Dia}&inversor=${id}`}
+                                                    to={`/ProduccionInversor/VLinguisticas?hora=${produccionDiaHora.Hora}&cantidad=${produccionDiaHora.cantidad}&dia=${produccionDiaHora.Dia}&inversor=${inversor}`}
                                                     className="text-dark text-decoration-none d-flex justify-content-center"
                                                 >
                                                     {produccionDiaHora.cantidad}
@@ -80,7 +105,7 @@ export function ProduccionTabla({ produccion, diasUnicos, horasUnicas, id, nombr
                                     );
                                 })}
                                 <td style={{ backgroundColor: '#c0c0c0' }}>
-                                    <Link to={`/inversor/${id}/produccion/grafico?hora=H${hora}`} className="text-dark text-decoration-none d-flex justify-content-center">
+                                    <Link to={`/inversor/${inversor}/produccion/grafico?hora=H${hora}`} className="text-dark text-decoration-none d-flex justify-content-center">
                                         Ver
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="ms-1 bi bi-graph-up text-dark" viewBox="0 0 16 16">
                                             <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />

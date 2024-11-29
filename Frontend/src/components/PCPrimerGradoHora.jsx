@@ -8,6 +8,7 @@ export function PCPrimerGradoHora({ inversorId, anio, mes, hora }) {
 
     useEffect(() => {
         async function obtenerPC() {
+            setPercepciones(null);
             try {
                 const data = await getPercepcionesPrimerGradoHora(inversorId, hora);
                 console.log(data);
@@ -19,8 +20,19 @@ export function PCPrimerGradoHora({ inversorId, anio, mes, hora }) {
         obtenerPC();
     }, [inversorId, hora]);
 
+    if (!percepciones) {
+        return (
+            <div className="text-center mt-4 d-flex justify-content-center align-items-center">
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+                <span className="ms-2">Cargando...</span>
+            </div>
+        );
+    }
+
     return (
-        <div>
+        <div className="mt-4">
             <table className="table table-striped table-bordered">
                 <thead>
                     <tr>

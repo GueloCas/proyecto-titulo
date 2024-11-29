@@ -144,8 +144,6 @@ class ObtenerPercepcionesPrimerGradoDiaView(APIView):
         inversor_id = request.query_params.get('inversor')
         dia = request.query_params.get('dia')
         dia_int = int(dia) if isinstance(dia, str) else dia
-
-        print(f"inversor_id: {inversor_id}")
         
         if not inversor_id:
             return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)

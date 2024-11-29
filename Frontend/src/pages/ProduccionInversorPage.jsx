@@ -1,60 +1,181 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ProduccionTabla } from "../components/ProduccionTabla";
-import { ProduccionEstadisticas } from "../components/ProduccionEstadisticas";
 import { useEffect, useState } from "react";
-import { getProduccionPorInversor } from "../api/produccion.api";
+import { getInversores } from "../api/inversor.api";
+import { anios, meses } from "../utils/dateHelpers";
 
 export function ProduccionInversorPage() {
-    const { id } = useParams();
-
-    const [produccion, setProduccion] = useState([]);
-    const [diasUnicos, setDiasUnicos] = useState([]);
-    const [horasUnicas, setHorasUnicas] = useState([]);
-    const [nombreInversor, setNombreInversor] = useState("");
+    const [inversores, setInversores] = useState([]);
+    const [selectedInversor, setSelectedInversor] = useState("");
+    const [selectedAnio, setSelectedAnio] = useState("");
+    const [selectedMes, setSelectedMes] = useState(""); // Se mantiene el selector de mes
+    const [mensajeError, setMensajeError] = useState("");
+    const [mostrar, setMostrar] = useState(false);
+    const [isAccordionOpen, setIsAccordionOpen] = useState(true);
+    const [searchParams, setSearchParams] = useState(null);
+    const [urlParams, setUrlParams] = useSearchParams();
 
     useEffect(() => {
-        async function loadProduccion() {
-            const data = await getProduccionPorInversor(id);
+        async function loadInversores() {
+            try {
+                const data = await getInversores();
+                setInversores(data);
 
-            // `data` incluye 'nombre_inversor' y 'producciones'
-            setNombreInversor(data.nombre_inversor);  // Guarda el nombre del inversor
-            setProduccion(data.producciones);  // Guarda las producciones
-
-            // Extraer días y horas únicos
-            const dias = [...new Set(data.producciones.map(produccion => produccion.Dia))].sort();
-            const horas = [...new Set(data.producciones.map(produccion => produccion.Hora))];
-
-            setDiasUnicos(dias);
-            setHorasUnicas(horas);
+                const inversorFromUrl = urlParams.get("inversor");
+                if (inversorFromUrl && data.some((inv) => inv.id.toString() === inversorFromUrl)) {
+                    console.log("Inversor encontrado en URL:", inversorFromUrl);
+                    setSelectedInversor(inversorFromUrl);
+                    setSelectedAnio(anios[0]);
+                    setSelectedMes(meses[0].value);
+                }
+            } catch (error) {
+                setMensajeError("Hubo un error al cargar las Inversores.");
+            }
         }
-        loadProduccion();
-    }, [id]);
+        loadInversores();
+    }, []);
+
+    const isFormValid = selectedInversor && selectedAnio && selectedMes;
+
+    const handleSearch = () => {
+        if (isFormValid) {
+            setSearchParams({ inversor: selectedInversor, anio: selectedAnio, mes: selectedMes }); // Actualizar parámetros de búsqueda
+            setMostrar(true);
+            setIsAccordionOpen(false); // Cierra el acordeón cuando se hace clic en "Buscar"
+            setMensajeError(""); // Limpiar mensajes de error
+        } else {
+            setMensajeError("Por favor, seleccione todos los campos.");
+        }
+    };
 
     return (
         <div className="container">
             <div className="page-inner">
-                <div className="mt-1 d-flex justify-content-between align-items-center">
-                    <h1>Producción de inversor: {nombreInversor}</h1>
-                    <div className="d-flex justify-content-right align-items-center">
-                        <Link to={`/ProduccionInversor/Estadisticas/${id}?inversor=${nombreInversor}`} className="text-decoration-none">
+                <div className="d-flex mb-1 justify-content-between align-items-center">
+                    <h1 className="mb-0 fw-bold">Producción Mensual de Inversor</h1>
+                    <Link to={`/inversores`} className="text-decoration-none">
+                        <button
+                            className="btn btn-success ms-4"
+                        >
+                            Volver
+                        </button>
+                    </Link>
+                </div>
+
+                {/* Breadcrumb */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-4">
+                        <li className="breadcrumb-item">
+                            <Link to="/dashboard">Dashboard</Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to="/percepciones-primer-grado">Producciones</Link>
+                        </li>
+                        <li className="breadcrumb-item active" aria-current="page">
+                            Por Inversor
+                        </li>
+                    </ol>
+                </nav>
+
+                {mensajeError && <div className="alert alert-danger">{mensajeError}</div>}
+
+                <div className="accordion" id="filtrosAccordion" style={{ maxWidth: '800px', margin: '0 auto' }}>
+                    <div className="accordion-item">
+                        <h2 className="accordion-header" id="filtrosHeader">
                             <button
-                                className="btn btn-outline-secondary ms-4"
-                                style={{ height: "38px" }}
+                                className={`accordion-button  ${isAccordionOpen ? '' : 'collapsed'}`}
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#filtrosContent"
+                                aria-expanded={isAccordionOpen}
+                                aria-controls="filtrosContent"
                             >
-                                Ver Tabla Estadisticas
+                                Filtros
                             </button>
-                        </Link>
-                        <Link to={`/ProduccionInversor/Grados/${id}?inversor=${nombreInversor}`} className="text-decoration-none">
-                            <button
-                                className="btn btn-outline-secondary ms-4"
-                                style={{ height: "38px" }}
-                            >
-                                Ver Tabla Grados
-                            </button>
-                        </Link>
+                        </h2>
+                        <div
+                            id="filtrosContent"
+                            className={`accordion-collapse collapse ${isAccordionOpen ? 'show' : ''}`}
+                            aria-labelledby="filtrosHeader"
+                            data-bs-parent="#filtrosAccordion"
+                        >
+                            <div className="accordion-body">
+                                <div className="d-flex justify-content-center mb-2">
+                                    <div className="d-flex flex-wrap justify-content-center">
+                                        <div className="px-2">
+                                            <label className="form-label">Inversor</label>
+                                            <select
+                                                className="form-select"
+                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                value={selectedInversor}
+                                                onChange={(e) => setSelectedInversor(e.target.value)}
+                                            >
+                                                <option value="" disabled>Seleccione una inversor</option>
+                                                {inversores.map((estacion) => (
+                                                    <option key={estacion.id} value={estacion.id}>
+                                                        {estacion.nombre}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="px-2">
+                                            <label className="form-label">Año</label>
+                                            <select
+                                                className="form-select"
+                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                value={selectedAnio}
+                                                onChange={(e) => setSelectedAnio(e.target.value)}
+                                            >
+                                                <option value="" disabled>Seleccione un año</option>
+                                                {anios.map((anio) => (
+                                                    <option key={anio} value={anio}>
+                                                        {anio}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="px-2">
+                                            <label className="form-label">Mes</label>
+                                            <select
+                                                className="form-select"
+                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                value={selectedMes}
+                                                onChange={(e) => setSelectedMes(e.target.value)}
+                                            >
+                                                <option value="" disabled>Seleccione un mes</option>
+                                                {meses.map((mes) => (
+                                                    <option key={mes.value} value={mes.value}>
+                                                        {mes.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="px-2 d-flex align-items-end">
+                                            <button
+                                                className={`btn ${isFormValid ? 'btn-success' : 'btn-secondary'} w-100`}
+                                                onClick={handleSearch}
+                                                disabled={!isFormValid}
+                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                            >
+                                                Buscar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <ProduccionTabla produccion={produccion} diasUnicos={diasUnicos} horasUnicas={horasUnicas} id={id} nombreInversor={nombreInversor} />
+
+                {mostrar && searchParams &&
+                    <ProduccionTabla
+                        inversor={searchParams.inversor}
+                        anio={searchParams.anio}
+                        mes={searchParams.mes}
+                     />}
             </div>
         </div>
     );

@@ -8,9 +8,9 @@ export function PCPrimerGradoDia({ inversorId, anio, mes, dia }) {
 
     useEffect(() => {
         async function obtenerPC() {
+            setPercepciones(null);
             try {
                 const data = await getPercepcionesPrimerGradoDia(inversorId, dia);
-                console.log(data);
                 setPercepciones(data);
             } catch (error) {
                 setMensajeError("Hubo un error al cargar las Percepciones.");
@@ -19,8 +19,19 @@ export function PCPrimerGradoDia({ inversorId, anio, mes, dia }) {
         obtenerPC();
     }, [inversorId, dia]);
 
+    if (!percepciones) {
+        return (
+            <div className="text-center mt-4 d-flex justify-content-center align-items-center">
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+                <span className="ms-2">Cargando...</span>
+            </div>
+        );
+    }
+
     return (
-        <div>
+        <div className="mt-4">
             <table className="table table-striped table-bordered">
                 <thead>
                     <tr>

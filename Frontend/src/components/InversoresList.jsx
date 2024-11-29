@@ -68,7 +68,7 @@ export function InversoresList() {
                   <td>
                     <div className="d-flex gap-2">
                       <Link
-                        to={`/inversor/${inversor.id}/produccion`}
+                        to={`/producciones/inversor?inversor=${inversor.id}`}
                         className="btn btn-primary text-light rounded-3"
                       >
                         Ver Producción

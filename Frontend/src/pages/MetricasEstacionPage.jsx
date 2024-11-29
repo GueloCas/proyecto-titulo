@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card } from "../components/Card";
 
-
 const cardData = [
   {
     to: "general-dia",

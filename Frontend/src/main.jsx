@@ -25,11 +25,12 @@ import { ResumenesPage } from "./pages/ResumenesPage.jsx";
 import { DescripcionesInversorPage } from "./pages/DescripcionesInversorPage.jsx";
 import { DescripcionesEstacionPage } from "./pages/DescripcionesEstacionPage.jsx";
 import { InformesPage } from "./pages/InformesPage.jsx";
-import { InformesEstacionPage } from "./pages/InformesEstacionPage.jsx";
+import { InformeEstacionPage } from "./pages/InformeEstacionPage.jsx";
 import { MetricasEstacionHoraMesPage } from "./pages/MetricasEstacionHoraMesPage.jsx";
 import { PercepcionesPrimerGradoPage } from "./pages/PercepcionesPrimerGradoPage.jsx";
 import { PercepcionesPrimerGradoDiaPage } from "./pages/PercepcionesPrimerGradoDiaPage.jsx";
 import { PercepcionesPrimerGradoHoraPage } from "./pages/PercepcionesPrimerGradoHoraPage.jsx";
+import { InformeInversorPage } from "./pages/InformeInversorPage.jsx";
 
 const router = createBrowserRouter([
   
@@ -55,7 +56,7 @@ const router = createBrowserRouter([
         element: <AgregarExcelPage />,
       },
       {
-        path: "/inversor/:id/produccion",
+        path: "/producciones/inversor",
         element: <ProduccionInversorPage />,
       },
       {
@@ -123,11 +124,11 @@ const router = createBrowserRouter([
         element: <ResumenesPage />,
       },
       {
-        path: "/resumenes/descripciones-inversor",
+        path: "/resumenes/resumenes-inversor",
         element: <DescripcionesInversorPage />,
       },
       {
-        path: "/resumenes/descripciones-estacion",
+        path: "/resumenes/resumenes-estacion",
         element: <DescripcionesEstacionPage />,
       },
       {
@@ -135,8 +136,12 @@ const router = createBrowserRouter([
         element: <InformesPage />,
       },
       {
-        path: "/informes/informes-estacion",
-        element: <InformesEstacionPage />,
+        path: "/informes/informe-estacion",
+        element: <InformeEstacionPage />,
+      },
+      {
+        path: "/informes/informe-inversor",
+        element: <InformeInversorPage />,
       },
     ],
   },

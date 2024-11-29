@@ -81,7 +81,6 @@ def obtenerPercepcionComputacionalSegundoGrado(percepcionesComputacionalesPrimer
     return percepcionesComputacionalesSegundoGrado
 
 def obtenerClasificacionDescripcionLinguistica(p, w):
-    print(p, w)
     if p == 0:
         return 'NINGUNA hora fue ' + w
     elif p > 0 and p < 0.1:

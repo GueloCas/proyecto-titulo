@@ -6,25 +6,33 @@ export function PCTablaDiaHora({ estacionId, anio, mes, dia, hora }) {
     const [error, setError] = useState(null); // Estado para almacenar errores
 
     useEffect(() => {
-        async function obtenerPC(dia, hora) {
+        async function obtenerPC() {
+            setData(null); 
             try {
                 setError(null); // Resetea el error
                 const responseData = await getPercepcionesSegundoGradoDiaHora(estacionId, dia, hora);
                 setData(responseData.percepciones_segundo_grado); // Almacena los datos en el estado
-                console.log(responseData.percepciones_segundo_grado);
             } catch (err) {
                 setError(err.response.data.error); // Manejo de errores
                 console.error(err.response.data.error);
             }
         }
-
-        if (dia && hora) { // Verifica que dia y hora no sean vacíos
-            obtenerPC(dia, hora);
-        }
+        obtenerPC();
     }, [dia, hora]);
 
+    if (!data) {
+        return (
+            <div className="text-center mt-4 d-flex justify-content-center align-items-center">
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+                <span className="ms-2">Cargando...</span>
+            </div>
+        );
+    }
+
     return (
-        <div>
+        <div className="mt-4">
             <h2>Tabla de percepciones computacionales</h2>
             {error && <div className="alert alert-danger">{error}</div>}
             {data && !error ? (
