@@ -2,12 +2,15 @@ import { Link } from "react-router-dom";
 import Papa from 'papaparse';
 import { useEffect, useState } from "react";
 import { getProduccionPorInversor } from "../api/produccion.api";
+import { ModalProduccionGrafico } from "./ModalProduccionGrafico";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export function ProduccionTabla({ inversor, anio, mes }) {
     const [produccion, setProduccion] = useState([]);
     const [nombreInversor, setNombreInversor] = useState("");
     const [diasUnicos, setDiasUnicos] = useState([]);
     const [horasUnicas, setHorasUnicas] = useState([]);
+    const [modalData, setModalData] = useState({ visible: false, hora: null, datos: [] });
 
     useEffect(() => {
         async function loadProduccion() {
@@ -26,6 +29,34 @@ export function ProduccionTabla({ inversor, anio, mes }) {
         }
         loadProduccion();
     }, [inversor]);
+
+    useEffect(() => {
+        const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(tooltipTriggerEl => {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }, []);
+
+    // Función para manejar la apertura del modal
+    const abrirModal = (aux, data) => {
+        if (aux === "hora") {
+            const datosHora = diasUnicos.map(dia => {
+                const produccionDiaHora = produccion.find(p => p.Dia === dia && p.Hora === data);
+                return { dia, cantidad: produccionDiaHora ? produccionDiaHora.cantidad : 0 };
+            });
+            setModalData({ visible: true, hora: data, dia: false, datos: datosHora });
+        } else {
+            const datosDia = horasUnicas.map(hora => {
+                const produccionDiaHora = produccion.find(p => p.Dia === data && p.Hora === hora);
+                return { hora, cantidad: produccionDiaHora ? produccionDiaHora.cantidad : 0 };
+            });
+            setModalData({ visible: true, hora: false, dia: data, datos: datosDia });
+        }
+    };
+
+    const cerrarModal = () => {
+        setModalData({ visible: false, hora: null, datos: [] });
+    };
 
     const exportToCSV = () => {
         // Crear los encabezados: Hora/Día + días únicos
@@ -75,24 +106,47 @@ export function ProduccionTabla({ inversor, anio, mes }) {
                 `}
             </style>
             <div className="table-responsive mt-4" style={{ overflowX: 'auto' }}>
+                <div className="d-flex justify-content-between mb-2 align-items-center">
+                    <h4 className="ms-2 mb-0">
+                        Tabla producción del inversor: <strong>{nombreInversor}</strong> el mes <strong>{mes}-{anio}</strong>
+                        {/* Icono con Tooltip */}
+                        <i
+                            className="bi bi-info-circle ms-2"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="top"
+                            title="Presiona una hora para ver gráfico con la producción en esa hora en el mes, o presiona un día para ver la producción por hora en ese día."
+                            style={{ fontSize: "1.5rem", cursor: "pointer" }}
+                        ></i>
+                    </h4>
+                    <button onClick={exportToCSV} className="btn btn-info btn-border">
+                        Descargar CSV
+                    </button>
+                </div>
                 <table className="mb-0 table table-striped table-bordered table-hover">
                     <thead>
                         <tr>
-                            <th>Hora/Día</th>
-                            {diasUnicos.map(dia => (
-                                <th key={dia}>{dia}</th>
+                            <th>Día/Hora</th>
+                            {horasUnicas.map(hora => (
+                                <th key={hora}>
+                                    <button className="btn p-0" onClick={() => abrirModal("hora", hora)}>
+                                        <strong>{hora}</strong>
+                                    </button>
+                                </th>
                             ))}
-                            <th>Gráf.</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {horasUnicas.map(hora => (
-                            <tr key={hora}>
-                                <td>{hora}</td>
-                                {diasUnicos.map(dia => {
+                        {diasUnicos.map(dia => (
+                            <tr key={dia}>
+                                <td>
+                                    <button className="btn p-0" onClick={() => abrirModal("dia", dia)}>
+                                        <strong>{dia}</strong>
+                                    </button>
+                                </td>
+                                {horasUnicas.map(hora => {
                                     const produccionDiaHora = produccion.find(p => p.Dia === dia && p.Hora === hora);
                                     return (
-                                        <td key={dia}>
+                                        <td key={hora}>
                                             {produccionDiaHora ? (
                                                 <Link
                                                     to={`/ProduccionInversor/VLinguisticas?hora=${produccionDiaHora.Hora}&cantidad=${produccionDiaHora.cantidad}&dia=${produccionDiaHora.Dia}&inversor=${inversor}`}
@@ -104,22 +158,24 @@ export function ProduccionTabla({ inversor, anio, mes }) {
                                         </td>
                                     );
                                 })}
-                                <td style={{ backgroundColor: '#c0c0c0' }}>
-                                    <Link to={`/inversor/${inversor}/produccion/grafico?hora=H${hora}`} className="text-dark text-decoration-none d-flex justify-content-center">
-                                        Ver
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" className="ms-1 bi bi-graph-up text-dark" viewBox="0 0 16 16">
-                                            <path fillRule="evenodd" d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07" />
-                                        </svg>
-                                    </Link>
-                                </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+
+                {/* Modal de gráfico */}
+                {modalData.visible && (
+                    <ModalProduccionGrafico
+                        nombreInv={nombreInversor}
+                        mes={mes}
+                        anio={anio}
+                        horaSeleccionada={modalData.hora}
+                        diaSeleccionado={modalData.dia}
+                        datos={modalData.datos}
+                        onClose={cerrarModal}
+                    />
+                )}
             </div>
-            <button onClick={exportToCSV} className="btn btn-info mt-1">
-                Descargar CSV
-            </button>
         </div>
     );
 }

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-
 export function BarraLateral() {
     useEffect(() => {
         const script = document.createElement('script');
@@ -114,7 +113,7 @@ export function BarraLateral() {
                                 <ul className="nav nav-collapse">
                                     <li className={`${isActive('/producciones/inversor')}`}>
                                         <a href="/producciones/inversor">
-                                            <span className="sub-item">Producciones por Inversor</span>
+                                            <span className="sub-item">Inversor</span>
                                         </a>
                                     </li>
                                 </ul>
