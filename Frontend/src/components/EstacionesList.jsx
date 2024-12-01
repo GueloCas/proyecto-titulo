@@ -4,14 +4,26 @@ import { Link } from "react-router-dom";
 
 export function EstacionesList() {
   const [estaciones, setEstaciones] = useState([]);
+  const [User, setUser] = useState(null);
 
   useEffect(() => {
-    async function loadEstaciones() {
-      const data = await getEstaciones();
-      setEstaciones(data);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
-    loadEstaciones();
   }, []);
+
+
+
+  useEffect(() => {
+    const fetchEstaciones = async () => {
+      const data = await getEstaciones();
+      console.log(data);
+      const estacionesUsers = data.filter((estacion) => estacion.usuario === User.id);
+      setEstaciones(estacionesUsers);
+    };
+    fetchEstaciones();
+  }, [User]);
 
   const handleDeleteEstacion = (id) => {
     return async () => {

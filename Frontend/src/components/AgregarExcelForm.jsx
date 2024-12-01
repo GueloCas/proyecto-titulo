@@ -1,11 +1,13 @@
-import React, { useState } from "react";
-import { useDropzone } from "react-dropzone"; // Importa useDropzone
+import React, { useState, useEffect } from "react";
+import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { set } from "react-hook-form";
 
 const AgregarExcelForm = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   // Configuración de dropzone
@@ -13,7 +15,7 @@ const AgregarExcelForm = () => {
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
         const file = acceptedFiles[0];
-        if (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || 
+        if (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
             file.type === "application/vnd.ms-excel" ||
             file.type === "text/csv") {
           setSelectedFile(file);
@@ -23,7 +25,15 @@ const AgregarExcelForm = () => {
       }
     }
   });
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
   
+
   const handleSubmit = async () => {
     if (!selectedFile) {
       alert("Por favor, selecciona un archivo");
@@ -32,11 +42,21 @@ const AgregarExcelForm = () => {
   
     const formData = new FormData();
     formData.append("file", selectedFile);
+    console.log("Archivo seleccionado:", selectedFile);
+  
+    if (user) {
+      console.log("Usuario:", user);
+      formData.append("user", JSON.stringify(user)); // Convierte `user` en una cadena JSON
+    }
+  
+    // Verificar el contenido del FormData
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
   
     setLoading(true);
   
     try {
-      // Verifica el tipo del archivo y define la URL correspondiente
       const fileType = selectedFile.type;
       let uploadUrl = "";
   
@@ -50,8 +70,6 @@ const AgregarExcelForm = () => {
         return;
       }
   
-      // Envía el archivo a la URL seleccionada
-      console.log(uploadUrl);
       const response = await axios.post(uploadUrl, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -66,6 +84,7 @@ const AgregarExcelForm = () => {
       setLoading(false);
     }
   };
+  
   
 
   return (
