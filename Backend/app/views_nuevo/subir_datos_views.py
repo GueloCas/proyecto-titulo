@@ -5,10 +5,15 @@ from rest_framework.response import Response
 import pandas as pd 
 import os
 from io import StringIO
+from django.contrib.auth.models import User
+import json
 
 class ExcelUploadView(APIView):
+
     def post(self, request, *args, **kwargs):
+        print(request)
         file = request.FILES.get('file')
+        user_json = request.POST.get('user')  # Cambiado a request.POST
         
         if not file:
             return Response({"error": "No se envió ningún archivo"}, status=status.HTTP_400_BAD_REQUEST)
@@ -16,15 +21,25 @@ class ExcelUploadView(APIView):
         try:
             if file.content_type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
                 return Response({"error": "Archivo no es un Excel válido"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Deserializar el JSON de `user`
+            user_data = json.loads(user_json)
+
+            # Recuperar el objeto de usuario
+            try:
+                user = User.objects.get(id=user_data['id'])
+            except User.DoesNotExist:
+                return Response({"error": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
             
-            print (request.user)
+            print("usuario: ", user)
+            print(file)
 
             xls = pd.ExcelFile(file)
             for sheet_name in xls.sheet_names:
                 df = pd.read_excel(xls, sheet_name=sheet_name, header=None)
 
                 # Crear o recuperar la estación
-                estacion, created = Estacion.objects.get_or_create(nombre=sheet_name)
+                estacion, _ = Estacion.objects.get_or_create(nombre=sheet_name, usuario=user)
                 producciones = []
 
                 for col_index in range(1, len(df.columns)):
@@ -52,10 +67,13 @@ class ExcelUploadView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+
 class CSVUploadView(APIView):
     def post(self, request, *args, **kwargs):
         # Obtener el archivo CSV enviado
         file = request.FILES.get('file')
+        user_json =request.POST.get('user')
 
         if not file:
             return Response({"error": "No se envió ningún archivo"}, status=status.HTTP_400_BAD_REQUEST)
@@ -64,6 +82,13 @@ class CSVUploadView(APIView):
             # Verificar que el archivo es CSV
             if file.content_type != 'text/csv':
                 return Response({"error": "Archivo no es un CSV válido"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user_data = json.loads(user_json)
+
+            try:
+                user = User.objects.get(id=user_data['id'])
+            except User.DoesNotExist:
+                return Response({"error": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
             # Leer el archivo CSV como un string
             csv_text = file.read().decode('utf-8')
@@ -97,7 +122,7 @@ class CSVUploadView(APIView):
 
             # Crear o recuperar la estación
             station_name = file.name.split('.')[0]
-            estacion, _ = Estacion.objects.get_or_create(nombre=station_name)
+            estacion, _ = Estacion.objects.get_or_create(nombre=station_name, usuario=user)
 
             producciones = []
 
