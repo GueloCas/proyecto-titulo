@@ -84,7 +84,7 @@ export function InversoresList() {
               <tr>
                 <th>#</th>
                 <th>Nombre del Inversor</th>
-                <th>Nombre de la Estación</th>
+                <th>Estación Asociada</th>
                 <th>Acciones</th>
               </tr>
             </thead>
