@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { getEstaciones } from "../api/estacion.api";
+import { getEstacionesByUser } from "../api/estacion.api";
 import { MetricasEstacionHoraMes } from "../components/MetricasEstacionHoraMes";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { anios, meses } from "../utils/dateHelpers";
 
 export function MetricasEstacionHoraMesPage() {
@@ -14,12 +14,22 @@ export function MetricasEstacionHoraMesPage() {
     const [mostrarMetricas, setMostrarMetricas] = useState(false); // Estado para mostrar el componente MetricasEstacion
     const [isAccordionOpen, setIsAccordionOpen] = useState(true);
     const [searchParams, setSearchParams] = useState(null);
+    const [urlParams, setUrlParams] = useSearchParams();
 
     useEffect(() => {
         async function loadEstaciones() {
             try {
-                const data = await getEstaciones();
-                setEstaciones(data);
+                const data = await getEstacionesByUser();
+                setEstaciones(data.estaciones);
+
+                const estacionFromUrl = urlParams.get("estacion");
+                if (estacionFromUrl && data.estaciones.some((inv) => inv.id.toString() === estacionFromUrl)) {
+                    console.log("estacion encontrado en URL:", estacionFromUrl);
+                    setSelectedEstacion(estacionFromUrl);
+                    setSelectedAnio(anios[0]);
+                    setSelectedMes(meses[0].value);
+                    setSelectedHora("8");
+                }
             } catch (error) {
                 setMensajeError("Hubo un error al cargar las estaciones.");
             }
@@ -48,7 +58,7 @@ export function MetricasEstacionHoraMesPage() {
             <div className="page-inner">
                 <div className="d-flex justify-content-between align-items-center mb-1">
                     <h1 className="mb-0 fw-bold">Métricas de Estación - Mensual por Hora</h1>
-                    <Link to="/estadisticas/metricas-estacion"><button className="btn btn-primary">Volver</button></Link>
+                    <Link to="/estadisticas/metricas-estacion"><button className="btn btn-secondary">Volver</button></Link>
                 </div>
 
                 {/* Breadcrumb */}
@@ -163,7 +173,7 @@ export function MetricasEstacionHoraMesPage() {
 
                                         <div className="px-2 d-flex align-items-end">
                                             <button
-                                                className={`btn ${isFormValid ? 'btn-success' : 'btn-secondary'} w-100`}
+                                                className="btn btn-success w-100"
                                                 onClick={handleSearch}
                                                 disabled={!isFormValid}
                                                 style={{ width: '200px' }}  // Definir el ancho aquí

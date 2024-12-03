@@ -41,7 +41,10 @@ export function MetricasEstacionGeneralDia({ estacionId, anio, mes, dia }) {
             {/* Información general de la estación */}
             {estacion && (
                 <div>
-                    <div className="row mt-4">
+                    <h4 className="ms-2 mt-4">
+                        Métricas generales de la estación <strong>[nombre_estacion]</strong> el día <strong>{dia}-{mes}-{anio}</strong>
+                    </h4>
+                    <div className="row mt-2">
                         <div className="col-sm-6 col-md-3">
                             <div className="card card-stats card-primary card-round">
                                 <div className="card-body">
@@ -135,6 +138,9 @@ export function MetricasEstacionGeneralDia({ estacionId, anio, mes, dia }) {
             {/* Tabla de inversores */}
             {metricas.length > 0 && (
                 <div>
+                    <h4 className="ms-2">
+                        Tabla de inversores de la estación <strong>[nombre_estacion]</strong> el día <strong>{dia}-{mes}-{anio}</strong>
+                    </h4>
                     <table className="table table-bordered">
                         <thead>
                             <tr>

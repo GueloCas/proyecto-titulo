@@ -41,7 +41,10 @@ export function MetricasEstacionHoraDia({ estacionId, anio, mes, dia, hora }) {
             {/* Información general de la estación */}
             {estacion && (
                 <div>
-                    <div className="row mt-4">
+                    <h4 className="ms-2 mt-4">
+                        Métricas generales de la estación <strong>[nombre_estacion]</strong> el día <strong>{dia}-{mes}-{anio}</strong> a las <strong>{hora}:00</strong>
+                    </h4>
+                    <div className="row mt-2">
                         <div className="col-sm-6 col-md-3">
                             <div className="card card-stats card-primary card-round">
                                 <div className="card-body">
@@ -134,12 +137,15 @@ export function MetricasEstacionHoraDia({ estacionId, anio, mes, dia, hora }) {
 
             {metricas.length > 0 && (
                 <div>
+                    <h4 className="ms-2">
+                        Tabla de inversores de la estación <strong>[nombre_estacion]</strong> el día <strong>{dia}-{mes}-{anio}</strong> a las <strong>{hora}:00</strong>
+                    </h4>
                     <table className="table table-bordered">
                         <thead>
                             <tr>
                                 <th>Nombre</th>
                                 <th>Producción</th>
-                                <th>Comparación con Promedio</th>
+                                <th>Comparación con Promedio Diario</th>
                                 <th>Promedio Mensual</th>
                                 <th>Comparación con Promedio Mensual</th>
                             </tr>

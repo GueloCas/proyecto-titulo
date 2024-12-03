@@ -81,7 +81,6 @@ class ObtenerPercepcionesSegundoGradoDiaView(APIView):
             mes_actual = "Aug"  # Nombre del mes en inglés
             anio_actual = 2022
             dia_formateado = f"{dia_int:02d}-{mes_actual}-{anio_actual}"
-            print(dia_formateado)
 
             # Lista para almacenar las percepciones por hora
             percepciones_diarias = []
@@ -206,8 +205,6 @@ class ObtenerPercepcionesPrimerGradoHoraView(APIView):
         inversor_id = request.query_params.get('inversor')
         hora = request.query_params.get('hora')
         hora_formateada = f"H{hora}"
-
-        print(f"inversor_id: {inversor_id}")
         
         if not inversor_id:
             return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)

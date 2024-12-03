@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 from .views import EstacionViewSet, InversorViewSet, ProduccionViewSet, InversorProduccionView, InversorProduccionHoraView, VariableLinguisticaHoraView, InversorMinMaxHoraView, InversorProduccionEstadisticasView, InversorProduccionGradoPertenenciaView
 from .views_nuevo.subir_datos_views import ExcelUploadView, CSVUploadView
-from .views_nuevo.estadisticas_views import MetricasEstacionHoraMesView, MetricasEstacionGeneralMesView, MetricasEstacionGeneralDiaView, MetricasEstacionHoraDiaView
+from .views_nuevo.estadisticas_views import MetricasEstacionHoraMesView, MetricasEstacionGeneralMesView, MetricasEstacionGeneralDiaView, MetricasEstacionHoraDiaView, MetricasInversorMesView
 from .views_nuevo.descripciones_views import CalcularDescripcionesLinguisticasInversor, CalcularDescripcionesLinguisticasEstacion
 from .views_nuevo.percepciones_views import ObtenerPercepcionesSegundoGradoDiaHoraView, ObtenerPercepcionesSegundoGradoDiaView, ObtenerPercepcionesPrimerGradoDiaView, ObtenerPercepcionesPrimerGradoHoraView
 from .views_nuevo.informes_views import GenerarInformeInversorView
@@ -43,6 +43,8 @@ urlpatterns = [
     path("api/v1/metricas-estacion-general-mes/", MetricasEstacionGeneralMesView.as_view(), name="metricas-estacion-general-mes"),
     path("api/v1/metricas-estacion-general-dia/", MetricasEstacionGeneralDiaView.as_view(), name='metricas-estacion-general-dia'),
     path("api/v1/metricas-estacion-hora-dia/", MetricasEstacionHoraDiaView.as_view(), name='metricas-estacion-hora-dia'),
+
+    path("api/v1/metricas-inversor-mes/", MetricasInversorMesView.as_view(), name="metricas-inversor-mes"),
 
     path('api/v1/descripciones-linguisticas-inversor/', CalcularDescripcionesLinguisticasInversor.as_view(), name='descripciones-linguisticas-inversor'),
     path('api/v1/descripciones-linguisticas-estacion/', CalcularDescripcionesLinguisticasEstacion.as_view(), name='descripciones-linguisticas-estacion'),

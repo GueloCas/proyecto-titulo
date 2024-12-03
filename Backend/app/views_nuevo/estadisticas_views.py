@@ -168,6 +168,7 @@ class MetricasEstacionGeneralDiaView(APIView):
             mes_actual = "Aug"  # Nombre del mes en inglés
             anio_actual = 2022
             dia_formateado = f"{dia_int:02d}-{mes_actual}-{anio_actual}"
+            print(dia_formateado)
 
             # Variables para el total diario de la estación y horas extremas
             total_diario_estacion = 0
@@ -180,6 +181,7 @@ class MetricasEstacionGeneralDiaView(APIView):
                 # Filtrar producciones para el inversor en el día dado
                 producciones = Produccion.objects.filter(inversor=inversor, Dia=dia_formateado)
                 total_diario_inversor = sum(produccion.cantidad for produccion in producciones)
+                print(f"Producción total de {inversor.nombre} el {dia_formateado}: {total_diario_inversor}")
                 total_diario_estacion += total_diario_inversor
 
                 # Comparar para encontrar el mejor y peor inversor de la estación
@@ -289,10 +291,27 @@ class MetricasEstacionHoraDiaView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class MetricasInversorMesView(APIView):
+    def get(self, request, *args, **kwargs):
+        id_inversor = request.query_params.get('inversor')
 
-            
-            
+        if not id_inversor:
+            return Response({"error": "Se requiere el parámetro 'inversor'"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Obtener el inversor por ID
+            inversor = Inversor.objects.get(pk=id_inversor)
 
+            # Agrupar las producciones por hora y calcular estadísticas agregadas
+            estadisticas_por_hora = inversor.obtener_MinMaxProm_producciones()
 
-            
-            
+            response_data = {
+                "estadisticas": estadisticas_por_hora,
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+        except Inversor.DoesNotExist:
+            return Response({"error": "No se encontró el inversor indicado"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

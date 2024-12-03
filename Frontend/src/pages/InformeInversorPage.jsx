@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getInversores } from "../api/inversor.api";
-import { Link } from "react-router-dom";
+import { getInversoresByUser } from "../api/inversor.api";
+import { Link, useSearchParams } from "react-router-dom";
 import GenerarPDF from "../components/InformeInversorPDF";
 import { anios, meses } from "../utils/dateHelpers";
 
@@ -10,12 +10,21 @@ export function InformeInversorPage() {
     const [selectedAnio, setSelectedAnio] = useState("");
     const [selectedMes, setSelectedMes] = useState("");
     const [mensajeError, setMensajeError] = useState("");
+    const [urlParams, setUrlParams] = useSearchParams();
 
     useEffect(() => {
         async function loadInversores() {
             try {
-                const data = await getInversores();
-                setInversores(data);
+                const data = await getInversoresByUser();
+                setInversores(data.inversores);
+
+                const inversorFromUrl = urlParams.get("inversor");
+                if (inversorFromUrl && data.inversores.some((inv) => inv.id.toString() === inversorFromUrl)) {
+                    console.log("Inversor encontrado en URL:", inversorFromUrl);
+                    setSelectedInversor(inversorFromUrl);
+                    setSelectedAnio(anios[0]);
+                    setSelectedMes(meses[0].value);
+                }
             } catch (error) {
                 setMensajeError("Hubo un error al cargar la información.");
             }
@@ -30,7 +39,7 @@ export function InformeInversorPage() {
             <div className="page-inner">
                 <div className="d-flex justify-content-between align-items-center mb-1">
                     <h1 className="mb-0 fw-bold">Generar Informe de Inversor</h1>
-                    <Link to="/informes"><button className="btn btn-primary">Volver</button></Link>
+                    <Link to="/informes"><button className="btn btn-secondary">Volver</button></Link>
                 </div>
 
                 {/* Breadcrumb */}
@@ -71,21 +80,32 @@ export function InformeInversorPage() {
                                 <h4 className="card-title mb-4">Selecciona los Datos</h4>
                                 <div className="text-center">
                                     <div className="px-2 my-2">
-                                        <label className="form-label">Inversor</label>
-                                        <select
-                                            className="form-select mx-auto"
-                                            style={{ width: '200px' }}
-                                            value={selectedInversor}
-                                            onChange={(e) => setSelectedInversor(e.target.value)}
-                                        >
-                                            <option value="" disabled>Seleccione un Inversor</option>
-                                            {inversores.map((inversor) => (
-                                                <option key={inversor.id} value={inversor.id}>
-                                                    {inversor.nombre}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
+                                            <label className="form-label">Inversor</label>
+                                            <select
+                                                className="form-select mx-auto"
+                                                style={{ width: '200px' }}
+                                                value={selectedInversor}
+                                                onChange={(e) => setSelectedInversor(e.target.value)}
+                                            >
+                                                <option value="" disabled>Seleccione un inversor</option>
+                                                {Object.entries(
+                                                    inversores.reduce((acc, inversor) => {
+                                                        const estacion = inversor.nombre_estacion || "Sin Estación";
+                                                        if (!acc[estacion]) acc[estacion] = [];
+                                                        acc[estacion].push(inversor);
+                                                        return acc;
+                                                    }, {})
+                                                ).map(([estacion, inversores]) => (
+                                                    <optgroup key={estacion} label={estacion}>
+                                                        {inversores.map((inversor) => (
+                                                            <option key={inversor.id} value={inversor.id}>
+                                                                {inversor.nombre}
+                                                            </option>
+                                                        ))}
+                                                    </optgroup>
+                                                ))}
+                                            </select>
+                                        </div>
 
                                     <div className="px-2 my-2">
                                         <label className="form-label">Año</label>

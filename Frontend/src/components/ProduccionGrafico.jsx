@@ -127,7 +127,7 @@ export function ProduccionGrafico(req) {
             <div className="d-flex justify-content-between align-items-center">
                 <h1>Gráfico {nombreInversor} - H{horaSeleccionada}</h1>
                 <Link to={`/inversor/${req.id}/produccion`} className=" text-decoration-none">
-                    <button className="btn btn-success">Volver</button>
+                    <button className="btn btn-secondary">Volver</button>
                 </Link>
             </div>
 
