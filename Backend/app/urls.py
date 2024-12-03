@@ -6,6 +6,7 @@ from .views_nuevo.estadisticas_views import MetricasEstacionHoraMesView, Metrica
 from .views_nuevo.descripciones_views import CalcularDescripcionesLinguisticasInversor, CalcularDescripcionesLinguisticasEstacion
 from .views_nuevo.percepciones_views import ObtenerPercepcionesSegundoGradoDiaHoraView, ObtenerPercepcionesSegundoGradoDiaView, ObtenerPercepcionesPrimerGradoDiaView, ObtenerPercepcionesPrimerGradoHoraView
 from .views_nuevo.informes_views import GenerarInformeInversorView
+from .views_nuevo.estaciones_views import EstacionesByUserView, InversoresByUserView
 from .views import login, register
 
 from drf_yasg.views import get_schema_view
@@ -47,6 +48,9 @@ urlpatterns = [
     path('api/v1/descripciones-linguisticas-estacion/', CalcularDescripcionesLinguisticasEstacion.as_view(), name='descripciones-linguisticas-estacion'),
 
     path('api/v1/informe-inversor/', GenerarInformeInversorView.as_view(), name='informe-inversor'),
+
+    path('api/v1/estacionesByUser/', EstacionesByUserView.as_view(), name='estacionesByUser'),
+    path('api/v1/inversoresByUser/', InversoresByUserView.as_view(), name='inversoresByUser'),
     
     path('api/v1/login/', login, name='login'),
     path('api/v1/register/', register, name='register'),

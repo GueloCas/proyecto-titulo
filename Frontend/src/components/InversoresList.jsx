@@ -1,51 +1,31 @@
 import { useEffect, useState } from "react";
-import { deleteInversor, getInversores } from "../api/inversor.api";
-import { getEstaciones } from "../api/estacion.api";
+import { deleteInversor, getInversores, getInversoresByUser } from "../api/inversor.api";
 import { Link, useLocation } from "react-router-dom";
 
 export function InversoresList() {
   const [inversores, setInversores] = useState([]);
-  const [estaciones, setEstaciones] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const location = useLocation();
-  const [User, setUser] = useState(null);
 
   useEffect(() => {
     // Obtener el parámetro de búsqueda de la URL si está presente
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-      loadEstaciones(storedUser.id);
-    }
     const params = new URLSearchParams(location.search);
     const initialSearch = params.get("buscar") || "";
     setSearchTerm(initialSearch);
-  }, [location.search]);
 
-  // Cargar inversores cuando las estaciones o el usuario cambian
-  useEffect(() => {
-    if (User && estaciones.length > 0) {
-      loadInversores(User.id);
+    async function loadInversores() {
+      const data = await getInversoresByUser();
+      console.log("Inversores:", data.inversores);
+      setInversores(data.inversores);
     }
-  }, [User, estaciones]);
-
-  const loadEstaciones = async (id) => {
-    const data = await getEstaciones();
-    const estacionesUsers = data.filter((estacion) => estacion.usuario === id);
-    setEstaciones(estacionesUsers);
-    console.log(estacionesUsers);
-  };
-
-  const loadInversores = async (id) => {
-    const data = await getInversores();
-    const inversoresUsers = data.filter((inversor) => estaciones.some((estacion) => estacion.id === inversor.estacion));
-    setInversores(inversoresUsers);
-  };
+    loadInversores();
+  }, [location.search]);
 
   const handleDeleteInversor = (id) => {
     return async () => {
       await deleteInversor(id);
-      loadInversores(User.id); // Recargar inversores después de eliminar uno
+      const data = await getInversoresByUser();
+      setInversores(data.inversores);
     };
   };
 

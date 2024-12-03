@@ -1,35 +1,23 @@
 import { useEffect, useState } from "react";
-import { deleteEstacion, getEstaciones } from "../api/estacion.api";
+import { deleteEstacion, getEstacionesByUser } from "../api/estacion.api";
 import { Link } from "react-router-dom";
 
 export function EstacionesList() {
   const [estaciones, setEstaciones] = useState([]);
-  const [User, setUser] = useState(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-
 
   useEffect(() => {
     const fetchEstaciones = async () => {
-      const data = await getEstaciones();
-      console.log(data);
-      const estacionesUsers = data.filter((estacion) => estacion.usuario === User.id);
-      setEstaciones(estacionesUsers);
+      const data = await getEstacionesByUser();
+      setEstaciones(data.estaciones);
     };
     fetchEstaciones();
-  }, [User]);
+  }, []);
 
   const handleDeleteEstacion = (id) => {
     return async () => {
       await deleteEstacion(id);
-      const data = await getEstaciones();
-      setEstaciones(data);
+      const data = await getEstacionesByUser();
+      setEstaciones(data.estaciones);
     };
   };
 
