@@ -31,6 +31,7 @@ import { PercepcionesPrimerGradoPage } from "./pages/PercepcionesPrimerGradoPage
 import { PercepcionesPrimerGradoDiaPage } from "./pages/PercepcionesPrimerGradoDiaPage.jsx";
 import { PercepcionesPrimerGradoHoraPage } from "./pages/PercepcionesPrimerGradoHoraPage.jsx";
 import { InformeInversorPage } from "./pages/InformeInversorPage.jsx";
+import {EditarPerfilPage} from "./pages/EditarPerfilPage.jsx";
 
 const router = createBrowserRouter([
   
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <App />,  // Página pública de inicio
+      },
+      {
+        path: "/editar-perfil",
+        element: <EditarPerfilPage />,
       },
       {
         path: "/estaciones",
