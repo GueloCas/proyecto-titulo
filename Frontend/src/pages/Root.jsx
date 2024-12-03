@@ -27,19 +27,21 @@ function PageRoot() {
   const showSidebarAndNav = location.pathname !== "/";
 
   return (
-    <div>
+    <>
       {/* Render only the main-panel wrapper if not on "/" */}
       {showSidebarAndNav && (
-        <div className="main-panel">
+        <>
           <BarraLateral />
-          <Navegacion />
-          <Outlet />
-        </div>
+          <div className="main-panel">
+            <Navegacion />
+            <Outlet />
+          </div>
+        </>
       )}
 
       {/* If you're on "/" route, just show the Outlet */}
       {location.pathname === "/" && <Outlet />}
-    </div>
+    </>
   );
 }
 
