@@ -98,7 +98,6 @@ class InversorProduccionHoraView(APIView):
         # Obtener el ID del inversor y la hora de los parámetros de la solicitud
         inversor_id = request.query_params.get('inversor_id')
         hora = request.query_params.get('hora')
-        print(f"inversor_id: {inversor_id}, hora: {hora}")
 
         if not inversor_id:
             return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)
@@ -106,7 +105,6 @@ class InversorProduccionHoraView(APIView):
         try:
             inversor = Inversor.objects.get(pk=inversor_id)
             horasdas = inversor.obtener_MinMaxProm_producciones_hora(hora)
-            print(horasdas)
             producciones = inversor.obtener_producciones_hora(hora)
             serializer = ProduccionSerializer(producciones, many=True)
 

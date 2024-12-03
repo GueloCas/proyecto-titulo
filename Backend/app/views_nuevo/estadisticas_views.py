@@ -106,7 +106,6 @@ class MetricasEstacionGeneralMesView(APIView):
                     
                     # Obtener la producción diaria
                     total_diario = inversor.obtener_cantidad_total_diaria(dia_formateado)
-                    print(f"Producción diaria de {inversor.nombre} el {dia_formateado}: {total_diario}")
                     total_mensual_inversor += total_diario
                     
                     # Actualizar mejor y peor día del inversor
@@ -289,10 +288,27 @@ class MetricasEstacionHoraDiaView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class MetricasInversorMesView(APIView):
+    def get(self, request, *args, **kwargs):
+        id_inversor = request.query_params.get('inversor')
 
-            
-            
+        if not id_inversor:
+            return Response({"error": "Se requiere el parámetro 'inversor'"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Obtener el inversor por ID
+            inversor = Inversor.objects.get(pk=id_inversor)
 
+            # Agrupar las producciones por hora y calcular estadísticas agregadas
+            estadisticas_por_hora = inversor.obtener_MinMaxProm_producciones()
 
-            
-            
+            response_data = {
+                "estadisticas": estadisticas_por_hora,
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+        except Inversor.DoesNotExist:
+            return Response({"error": "No se encontró el inversor indicado"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

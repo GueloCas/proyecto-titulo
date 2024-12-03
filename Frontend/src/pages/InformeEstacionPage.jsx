@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getEstaciones } from "../api/estacion.api";
-import { Link } from "react-router-dom";
+import { getEstacionesByUser } from "../api/estacion.api";
+import { Link, useSearchParams } from "react-router-dom";
 import { anios, meses } from "../utils/dateHelpers";
 
 export function InformeEstacionPage() {
@@ -9,12 +9,21 @@ export function InformeEstacionPage() {
     const [selectedAnio, setSelectedAnio] = useState("");
     const [selectedMes, setSelectedMes] = useState("");
     const [mensajeError, setMensajeError] = useState("");
+    const [urlParams, setUrlParams] = useSearchParams();
 
     useEffect(() => {
         async function loadestaciones() {
             try {
-                const data = await getEstaciones();
-                setEstaciones(data);
+                const data = await getEstacionesByUser();
+                setEstaciones(data.estaciones);
+
+                const estacionFromUrl = urlParams.get("estacion");
+                if (estacionFromUrl && data.estaciones.some((inv) => inv.id.toString() === estacionFromUrl)) {
+                    console.log("estacion encontrado en URL:", estacionFromUrl);
+                    setSelectedEstacion(estacionFromUrl);
+                    setSelectedAnio(anios[0]);
+                    setSelectedMes(meses[0].value);
+                }
             } catch (error) {
                 setMensajeError("Hubo un error al cargar la información.");
             }
@@ -29,7 +38,7 @@ export function InformeEstacionPage() {
             <div className="page-inner">
                 <div className="d-flex justify-content-between align-items-center mb-1">
                     <h1 className="mb-0 fw-bold">Generar Informe de Estación</h1>
-                    <Link to="/informes"><button className="btn btn-primary">Volver</button></Link>
+                    <Link to="/informes"><button className="btn btn-secondary">Volver</button></Link>
                 </div>
 
                 {/* Breadcrumb */}

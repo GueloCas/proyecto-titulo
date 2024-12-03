@@ -11,7 +11,6 @@ import json
 class ExcelUploadView(APIView):
 
     def post(self, request, *args, **kwargs):
-        print(request)
         file = request.FILES.get('file')
         user_json = request.POST.get('user')  # Cambiado a request.POST
         
@@ -30,9 +29,6 @@ class ExcelUploadView(APIView):
                 user = User.objects.get(id=user_data['id'])
             except User.DoesNotExist:
                 return Response({"error": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
-            
-            print("usuario: ", user)
-            print(file)
 
             xls = pd.ExcelFile(file)
             for sheet_name in xls.sheet_names:
@@ -130,14 +126,11 @@ class CSVUploadView(APIView):
             inversores = {}
             for col_index in range(0, len(df.columns)):  # Comenzar desde la columna 2 porque las dos primeras son Fecha y Hora
                 nombre_inversor = df.iloc[0, col_index]  # Tomamos el nombre del inversor desde la primera fila
-                print(nombre_inversor)
                 
                 # Validar que el nombre no esté vacío o sea NaN
                 if pd.notna(nombre_inversor) and nombre_inversor.strip():
                     inversor, _ = Inversor.objects.get_or_create(nombre=nombre_inversor.strip(), estacion=estacion)
                     inversores[col_index] = inversor
-
-            print(inversores)
 
             for row_index in range(1, len(df)):
                 fecha = df.iloc[row_index, 0]
@@ -146,7 +139,7 @@ class CSVUploadView(APIView):
                 for col_index in range(2, len(df.columns)):
                     valor = df.iloc[row_index, col_index]
                     if pd.notna(valor):
-                        inversor = inversores.get(col_index - 4)
+                        inversor = inversores.get(col_index - 2)
                         if inversor:  # Validar que el inversor exista
                             produccion = Produccion(
                                 Dia=fecha,

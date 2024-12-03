@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { deleteInversor, getInversores, getInversoresByUser } from "../api/inversor.api";
 import { Link, useLocation } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export function InversoresList() {
   const [inversores, setInversores] = useState([]);
@@ -15,7 +16,6 @@ export function InversoresList() {
 
     async function loadInversores() {
       const data = await getInversoresByUser();
-      console.log("Inversores:", data.inversores);
       setInversores(data.inversores);
     }
     loadInversores();
@@ -23,9 +23,35 @@ export function InversoresList() {
 
   const handleDeleteInversor = (id) => {
     return async () => {
-      await deleteInversor(id);
-      const data = await getInversoresByUser();
-      setInversores(data.inversores);
+      const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Toda la información relacionada con esta estación será eliminada.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await deleteInversor(id);
+          const data = await getInversoresByUser();
+          setInversores(data.inversores);
+          Swal.fire(
+            'Eliminada',
+            'La estación y toda su información relacionada han sido eliminadas.',
+            'success'
+          );
+        } catch (error) {
+          Swal.fire(
+            'Error',
+            'Ocurrió un error al intentar eliminar la estación. Por favor, inténtelo de nuevo.',
+            'error'
+          );
+        }
+      }
     };
   };
 
@@ -47,9 +73,11 @@ export function InversoresList() {
         />
       </div>
 
-      <div className="table-responsive">
+      <div className="table-responsive" style={{ position: "relative", overflow: "visible" }}>
         {filteredInversores.length === 0 ? (
-          <p>No existen inversores</p>
+          <div className="alert alert-warning" role="alert">
+            No existen inversores
+          </div>
         ) : (
           <table className="table table-striped">
             <thead>
@@ -74,11 +102,34 @@ export function InversoresList() {
                       >
                         Ver Producción
                       </Link>
+                      <div className="btn-group">
+                        <button type="button" className="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                          Ver Estadísticas
+                        </button>
+                        <ul className="dropdown-menu" style={{ position: 'absolute', zIndex: '1050' }}>
+                          <li><a className="dropdown-item" href={`estadisticas/metricas-inversor/mes?inversor=${inversor.id}`}>Métricas Mensuales</a></li>
+                        </ul>
+                      </div>
+                      <div className="btn-group">
+                        <button type="button" className="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                          Ver Percepciones
+                        </button>
+                        <ul className="dropdown-menu" style={{ position: 'absolute', zIndex: '1050' }}>
+                          <li><a className="dropdown-item" href={`percepciones-primer-grado/dia?inversor=${inversor.id}`}>1° por Día</a></li>
+                          <li><a className="dropdown-item" href={`percepciones-primer-grado/hora?inversor=${inversor.id}`}>1° por Hora</a></li>
+                        </ul>
+                      </div>
                       <Link
-                        to={`/ProduccionInversor/Estadisticas/${inversor.id}?inversor=${inversor.nombre}`}
-                        className="btn btn-secondary rounded-3"
+                        to={`/resumenes/resumenes-inversor?inversor=${inversor.id}`}
+                        className="btn btn-warning text-light rounded-3"
                       >
-                        Ver Estadísticas
+                        Ver Resumen
+                      </Link>
+                      <Link
+                        to={`/informes/informe-inversor?inversor=${inversor.id}`}
+                        className="btn btn-success text-light rounded-3"
+                      >
+                        Generar Informe
                       </Link>
                       <button
                         onClick={handleDeleteInversor(inversor.id)}

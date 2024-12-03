@@ -1,54 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import { PCTablaDiaHora } from '../components/PCTablaDiaHora';
-import { Link, useSearchParams } from 'react-router-dom';
-import { getEstacionesByUser } from '../api/estacion.api';
-import { anios, meses } from '../utils/dateHelpers';
+import { useEffect, useState } from "react";
+import { getInversoresByUser } from "../api/inversor.api";
+import { Link, useSearchParams } from "react-router-dom";
+import { anios, meses } from "../utils/dateHelpers";
+import { MetricasInversorMes } from "../components/MetricasinversorMes";
 
-export function PercepcionesSegundoGradoDiaHoraPage() {
-    const [estaciones, setEstaciones] = useState([]);
-    const [selectedEstacion, setSelectedEstacion] = useState("");
+export function MetricasInversorMesPage() {
+    const [inversores, setInversores] = useState([]);
+    const [selectedInversor, setSelectedInversor] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
-    const [selectedMes, setSelectedMes] = useState(""); // Se mantiene el selector de mes
-    const [selectedDia, setSelectedDia] = useState(""); // Selección del día (1-31)
-    const [selectedHora, setSelectedHora] = useState(""); // Selección de la hora (0-23)
+    const [selectedMes, setSelectedMes] = useState("");
     const [mensajeError, setMensajeError] = useState("");
-    const [mostrar, setMostrar] = useState(false);
+    const [mostrarMetricas, setMostrarMetricas] = useState(false);
     const [isAccordionOpen, setIsAccordionOpen] = useState(true);
     const [searchParams, setSearchParams] = useState(null);
     const [urlParams, setUrlParams] = useSearchParams();
 
     useEffect(() => {
-        async function loadEstaciones() {
+        async function loadInversores() {
             try {
-                const data = await getEstacionesByUser();
-                setEstaciones(data.estaciones);
+                const data = await getInversoresByUser();
+                setInversores(data.inversores);
 
-                const estacionFromUrl = urlParams.get("estacion");
-                if (estacionFromUrl && data.estaciones.some((inv) => inv.id.toString() === estacionFromUrl)) {
-                    console.log("estacion encontrado en URL:", estacionFromUrl);
-                    setSelectedEstacion(estacionFromUrl);
+                const inversorFromUrl = urlParams.get("inversor");
+                if (inversorFromUrl && data.inversores.some((inv) => inv.id.toString() === inversorFromUrl)) {
+                    console.log("Inversor encontrado en URL:", inversorFromUrl);
+                    setSelectedInversor(inversorFromUrl);
                     setSelectedAnio(anios[0]);
                     setSelectedMes(meses[0].value);
-                    setSelectedDia("1");
-                    setSelectedHora("8");
                 }
             } catch (error) {
-                setMensajeError("Hubo un error al cargar las estaciones.");
+                setMensajeError("Hubo un error al cargar los inversores.");
             }
         }
-        loadEstaciones();
+        loadInversores();
     }, []);
 
-    // Opciones de días (1-31)
-    const dias = Array.from({ length: 31 }, (_, i) => i + 1);
-    const horas = Array.from({ length: 16 }, (_, i) => i + 8); // Horas de 8 a 23
-
-    const isFormValid = selectedEstacion && selectedAnio && selectedMes && selectedDia && selectedHora;
+    const isFormValid = selectedInversor && selectedAnio && selectedMes;
 
     const handleSearch = () => {
         if (isFormValid) {
-            setSearchParams({ estacion: selectedEstacion, anio: selectedAnio, mes: selectedMes, dia: selectedDia, hora: selectedHora }); // Actualizar parámetros de búsqueda
-            setMostrar(true);
+            setSearchParams({ inversor: selectedInversor, anio: selectedAnio, mes: selectedMes }); // Actualizar parámetros de búsqueda
+            setMostrarMetricas(true);
             setIsAccordionOpen(false); // Cierra el acordeón cuando se hace clic en "Buscar"
             setMensajeError(""); // Limpiar mensajes de error
         } else {
@@ -59,24 +51,9 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
     return (
         <div className="container">
             <div className="page-inner">
-                <div className="d-flex mb-1 justify-content-between align-items-center">
-                    <h1 className="mb-0 fw-bold">Percepciones Segundo Grado por Día y Hora</h1>
-                    <div className="d-flex justify-content-right align-items-end">
-                        <Link to={`/percepciones-segundo-grado/dia`} className="text-decoration-none">
-                            <button
-                                className="btn btn-outline-secondary ms-4"
-                            >
-                                Ver por Día
-                            </button>
-                        </Link>
-                        <Link to={`/percepciones-segundo-grado`} className="text-decoration-none">
-                            <button
-                                className="btn btn-secondary ms-4"
-                            >
-                                Volver
-                            </button>
-                        </Link>
-                    </div>
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                    <h1 className="mb-0 fw-bold">Métricas de Inversor - Mensual</h1>
+                    <Link to="/estadisticas/metricas-inversor"><button className="btn btn-secondary">Volver</button></Link>
                 </div>
 
                 {/* Breadcrumb */}
@@ -86,17 +63,19 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
                             <Link to="/dashboard">Dashboard</Link>
                         </li>
                         <li className="breadcrumb-item">
-                            <Link to="/percepciones-segundo-grado">Percepciones 2°</Link>
+                            <Link to="/informes">Metricas Inversor</Link>
                         </li>
                         <li className="breadcrumb-item active" aria-current="page">
-                            Por Día y Hora
+                            Mensual 
                         </li>
                     </ol>
                 </nav>
 
+                {/* Mostrar mensaje de error */}
                 {mensajeError && <div className="alert alert-danger">{mensajeError}</div>}
 
-                <div className="accordion" id="filtrosAccordion" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+                {/* Selectores de Inversor, Año, Mes, Hora y Botón Buscar */}
+                <div className="accordion" id="filtrosAccordion" style={{ maxWidth: '800px', margin: '0 auto' }}>
                     <div className="accordion-item">
                         <h2 className="accordion-header" id="filtrosHeader">
                             <button
@@ -120,18 +99,29 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
                                 <div className="d-flex justify-content-center mb-2">
                                     <div className="d-flex flex-wrap justify-content-center">
                                         <div className="px-2">
-                                            <label className="form-label">Estación</label>
+                                            <label className="form-label">Inversor</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
-                                                value={selectedEstacion}
-                                                onChange={(e) => setSelectedEstacion(e.target.value)}
+                                                style={{ width: '200px' }}
+                                                value={selectedInversor}
+                                                onChange={(e) => setSelectedInversor(e.target.value)}
                                             >
-                                                <option value="" disabled>Seleccione una estación</option>
-                                                {estaciones.map((estacion) => (
-                                                    <option key={estacion.id} value={estacion.id}>
-                                                        {estacion.nombre}
-                                                    </option>
+                                                <option value="" disabled>Seleccione un inversor</option>
+                                                {Object.entries(
+                                                    inversores.reduce((acc, inversor) => {
+                                                        const estacion = inversor.nombre_estacion || "Sin Estación";
+                                                        if (!acc[estacion]) acc[estacion] = [];
+                                                        acc[estacion].push(inversor);
+                                                        return acc;
+                                                    }, {})
+                                                ).map(([estacion, inversores]) => (
+                                                    <optgroup key={estacion} label={estacion}>
+                                                        {inversores.map((inversor) => (
+                                                            <option key={inversor.id} value={inversor.id}>
+                                                                {inversor.nombre}
+                                                            </option>
+                                                        ))}
+                                                    </optgroup>
                                                 ))}
                                             </select>
                                         </div>
@@ -170,40 +160,6 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
                                             </select>
                                         </div>
 
-                                        <div className="px-2">
-                                            <label className="form-label">Día</label>
-                                            <select
-                                                className="form-select"
-                                                style={{ width: '200px' }}
-                                                value={selectedDia}
-                                                onChange={(e) => setSelectedDia(e.target.value)}
-                                            >
-                                                <option value="" disabled>Seleccione un día</option>
-                                                {dias.map((dia) => (
-                                                    <option key={dia} value={dia}>
-                                                        {dia}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-
-                                        <div className="px-2">
-                                            <label className="form-label">Hora</label>
-                                            <select
-                                                className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
-                                                value={selectedHora}
-                                                onChange={(e) => setSelectedHora(e.target.value)}
-                                            >
-                                                <option value="" disabled>Seleccione una hora</option>
-                                                {horas.map((hora) => (
-                                                    <option key={hora} value={hora}>
-                                                        {hora}:00
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-
                                         <div className="px-2 d-flex align-items-end">
                                             <button
                                                 className={`btn ${isFormValid ? 'btn-success' : 'btn-secondary'} w-100`}
@@ -221,13 +177,12 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
                     </div>
                 </div>
 
-                {mostrar && searchParams && (
-                    <PCTablaDiaHora
-                        estacionId={searchParams.estacion}
+                {/* Mostrar el componente Metricasinversor solo si todo está seleccionado */}
+                {mostrarMetricas && searchParams && (
+                    <MetricasInversorMes
+                        inversorId={searchParams.inversor}
                         anio={searchParams.anio}
                         mes={searchParams.mes}
-                        dia={searchParams.dia}
-                        hora={searchParams.hora}
                     />
                 )}
             </div>

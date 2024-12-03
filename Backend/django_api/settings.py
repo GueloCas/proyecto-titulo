@@ -132,4 +132,8 @@ CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
 
 CORS_ALLOW_HEADERS = [
     'User-ID',  # Agrega el encabezado personalizado
+    'content-type',  # Encabezado necesario para solicitudes POST, PUT, PATCH, etc.
+    'authorization',  # Para permitir el encabezado de autorización (token)
+    'x-requested-with',  # Para solicitudes AJAX
+    'accept',  # Para solicitudes que manejan el tipo de contenido
 ]

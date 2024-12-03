@@ -53,7 +53,6 @@ class CalcularDescripcionesLinguisticasInversor(APIView):
                     pertenencia_baja = calcular_pertenencia_baja(cantidad, TLbaja)
                     pertenencia_media = calcular_pertenencia_media(cantidad, TLmedia)
                     pertenencia_alta = calcular_pertenencia_alta(cantidad, TLalta)
-                    print(hora_str, pertenencia_baja, pertenencia_media, pertenencia_alta)
 
                     # Acumular las pertenencias
                     cantidad_r += 1
@@ -154,11 +153,11 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
                         'inversor_nombre': inversor.nombre,  # Asegúrate de tener el campo nombre en el modelo Inversor
                         'cantidad_r_inversor': cantidad_inversor,
                         'suma_baja_inversor': suma_baja,
-                        'DL_baja_inversor': obtenerClasificacionDescripcionLinguistica(suma_baja / cantidad_inversor, "baja"),
+                        'DL_baja_inversor': obtenerClasificacionDescripcionLinguistica(suma_baja / cantidad_inversor, "BAJA"),
                         'suma_media_inversor': suma_media,
-                        'DL_media_inversor': obtenerClasificacionDescripcionLinguistica(suma_media / cantidad_inversor, "media"),
+                        'DL_media_inversor': obtenerClasificacionDescripcionLinguistica(suma_media / cantidad_inversor, "MEDIA"),
                         'suma_alta_inversor': suma_alta,
-                        'DL_alta_inversor': obtenerClasificacionDescripcionLinguistica(suma_alta / cantidad_inversor, "alta")
+                        'DL_alta_inversor': obtenerClasificacionDescripcionLinguistica(suma_alta / cantidad_inversor, "ALTA")
                     }
                     inversores_info.append(inversor_info)
 
@@ -166,11 +165,11 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
             return Response({
                 "cantidad_r": cantidad_r,
                 "suma_mala": suma_mala,
-                "DL_mala": obtenerClasificacionDescripcionLinguistica(suma_mala / cantidad_r, "mala"),
+                "DL_mala": obtenerClasificacionDescripcionLinguistica(suma_mala / cantidad_r, "MALA"),
                 "suma_normal": suma_normal,
-                "DL_normal": obtenerClasificacionDescripcionLinguistica(suma_normal / cantidad_r, "normal"),
+                "DL_normal": obtenerClasificacionDescripcionLinguistica(suma_normal / cantidad_r, "NORMAL"),
                 "suma_excelente": suma_excelente,
-                "DL_excelente": obtenerClasificacionDescripcionLinguistica(suma_excelente / cantidad_r, "excelente"),
+                "DL_excelente": obtenerClasificacionDescripcionLinguistica(suma_excelente / cantidad_r, "EXCELENTE"),
                 "inversores_info": inversores_info  # Incluir las descripciones de cada inversor
             }, status=status.HTTP_200_OK)
 

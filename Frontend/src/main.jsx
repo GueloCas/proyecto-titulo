@@ -31,6 +31,8 @@ import { PercepcionesPrimerGradoPage } from "./pages/PercepcionesPrimerGradoPage
 import { PercepcionesPrimerGradoDiaPage } from "./pages/PercepcionesPrimerGradoDiaPage.jsx";
 import { PercepcionesPrimerGradoHoraPage } from "./pages/PercepcionesPrimerGradoHoraPage.jsx";
 import { InformeInversorPage } from "./pages/InformeInversorPage.jsx";
+import { MetricasInversorMesPage } from "./pages/MetricasInversorMesPage.jsx";
+import { MetricasInversorPage } from "./pages/MetricasInversorPage.jsx";
 import {EditarPerfilPage} from "./pages/EditarPerfilPage.jsx";
 
 const router = createBrowserRouter([
@@ -99,6 +101,14 @@ const router = createBrowserRouter([
       {
         path: "/estadisticas/metricas-estacion/hora-dia",
         element: <MetricasEstacionHoraDiaPage />,
+      },
+      {
+        path: "/estadisticas/metricas-inversor",
+        element: <MetricasInversorPage />,
+      },
+      {
+        path: "/estadisticas/metricas-inversor/mes",
+        element: <MetricasInversorMesPage />,
       },
       {
         path: "/percepciones-segundo-grado",

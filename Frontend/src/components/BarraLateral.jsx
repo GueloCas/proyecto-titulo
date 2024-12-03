@@ -133,17 +133,22 @@ export function BarraLateral() {
                                 </ul>
                             </div>
                         </li>
-                        <li className={`nav-item ${isActive('/estadisticas/metricas-estacion')} ${isActive('/estadisticas/metricas-estacion/general-dia')} ${isActive('/estadisticas/metricas-estacion/hora-dia')} ${isActive('/estadisticas/metricas-estacion/general-mes')} ${isActive('/estadisticas/metricas-estacion/hora-mes')}`}>
+                        <li className={`nav-item ${isActive('/estadisticas/metricas-estacion')} ${isActive('/estadisticas/metricas-estacion/general-dia')} ${isActive('/estadisticas/metricas-estacion/hora-dia')} ${isActive('/estadisticas/metricas-estacion/general-mes')} ${isActive('/estadisticas/metricas-estacion/hora-mes')} ${isActive('/estadisticas/metricas-inversor')} ${isActive('/estadisticas/metricas-inversor/mes')}`}>
                             <a data-bs-toggle="collapse" href="#estadisticas">
                                 <i className="bi bi-bar-chart-line-fill"></i>
                                 <p>Estadísticas</p>
                                 <span className="caret"></span>
                             </a>
-                            <div className={`collapse ${isShow('/estadisticas/metricas-estacion')} ${isShow('/estadisticas/metricas-estacion/general-dia')} ${isShow('/estadisticas/metricas-estacion/hora-dia')} ${isShow('/estadisticas/metricas-estacion/general-mes')} ${isShow('/estadisticas/metricas-estacion/hora-mes')}`} id="estadisticas">
+                            <div className={`collapse ${isShow('/estadisticas/metricas-estacion')} ${isShow('/estadisticas/metricas-estacion/general-dia')} ${isShow('/estadisticas/metricas-estacion/hora-dia')} ${isShow('/estadisticas/metricas-estacion/general-mes')} ${isShow('/estadisticas/metricas-estacion/hora-mes')}  ${isShow('/estadisticas/metricas-inversor')} ${isShow('/estadisticas/metricas-inversor/mes')}`} id="estadisticas">
                                 <ul className="nav nav-collapse">
                                     <li className={`${isActive('/estadisticas/metricas-estacion')} ${isActive('/estadisticas/metricas-estacion/general-dia')} ${isActive('/estadisticas/metricas-estacion/hora-dia')} ${isActive('/estadisticas/metricas-estacion/general-mes')} ${isActive('/estadisticas/metricas-estacion/hora-mes')}`}>
                                         <a href="/estadisticas/metricas-estacion">
                                             <span className="sub-item">Métricas por Estación</span>
+                                        </a>
+                                    </li>
+                                    <li className={`${isActive('/estadisticas/metricas-inversor')} ${isActive('/estadisticas/metricas-inversor/mes')}`}>
+                                        <a href="/estadisticas/metricas-inversor">
+                                            <span className="sub-item">Métricas por Inversor</span>
                                         </a>
                                     </li>
                                 </ul>

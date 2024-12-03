@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getEstaciones } from "../api/estacion.api";
-import { Link } from "react-router-dom";
+import { getEstacionesByUser } from "../api/estacion.api";
+import { Link, useSearchParams } from "react-router-dom";
 import { MetricasEstacionGeneralMes } from "../components/MetricasEstacionGeneralMes";
 import { anios, meses } from "../utils/dateHelpers";
 
@@ -13,12 +13,21 @@ export function MetricasEstacionGeneralMesPage() {
     const [mostrarMetricas, setMostrarMetricas] = useState(false);
     const [isAccordionOpen, setIsAccordionOpen] = useState(true);
     const [searchParams, setSearchParams] = useState(null);
+    const [urlParams, setUrlParams] = useSearchParams();
 
     useEffect(() => {
         async function loadEstaciones() {
             try {
-                const data = await getEstaciones();
-                setEstaciones(data);
+                const data = await getEstacionesByUser();
+                setEstaciones(data.estaciones);
+
+                const estacionFromUrl = urlParams.get("estacion");
+                if (estacionFromUrl && data.estaciones.some((inv) => inv.id.toString() === estacionFromUrl)) {
+                    console.log("estacion encontrado en URL:", estacionFromUrl);
+                    setSelectedEstacion(estacionFromUrl);
+                    setSelectedAnio(anios[0]);
+                    setSelectedMes(meses[0].value);
+                }
             } catch (error) {
                 setMensajeError("Hubo un error al cargar las estaciones.");
             }
@@ -44,7 +53,7 @@ export function MetricasEstacionGeneralMesPage() {
             <div className="page-inner">
                 <div className="d-flex justify-content-between align-items-center mb-1">
                     <h1 className="mb-0 fw-bold">Métricas de Estación - Mensual General</h1>
-                    <Link to="/estadisticas/metricas-estacion"><button className="btn btn-primary">Volver</button></Link>
+                    <Link to="/estadisticas/metricas-estacion"><button className="btn btn-secondary">Volver</button></Link>
                 </div>
 
                 {/* Breadcrumb */}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { getInversores } from '../api/inversor.api';
+import { Link, useSearchParams } from 'react-router-dom';
+import { getInversoresByUser } from '../api/inversor.api';
 import { PCPrimerGradoDia } from '../components/PCPrimerGradoDia';
 import { anios, meses } from '../utils/dateHelpers';
 
@@ -14,12 +14,22 @@ export function PercepcionesPrimerGradoDiaPage() {
     const [mostrar, setMostrar] = useState(false);
     const [isAccordionOpen, setIsAccordionOpen] = useState(true);
     const [searchParams, setSearchParams] = useState(null);
+    const [urlParams, setUrlParams] = useSearchParams();
 
     useEffect(() => {
         async function loadInversores() {
             try {
-                const data = await getInversores();
-                setInversores(data);
+                const data = await getInversoresByUser();
+                setInversores(data.inversores);
+
+                const inversorFromUrl = urlParams.get("inversor");
+                if (inversorFromUrl && data.inversores.some((inv) => inv.id.toString() === inversorFromUrl)) {
+                    console.log("Inversor encontrado en URL:", inversorFromUrl);
+                    setSelectedInversor(inversorFromUrl);
+                    setSelectedAnio(anios[0]);
+                    setSelectedMes(meses[0].value);
+                    setSelectedDia("1");
+                }
             } catch (error) {
                 setMensajeError("Hubo un error al cargar las Inversores.");
             }
@@ -50,7 +60,7 @@ export function PercepcionesPrimerGradoDiaPage() {
                     <h1 className="mb-0 fw-bold">Percepciones Primer Grado por Día</h1>
                     <Link to={`/percepciones-primer-grado`} className="text-decoration-none">
                         <button
-                            className="btn btn-success ms-4"
+                            className="btn btn-secondary ms-4"
                         >
                             Volver
                         </button>
@@ -101,15 +111,26 @@ export function PercepcionesPrimerGradoDiaPage() {
                                             <label className="form-label">Inversor</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }}
                                                 value={selectedInversor}
                                                 onChange={(e) => setSelectedInversor(e.target.value)}
                                             >
-                                                <option value="" disabled>Seleccione una inversor</option>
-                                                {inversores.map((estacion) => (
-                                                    <option key={estacion.id} value={estacion.id}>
-                                                        {estacion.nombre}
-                                                    </option>
+                                                <option value="" disabled>Seleccione un inversor</option>
+                                                {Object.entries(
+                                                    inversores.reduce((acc, inversor) => {
+                                                        const estacion = inversor.nombre_estacion || "Sin Estación";
+                                                        if (!acc[estacion]) acc[estacion] = [];
+                                                        acc[estacion].push(inversor);
+                                                        return acc;
+                                                    }, {})
+                                                ).map(([estacion, inversores]) => (
+                                                    <optgroup key={estacion} label={estacion}>
+                                                        {inversores.map((inversor) => (
+                                                            <option key={inversor.id} value={inversor.id}>
+                                                                {inversor.nombre}
+                                                            </option>
+                                                        ))}
+                                                    </optgroup>
                                                 ))}
                                             </select>
                                         </div>

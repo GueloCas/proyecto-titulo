@@ -215,7 +215,7 @@ const LogicaDifusaChart = () => {
                 <div className="d-flex justify-content-between align-items-center">
                     <h1 className='mb-3 mt-2 fw-bold'>Producción en hora: {hora}, día: {dia}</h1>
                     <Link to={`/inversor/${id}/produccion`} className=" text-decoration-none">
-                        <button className="btn btn-success">Volver</button>
+                        <button className="btn btn-secondary">Volver</button>
                     </Link>
                 </div>
                 <div id="logicaDifusaChart"></div>
