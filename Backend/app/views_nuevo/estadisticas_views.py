@@ -106,7 +106,6 @@ class MetricasEstacionGeneralMesView(APIView):
                     
                     # Obtener la producción diaria
                     total_diario = inversor.obtener_cantidad_total_diaria(dia_formateado)
-                    print(f"Producción diaria de {inversor.nombre} el {dia_formateado}: {total_diario}")
                     total_mensual_inversor += total_diario
                     
                     # Actualizar mejor y peor día del inversor
@@ -168,7 +167,6 @@ class MetricasEstacionGeneralDiaView(APIView):
             mes_actual = "Aug"  # Nombre del mes en inglés
             anio_actual = 2022
             dia_formateado = f"{dia_int:02d}-{mes_actual}-{anio_actual}"
-            print(dia_formateado)
 
             # Variables para el total diario de la estación y horas extremas
             total_diario_estacion = 0
@@ -181,7 +179,6 @@ class MetricasEstacionGeneralDiaView(APIView):
                 # Filtrar producciones para el inversor en el día dado
                 producciones = Produccion.objects.filter(inversor=inversor, Dia=dia_formateado)
                 total_diario_inversor = sum(produccion.cantidad for produccion in producciones)
-                print(f"Producción total de {inversor.nombre} el {dia_formateado}: {total_diario_inversor}")
                 total_diario_estacion += total_diario_inversor
 
                 # Comparar para encontrar el mejor y peor inversor de la estación
