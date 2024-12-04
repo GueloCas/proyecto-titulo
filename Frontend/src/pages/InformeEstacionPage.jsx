@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { getEstacionesByUser } from "../api/estacion.api";
 import { Link, useSearchParams } from "react-router-dom";
-import { anios, meses } from "../utils/dateHelpers";
+import { getAnioByEstacion, getMesByAnioEstacion } from "../api/filtros.api";
 
 export function InformeEstacionPage() {
     const [estaciones, setEstaciones] = useState([]);
+    const [aniosDisponibles, setAniosDisponibles] = useState([]);
+    const [mesesDisponibles, setMesesDisponibles] = useState([]);
     const [selectedEstacion, setSelectedEstacion] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
     const [selectedMes, setSelectedMes] = useState("");
@@ -19,10 +21,8 @@ export function InformeEstacionPage() {
 
                 const estacionFromUrl = urlParams.get("estacion");
                 if (estacionFromUrl && data.estaciones.some((inv) => inv.id.toString() === estacionFromUrl)) {
-                    console.log("estacion encontrado en URL:", estacionFromUrl);
                     setSelectedEstacion(estacionFromUrl);
-                    setSelectedAnio(anios[0]);
-                    setSelectedMes(meses[0].value);
+                    handleEstacionChange(estacionFromUrl);
                 }
             } catch (error) {
                 setMensajeError("Hubo un error al cargar la información.");
@@ -30,6 +30,34 @@ export function InformeEstacionPage() {
         }
         loadestaciones();
     }, []);
+
+    const handleEstacionChange = async (estacionId) => {
+        setSelectedEstacion(estacionId);
+        setSelectedAnio("");
+        setSelectedMes("");
+        setAniosDisponibles([]);
+        setMesesDisponibles([]);
+
+        try {
+            const data = await getAnioByEstacion(estacionId);
+            setAniosDisponibles(data.anios);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los años.");
+        }
+    };
+
+    const handleAnioChange = async (anio) => {
+        setSelectedAnio(anio);
+        setSelectedMes("");
+        setMesesDisponibles([]);
+
+        try {
+            const data = await getMesByAnioEstacion(selectedEstacion, anio);
+            setMesesDisponibles(data.meses);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los meses.");
+        }
+    };
 
     const isFormValid = selectedEstacion && selectedAnio && selectedMes ? true : false;
 
@@ -82,11 +110,11 @@ export function InformeEstacionPage() {
                                         <label className="form-label">Estación</label>
                                         <select
                                             className="form-select mx-auto"
-                                            style={{ width: '200px' }}
+                                            style={{ width: '200px' }}  // Definir el ancho aquí
                                             value={selectedEstacion}
-                                            onChange={(e) => setSelectedEstacion(e.target.value)}
+                                            onChange={(e) => handleEstacionChange(e.target.value)}
                                         >
-                                            <option value="" disabled>Seleccione una Estación</option>
+                                            <option value="" disabled>Seleccione una estación</option>
                                             {estaciones.map((estacion) => (
                                                 <option key={estacion.id} value={estacion.id}>
                                                     {estacion.nombre}
@@ -99,12 +127,13 @@ export function InformeEstacionPage() {
                                         <label className="form-label">Año</label>
                                         <select
                                             className="form-select mx-auto"
-                                            style={{ width: '200px' }}
+                                            style={{ width: '200px' }}  // Definir el ancho aquí
                                             value={selectedAnio}
-                                            onChange={(e) => setSelectedAnio(e.target.value)}
+                                            onChange={(e) => handleAnioChange(e.target.value)}
+                                            disabled={!aniosDisponibles.length}
                                         >
                                             <option value="" disabled>Seleccione un año</option>
-                                            {anios.map((anio) => (
+                                            {aniosDisponibles.map((anio) => (
                                                 <option key={anio} value={anio}>
                                                     {anio}
                                                 </option>
@@ -116,18 +145,20 @@ export function InformeEstacionPage() {
                                         <label className="form-label">Mes</label>
                                         <select
                                             className="form-select mx-auto"
-                                            style={{ width: '200px' }}
+                                            style={{ width: '200px' }}  // Definir el ancho aquí
                                             value={selectedMes}
                                             onChange={(e) => setSelectedMes(e.target.value)}
+                                            disabled={!mesesDisponibles.length}
                                         >
                                             <option value="" disabled>Seleccione un mes</option>
-                                            {meses.map((mes) => (
+                                            {mesesDisponibles.map((mes) => (
                                                 <option key={mes.value} value={mes.value}>
                                                     {mes.label}
                                                 </option>
                                             ))}
                                         </select>
                                     </div>
+
                                 </div>
                             </div>
                         </div>

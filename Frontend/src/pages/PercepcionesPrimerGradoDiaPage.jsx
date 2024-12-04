@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { getInversoresByUser } from '../api/inversor.api';
 import { PCPrimerGradoDia } from '../components/PCPrimerGradoDia';
-import { anios, meses } from '../utils/dateHelpers';
+import { getAnioByInversor, getDiaByMesAnioInversor, getMesByAnioInversor } from "../api/filtros.api";
 
 export function PercepcionesPrimerGradoDiaPage() {
     const [inversores, setInversores] = useState([]);
+    const [aniosDisponibles, setAniosDisponibles] = useState([]);
+    const [mesesDisponibles, setMesesDisponibles] = useState([]);
+    const [diasDisponibles, setDiasDisponibles] = useState([]);
     const [selectedInversor, setSelectedInversor] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
     const [selectedMes, setSelectedMes] = useState(""); // Se mantiene el selector de mes
@@ -24,11 +27,8 @@ export function PercepcionesPrimerGradoDiaPage() {
 
                 const inversorFromUrl = urlParams.get("inversor");
                 if (inversorFromUrl && data.inversores.some((inv) => inv.id.toString() === inversorFromUrl)) {
-                    console.log("Inversor encontrado en URL:", inversorFromUrl);
                     setSelectedInversor(inversorFromUrl);
-                    setSelectedAnio(anios[0]);
-                    setSelectedMes(meses[0].value);
-                    setSelectedDia("1");
+                    handleInversorChange(inversorFromUrl);
                 }
             } catch (error) {
                 setMensajeError("Hubo un error al cargar las Inversores.");
@@ -37,8 +37,47 @@ export function PercepcionesPrimerGradoDiaPage() {
         loadInversores();
     }, []);
 
-    // Opciones de días (1-31)
-    const dias = Array.from({ length: 31 }, (_, i) => i + 1);
+    const handleInversorChange = async (inversorId) => {
+        setSelectedInversor(inversorId);
+        setSelectedAnio("");
+        setSelectedMes("");
+        setAniosDisponibles([]);
+        setMesesDisponibles([]);
+        setDiasDisponibles([]);
+
+        try {
+            const data = await getAnioByInversor(inversorId);
+            setAniosDisponibles(data.anios);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los años.");
+        }
+    };
+
+    const handleAnioChange = async (anio) => {
+        setSelectedAnio(anio);
+        setSelectedMes("");
+        setMesesDisponibles([]);
+        setDiasDisponibles([]);
+
+        try {
+            const data = await getMesByAnioInversor(selectedInversor, anio);
+            setMesesDisponibles(data.meses);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los meses.");
+        }
+    };
+
+    const handleMesChange = async (mes) => {
+        setSelectedMes(mes);
+        setDiasDisponibles([]);
+
+        try {
+            const data = await getDiaByMesAnioInversor(selectedInversor, selectedAnio, mes);
+            setDiasDisponibles(data.dias);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los días.");
+        }
+    };
 
     const isFormValid = selectedInversor && selectedAnio && selectedMes && selectedDia;
 
@@ -111,9 +150,9 @@ export function PercepcionesPrimerGradoDiaPage() {
                                             <label className="form-label">Inversor</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}
+                                                style={{ width: "200px" }}
                                                 value={selectedInversor}
-                                                onChange={(e) => setSelectedInversor(e.target.value)}
+                                                onChange={(e) => handleInversorChange(e.target.value)}
                                             >
                                                 <option value="" disabled>Seleccione un inversor</option>
                                                 {Object.entries(
@@ -139,12 +178,15 @@ export function PercepcionesPrimerGradoDiaPage() {
                                             <label className="form-label">Año</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: "200px" }}
                                                 value={selectedAnio}
-                                                onChange={(e) => setSelectedAnio(e.target.value)}
+                                                onChange={(e) => handleAnioChange(e.target.value)}
+                                                disabled={!aniosDisponibles.length}
                                             >
-                                                <option value="" disabled>Seleccione un año</option>
-                                                {anios.map((anio) => (
+                                                <option value="" disabled>
+                                                    Seleccione un año
+                                                </option>
+                                                {aniosDisponibles.map((anio) => (
                                                     <option key={anio} value={anio}>
                                                         {anio}
                                                     </option>
@@ -156,13 +198,16 @@ export function PercepcionesPrimerGradoDiaPage() {
                                             <label className="form-label">Mes</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: "200px" }}
                                                 value={selectedMes}
-                                                onChange={(e) => setSelectedMes(e.target.value)}
+                                                onChange={(e) => handleMesChange(e.target.value)}
+                                                disabled={!mesesDisponibles.length}
                                             >
-                                                <option value="" disabled>Seleccione un mes</option>
-                                                {meses.map((mes) => (
-                                                    <option key={mes.value} value={mes.value}>
+                                                <option value="" disabled>
+                                                    Seleccione un mes
+                                                </option>
+                                                {mesesDisponibles.map((mes, index) => (
+                                                    <option key={index} value={mes.value}>
                                                         {mes.label}
                                                     </option>
                                                 ))}
@@ -176,10 +221,11 @@ export function PercepcionesPrimerGradoDiaPage() {
                                                 style={{ width: '200px' }}
                                                 value={selectedDia}
                                                 onChange={(e) => setSelectedDia(e.target.value)}
+                                                disabled={!diasDisponibles.length}
                                             >
                                                 <option value="" disabled>Seleccione un día</option>
-                                                {dias.map((dia) => (
-                                                    <option key={dia} value={dia}>
+                                                {diasDisponibles.map((dia, index) => (
+                                                    <option key={index} value={dia}>
                                                         {dia}
                                                     </option>
                                                 ))}

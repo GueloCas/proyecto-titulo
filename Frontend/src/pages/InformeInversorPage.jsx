@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { getInversoresByUser } from "../api/inversor.api";
 import { Link, useSearchParams } from "react-router-dom";
 import GenerarPDF from "../components/InformeInversorPDF";
-import { anios, meses } from "../utils/dateHelpers";
+import { getAnioByInversor, getMesByAnioInversor } from "../api/filtros.api";
 
 export function InformeInversorPage() {
     const [inversores, setInversores] = useState([]);
+    const [aniosDisponibles, setAniosDisponibles] = useState([]);
+    const [mesesDisponibles, setMesesDisponibles] = useState([]);
     const [selectedInversor, setSelectedInversor] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
     const [selectedMes, setSelectedMes] = useState("");
@@ -20,10 +22,8 @@ export function InformeInversorPage() {
 
                 const inversorFromUrl = urlParams.get("inversor");
                 if (inversorFromUrl && data.inversores.some((inv) => inv.id.toString() === inversorFromUrl)) {
-                    console.log("Inversor encontrado en URL:", inversorFromUrl);
                     setSelectedInversor(inversorFromUrl);
-                    setSelectedAnio(anios[0]);
-                    setSelectedMes(meses[0].value);
+                    handleInversorChange(inversorFromUrl);
                 }
             } catch (error) {
                 setMensajeError("Hubo un error al cargar la información.");
@@ -32,7 +32,35 @@ export function InformeInversorPage() {
         loadInversores();
     }, []);
 
-    const isFormValid = selectedInversor && selectedAnio && selectedMes ? true : false;
+    const handleInversorChange = async (inversorId) => {
+        setSelectedInversor(inversorId);
+        setSelectedAnio("");
+        setSelectedMes("");
+        setAniosDisponibles([]);
+        setMesesDisponibles([]);
+
+        try {
+            const data = await getAnioByInversor(inversorId);
+            setAniosDisponibles(data.anios);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los años.");
+        }
+    };
+
+    const handleAnioChange = async (anio) => {
+        setSelectedAnio(anio);
+        setSelectedMes("");
+        setMesesDisponibles([]);
+
+        try {
+            const data = await getMesByAnioInversor(selectedInversor, anio);
+            setMesesDisponibles(data.meses);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los meses.");
+        }
+    };
+
+    const isFormValid = selectedInversor && selectedAnio && selectedMes;
 
     return (
         <div className="container">
@@ -80,43 +108,46 @@ export function InformeInversorPage() {
                                 <h4 className="card-title mb-4">Selecciona los Datos</h4>
                                 <div className="text-center">
                                     <div className="px-2 my-2">
-                                            <label className="form-label">Inversor</label>
-                                            <select
-                                                className="form-select mx-auto"
-                                                style={{ width: '200px' }}
-                                                value={selectedInversor}
-                                                onChange={(e) => setSelectedInversor(e.target.value)}
-                                            >
-                                                <option value="" disabled>Seleccione un inversor</option>
-                                                {Object.entries(
-                                                    inversores.reduce((acc, inversor) => {
-                                                        const estacion = inversor.nombre_estacion || "Sin Estación";
-                                                        if (!acc[estacion]) acc[estacion] = [];
-                                                        acc[estacion].push(inversor);
-                                                        return acc;
-                                                    }, {})
-                                                ).map(([estacion, inversores]) => (
-                                                    <optgroup key={estacion} label={estacion}>
-                                                        {inversores.map((inversor) => (
-                                                            <option key={inversor.id} value={inversor.id}>
-                                                                {inversor.nombre}
-                                                            </option>
-                                                        ))}
-                                                    </optgroup>
-                                                ))}
-                                            </select>
-                                        </div>
+                                        <label className="form-label">Inversor</label>
+                                        <select
+                                            className="form-select mx-auto"
+                                            style={{ width: "200px" }}
+                                            value={selectedInversor}
+                                            onChange={(e) => handleInversorChange(e.target.value)}
+                                        >
+                                            <option value="" disabled>Seleccione un inversor</option>
+                                            {Object.entries(
+                                                inversores.reduce((acc, inversor) => {
+                                                    const estacion = inversor.nombre_estacion || "Sin Estación";
+                                                    if (!acc[estacion]) acc[estacion] = [];
+                                                    acc[estacion].push(inversor);
+                                                    return acc;
+                                                }, {})
+                                            ).map(([estacion, inversores]) => (
+                                                <optgroup key={estacion} label={estacion}>
+                                                    {inversores.map((inversor) => (
+                                                        <option key={inversor.id} value={inversor.id}>
+                                                            {inversor.nombre}
+                                                        </option>
+                                                    ))}
+                                                </optgroup>
+                                            ))}
+                                        </select>
+                                    </div>
 
                                     <div className="px-2 my-2">
                                         <label className="form-label">Año</label>
                                         <select
                                             className="form-select mx-auto"
-                                            style={{ width: '200px' }}
+                                            style={{ width: "200px" }}
                                             value={selectedAnio}
-                                            onChange={(e) => setSelectedAnio(e.target.value)}
+                                            onChange={(e) => handleAnioChange(e.target.value)}
+                                            disabled={!aniosDisponibles.length}
                                         >
-                                            <option value="" disabled>Seleccione un año</option>
-                                            {anios.map((anio) => (
+                                            <option value="" disabled>
+                                                Seleccione un año
+                                            </option>
+                                            {aniosDisponibles.map((anio) => (
                                                 <option key={anio} value={anio}>
                                                     {anio}
                                                 </option>
@@ -128,20 +159,23 @@ export function InformeInversorPage() {
                                         <label className="form-label">Mes</label>
                                         <select
                                             className="form-select mx-auto"
-                                            style={{ width: '200px' }}
+                                            style={{ width: "200px" }}
                                             value={selectedMes}
                                             onChange={(e) => setSelectedMes(e.target.value)}
+                                            disabled={!mesesDisponibles.length}
                                         >
-                                            <option value="" disabled>Seleccione un mes</option>
-                                            {meses.map((mes) => (
-                                                <option key={mes.value} value={mes.value}>
+                                            <option value="" disabled>
+                                                Seleccione un mes
+                                            </option>
+                                            {mesesDisponibles.map((mes, index) => (
+                                                <option key={index} value={mes.value}>
                                                     {mes.label}
                                                 </option>
                                             ))}
                                         </select>
                                     </div>
 
-                                    <GenerarPDF inversor={selectedInversor} anio={selectedAnio} mes={selectedMes} mostrarBoton={isFormValid}/>
+                                    <GenerarPDF inversor={selectedInversor} anio={selectedAnio} mes={selectedMes} />
                                 </div>
                             </div>
                         </div>

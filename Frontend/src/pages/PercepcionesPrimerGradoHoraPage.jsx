@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { getInversoresByUser } from '../api/inversor.api';
 import { PCPrimerGradoHora } from '../components/PCPrimerGradoHora';
-import { anios, meses } from '../utils/dateHelpers';
+import { getAnioByInversor, getHoraByMesAnioInversor, getMesByAnioInversor } from "../api/filtros.api";
 
 export function PercepcionesPrimerGradoHoraPage() {
     const [inversores, setInversores] = useState([]);
+    const [aniosDisponibles, setAniosDisponibles] = useState([]);
+    const [mesesDisponibles, setMesesDisponibles] = useState([]);
+    const [horasDisponibles, setHorasDisponibles] = useState([]);
     const [selectedInversor, setSelectedInversor] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
     const [selectedMes, setSelectedMes] = useState(""); // Se mantiene el selector de mes
@@ -24,11 +27,8 @@ export function PercepcionesPrimerGradoHoraPage() {
 
                 const inversorFromUrl = urlParams.get("inversor");
                 if (inversorFromUrl && data.inversores.some((inv) => inv.id.toString() === inversorFromUrl)) {
-                    console.log("Inversor encontrado en URL:", inversorFromUrl);
                     setSelectedInversor(inversorFromUrl);
-                    setSelectedAnio(anios[0]);
-                    setSelectedMes(meses[0].value);
-                    setSelectedHora("8");
+                    handleInversorChange(inversorFromUrl);
                 }
             } catch (error) {
                 setMensajeError("Hubo un error al cargar las Inversores.");
@@ -37,7 +37,47 @@ export function PercepcionesPrimerGradoHoraPage() {
         loadInversores();
     }, []);
 
-    const horas = Array.from({ length: 16 }, (_, i) => i + 8); // Horas de 8 a 23
+    const handleInversorChange = async (inversorId) => {
+        setSelectedInversor(inversorId);
+        setSelectedAnio("");
+        setSelectedMes("");
+        setAniosDisponibles([]);
+        setMesesDisponibles([]);
+        setHorasDisponibles([]);
+
+        try {
+            const data = await getAnioByInversor(inversorId);
+            setAniosDisponibles(data.anios);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los años.");
+        }
+    };
+
+    const handleAnioChange = async (anio) => {
+        setSelectedAnio(anio);
+        setSelectedMes("");
+        setMesesDisponibles([]);
+        setHorasDisponibles([]);
+
+        try {
+            const data = await getMesByAnioInversor(selectedInversor, anio);
+            setMesesDisponibles(data.meses);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los meses.");
+        }
+    };
+
+    const handleMesChange = async (mes) => {
+        setSelectedMes(mes);
+        setHorasDisponibles([]);
+
+        try {
+            const data = await getHoraByMesAnioInversor(selectedInversor, selectedAnio, mes);
+            setHorasDisponibles(data.horas);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar las horas.");
+        }
+    };
 
     const isFormValid = selectedInversor && selectedAnio && selectedMes && selectedHora;
 
@@ -106,13 +146,13 @@ export function PercepcionesPrimerGradoHoraPage() {
                             <div className="accordion-body">
                                 <div className="d-flex justify-content-center mb-2">
                                     <div className="d-flex flex-wrap justify-content-center">
-                                        <div className="px-2">
+                                    <div className="px-2">
                                             <label className="form-label">Inversor</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}
+                                                style={{ width: "200px" }}
                                                 value={selectedInversor}
-                                                onChange={(e) => setSelectedInversor(e.target.value)}
+                                                onChange={(e) => handleInversorChange(e.target.value)}
                                             >
                                                 <option value="" disabled>Seleccione un inversor</option>
                                                 {Object.entries(
@@ -138,12 +178,15 @@ export function PercepcionesPrimerGradoHoraPage() {
                                             <label className="form-label">Año</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: "200px" }}
                                                 value={selectedAnio}
-                                                onChange={(e) => setSelectedAnio(e.target.value)}
+                                                onChange={(e) => handleAnioChange(e.target.value)}
+                                                disabled={!aniosDisponibles.length}
                                             >
-                                                <option value="" disabled>Seleccione un año</option>
-                                                {anios.map((anio) => (
+                                                <option value="" disabled>
+                                                    Seleccione un año
+                                                </option>
+                                                {aniosDisponibles.map((anio) => (
                                                     <option key={anio} value={anio}>
                                                         {anio}
                                                     </option>
@@ -155,13 +198,16 @@ export function PercepcionesPrimerGradoHoraPage() {
                                             <label className="form-label">Mes</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: "200px" }}
                                                 value={selectedMes}
-                                                onChange={(e) => setSelectedMes(e.target.value)}
+                                                onChange={(e) => handleMesChange(e.target.value)}
+                                                disabled={!mesesDisponibles.length}
                                             >
-                                                <option value="" disabled>Seleccione un mes</option>
-                                                {meses.map((mes) => (
-                                                    <option key={mes.value} value={mes.value}>
+                                                <option value="" disabled>
+                                                    Seleccione un mes
+                                                </option>
+                                                {mesesDisponibles.map((mes, index) => (
+                                                    <option key={index} value={mes.value}>
                                                         {mes.label}
                                                     </option>
                                                 ))}
@@ -175,10 +221,11 @@ export function PercepcionesPrimerGradoHoraPage() {
                                                 style={{ width: '200px' }}  // Definir el ancho aquí
                                                 value={selectedHora}
                                                 onChange={(e) => setSelectedHora(e.target.value)}
+                                                disabled={!horasDisponibles.length}
                                             >
                                                 <option value="" disabled>Seleccione una hora</option>
-                                                {horas.map((hora) => (
-                                                    <option key={hora} value={hora}>
+                                                {horasDisponibles.map((hora, index) => (
+                                                    <option key={index} value={hora}>
                                                         {hora}:00
                                                     </option>
                                                 ))}

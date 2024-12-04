@@ -2,22 +2,30 @@ import React, { useEffect, useState } from 'react';
 import { jsPDF } from 'jspdf';
 import { getDatosInformeInversor } from '../api/informes.api';
 
-const GenerarPDF = ({ inversor, anio, mes, mostrarBoton }) => {
+const GenerarPDF = ({ inversor, anio, mes }) => {
   const [data, setData] = useState([]);
   const [mensajeError, setMensajeError] = useState("");
+  const [mostrarBoton, setMostrarBoton] = useState(false);
+  const [estadoInforme, setEstadoInforme] = useState("");
 
   useEffect(() => {
-    if (!inversor) return;
+    if (!inversor || !anio || !mes) return;
     async function loadDatos() {
+      setEstadoInforme("Generando...");
       try {
+        setMostrarBoton(false);
         const datos = await getDatosInformeInversor(inversor);
         setData(datos);
+        setMostrarBoton(true); // Activar botón una vez cargados los datos
+        setEstadoInforme("Informe listo."); // Cambiar mensaje cuando se termine el PDF
       } catch (error) {
         setMensajeError("Hubo un error al cargar la información.");
+        setEstadoInforme("Hubo un error al generar el informe"); // En caso de error
+        setMostrarBoton(false); // Desactivar botón si hay error
       }
     }
     loadDatos();
-  }, [inversor]);
+  }, [inversor, anio, mes]); // Añadir `anio` y `mes` como dependencias  
 
   const generatePDF = async () => {
     const doc = new jsPDF();
@@ -162,18 +170,21 @@ const GenerarPDF = ({ inversor, anio, mes, mostrarBoton }) => {
 
     // Guardar PDF
     doc.save(`informe_inversor_${data.inversor}.pdf`);
+    setTimeout(() => setEstadoInforme(""), 3000); // Ocultar mensaje después de 3 segundos
+
   };
 
   return (
     <div>
       <button
         className="btn btn-success mt-4"
-        disabled={!mostrarBoton}
+        disabled={!mostrarBoton || data.length === 0} // También verificamos si `data` está vacío
         onClick={generatePDF}
       >
-        Generar PDF
+        Descargar PDF
       </button>
       {mensajeError && <p>{mensajeError}</p>}
+      {estadoInforme && <p className="text-dark fs-6">{estadoInforme}</p>}
     </div>
   );
 };
