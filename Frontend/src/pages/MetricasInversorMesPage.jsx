@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { getInversoresByUser } from "../api/inversor.api";
 import { Link, useSearchParams } from "react-router-dom";
-import { anios, meses } from "../utils/dateHelpers";
 import { MetricasInversorMes } from "../components/MetricasinversorMes";
+import { getAnioByInversor, getMesByAnioInversor } from "../api/filtros.api";
 
 export function MetricasInversorMesPage() {
     const [inversores, setInversores] = useState([]);
+    const [aniosDisponibles, setAniosDisponibles] = useState([]);
+    const [mesesDisponibles, setMesesDisponibles] = useState([]);
     const [selectedInversor, setSelectedInversor] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
     const [selectedMes, setSelectedMes] = useState("");
@@ -23,10 +25,8 @@ export function MetricasInversorMesPage() {
 
                 const inversorFromUrl = urlParams.get("inversor");
                 if (inversorFromUrl && data.inversores.some((inv) => inv.id.toString() === inversorFromUrl)) {
-                    console.log("Inversor encontrado en URL:", inversorFromUrl);
                     setSelectedInversor(inversorFromUrl);
-                    setSelectedAnio(anios[0]);
-                    setSelectedMes(meses[0].value);
+                    handleInversorChange(inversorFromUrl);
                 }
             } catch (error) {
                 setMensajeError("Hubo un error al cargar los inversores.");
@@ -34,6 +34,34 @@ export function MetricasInversorMesPage() {
         }
         loadInversores();
     }, []);
+
+    const handleInversorChange = async (inversorId) => {
+        setSelectedInversor(inversorId);
+        setSelectedAnio("");
+        setSelectedMes("");
+        setAniosDisponibles([]);
+        setMesesDisponibles([]);
+
+        try {
+            const data = await getAnioByInversor(inversorId);
+            setAniosDisponibles(data.anios);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los años.");
+        }
+    };
+
+    const handleAnioChange = async (anio) => {
+        setSelectedAnio(anio);
+        setSelectedMes("");
+        setMesesDisponibles([]);
+
+        try {
+            const data = await getMesByAnioInversor(selectedInversor, anio);
+            setMesesDisponibles(data.meses);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los meses.");
+        }
+    };
 
     const isFormValid = selectedInversor && selectedAnio && selectedMes;
 
@@ -66,7 +94,7 @@ export function MetricasInversorMesPage() {
                             <Link to="/informes">Metricas Inversor</Link>
                         </li>
                         <li className="breadcrumb-item active" aria-current="page">
-                            Mensual 
+                            Mensual
                         </li>
                     </ol>
                 </nav>
@@ -102,9 +130,9 @@ export function MetricasInversorMesPage() {
                                             <label className="form-label">Inversor</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}
+                                                style={{ width: "200px" }}
                                                 value={selectedInversor}
-                                                onChange={(e) => setSelectedInversor(e.target.value)}
+                                                onChange={(e) => handleInversorChange(e.target.value)}
                                             >
                                                 <option value="" disabled>Seleccione un inversor</option>
                                                 {Object.entries(
@@ -130,12 +158,15 @@ export function MetricasInversorMesPage() {
                                             <label className="form-label">Año</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: "200px" }}
                                                 value={selectedAnio}
-                                                onChange={(e) => setSelectedAnio(e.target.value)}
+                                                onChange={(e) => handleAnioChange(e.target.value)}
+                                                disabled={!aniosDisponibles.length}
                                             >
-                                                <option value="" disabled>Seleccione un año</option>
-                                                {anios.map((anio) => (
+                                                <option value="" disabled>
+                                                    Seleccione un año
+                                                </option>
+                                                {aniosDisponibles.map((anio) => (
                                                     <option key={anio} value={anio}>
                                                         {anio}
                                                     </option>
@@ -147,13 +178,16 @@ export function MetricasInversorMesPage() {
                                             <label className="form-label">Mes</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: "200px" }}
                                                 value={selectedMes}
                                                 onChange={(e) => setSelectedMes(e.target.value)}
+                                                disabled={!mesesDisponibles.length}
                                             >
-                                                <option value="" disabled>Seleccione un mes</option>
-                                                {meses.map((mes) => (
-                                                    <option key={mes.value} value={mes.value}>
+                                                <option value="" disabled>
+                                                    Seleccione un mes
+                                                </option>
+                                                {mesesDisponibles.map((mes, index) => (
+                                                    <option key={index} value={mes.value}>
                                                         {mes.label}
                                                     </option>
                                                 ))}

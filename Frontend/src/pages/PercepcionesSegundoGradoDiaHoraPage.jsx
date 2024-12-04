@@ -2,10 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { PCTablaDiaHora } from '../components/PCTablaDiaHora';
 import { Link, useSearchParams } from 'react-router-dom';
 import { getEstacionesByUser } from '../api/estacion.api';
-import { anios, meses } from '../utils/dateHelpers';
+import { getAnioByEstacion, getMesByAnioEstacion, getDiaByMesAnioEstacion, getHoraByDiaMesAnioEstacion } from "../api/filtros.api";
 
 export function PercepcionesSegundoGradoDiaHoraPage() {
     const [estaciones, setEstaciones] = useState([]);
+    const [aniosDisponibles, setAniosDisponibles] = useState([]);
+    const [mesesDisponibles, setMesesDisponibles] = useState([]);
+    const [diasDisponibles, setDiasDisponibles] = useState([]);
+    const [horasDisponibles, setHorasDisponibles] = useState([]);
     const [selectedEstacion, setSelectedEstacion] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
     const [selectedMes, setSelectedMes] = useState(""); // Se mantiene el selector de mes
@@ -25,12 +29,8 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
 
                 const estacionFromUrl = urlParams.get("estacion");
                 if (estacionFromUrl && data.estaciones.some((inv) => inv.id.toString() === estacionFromUrl)) {
-                    console.log("estacion encontrado en URL:", estacionFromUrl);
                     setSelectedEstacion(estacionFromUrl);
-                    setSelectedAnio(anios[0]);
-                    setSelectedMes(meses[0].value);
-                    setSelectedDia("1");
-                    setSelectedHora("8");
+                    handleEstacionChange(estacionFromUrl);
                 }
             } catch (error) {
                 setMensajeError("Hubo un error al cargar las estaciones.");
@@ -39,9 +39,69 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
         loadEstaciones();
     }, []);
 
-    // Opciones de días (1-31)
-    const dias = Array.from({ length: 31 }, (_, i) => i + 1);
-    const horas = Array.from({ length: 16 }, (_, i) => i + 8); // Horas de 8 a 23
+    const handleEstacionChange = async (estacionId) => {
+        setSelectedEstacion(estacionId);
+        setSelectedAnio("");
+        setSelectedMes("");
+        setSelectedDia("");
+        setSelectedHora("");
+        setAniosDisponibles([]);
+        setMesesDisponibles([]);
+        setDiasDisponibles([]);
+        setHorasDisponibles([]);
+
+        try {
+            const data = await getAnioByEstacion(estacionId);
+            setAniosDisponibles(data.anios);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los años.");
+        }
+    };
+
+    const handleAnioChange = async (anio) => {
+        setSelectedAnio(anio);
+        setSelectedMes("");
+        setSelectedDia("");
+        setSelectedHora("");
+        setMesesDisponibles([]);
+        setDiasDisponibles([]);
+        setHorasDisponibles([]);
+
+        try {
+            const data = await getMesByAnioEstacion(selectedEstacion, anio);
+            setMesesDisponibles(data.meses);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los meses.");
+        }
+    };
+
+    const handleMesChange = async (mes) => {
+        setSelectedMes(mes);
+        setSelectedDia("");
+        setSelectedHora("");
+        setDiasDisponibles([]);
+        setHorasDisponibles([]);
+
+        try {
+            const data = await getDiaByMesAnioEstacion(selectedEstacion, selectedAnio, mes);
+            setDiasDisponibles(data.dias);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar los días.");
+        }
+    };
+
+    const handleDiaChange = async (dia) => {
+        setSelectedDia(dia);
+        setSelectedHora("");
+        setHorasDisponibles([]);
+
+        try {
+            const data = await getHoraByDiaMesAnioEstacion(selectedEstacion, selectedAnio, selectedMes, dia);
+            setHorasDisponibles(data.horas);
+        } catch (error) {
+            setMensajeError("Hubo un error al cargar las horas.");
+        }
+    };
 
     const isFormValid = selectedEstacion && selectedAnio && selectedMes && selectedDia && selectedHora;
 
@@ -125,7 +185,7 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
                                                 className="form-select"
                                                 style={{ width: '200px' }}  // Definir el ancho aquí
                                                 value={selectedEstacion}
-                                                onChange={(e) => setSelectedEstacion(e.target.value)}
+                                                onChange={(e) => handleEstacionChange(e.target.value)}
                                             >
                                                 <option value="" disabled>Seleccione una estación</option>
                                                 {estaciones.map((estacion) => (
@@ -142,10 +202,11 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
                                                 className="form-select"
                                                 style={{ width: '200px' }}  // Definir el ancho aquí
                                                 value={selectedAnio}
-                                                onChange={(e) => setSelectedAnio(e.target.value)}
+                                                onChange={(e) => handleAnioChange(e.target.value)}
+                                                disabled={!aniosDisponibles.length}
                                             >
                                                 <option value="" disabled>Seleccione un año</option>
-                                                {anios.map((anio) => (
+                                                {aniosDisponibles.map((anio) => (
                                                     <option key={anio} value={anio}>
                                                         {anio}
                                                     </option>
@@ -159,10 +220,11 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
                                                 className="form-select"
                                                 style={{ width: '200px' }}  // Definir el ancho aquí
                                                 value={selectedMes}
-                                                onChange={(e) => setSelectedMes(e.target.value)}
+                                                onChange={(e) => handleMesChange(e.target.value)}
+                                                disabled={!mesesDisponibles.length}
                                             >
                                                 <option value="" disabled>Seleccione un mes</option>
-                                                {meses.map((mes) => (
+                                                {mesesDisponibles.map((mes) => (
                                                     <option key={mes.value} value={mes.value}>
                                                         {mes.label}
                                                     </option>
@@ -176,10 +238,11 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
                                                 className="form-select"
                                                 style={{ width: '200px' }}
                                                 value={selectedDia}
-                                                onChange={(e) => setSelectedDia(e.target.value)}
+                                                onChange={(e) => handleDiaChange(e.target.value)}
+                                                disabled={!diasDisponibles.length}
                                             >
                                                 <option value="" disabled>Seleccione un día</option>
-                                                {dias.map((dia) => (
+                                                {diasDisponibles.map((dia) => (
                                                     <option key={dia} value={dia}>
                                                         {dia}
                                                     </option>
@@ -194,9 +257,10 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
                                                 style={{ width: '200px' }}  // Definir el ancho aquí
                                                 value={selectedHora}
                                                 onChange={(e) => setSelectedHora(e.target.value)}
+                                                disabled={!horasDisponibles.length}
                                             >
                                                 <option value="" disabled>Seleccione una hora</option>
-                                                {horas.map((hora) => (
+                                                {horasDisponibles.map((hora) => (
                                                     <option key={hora} value={hora}>
                                                         {hora}:00
                                                     </option>

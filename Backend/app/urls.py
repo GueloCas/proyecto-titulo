@@ -5,6 +5,7 @@ from .views_nuevo.subir_datos_views import ExcelUploadView, CSVUploadView
 from .views_nuevo.estadisticas_views import MetricasEstacionHoraMesView, MetricasEstacionGeneralMesView, MetricasEstacionGeneralDiaView, MetricasEstacionHoraDiaView, MetricasInversorMesView
 from .views_nuevo.descripciones_views import CalcularDescripcionesLinguisticasInversor, CalcularDescripcionesLinguisticasEstacion
 from .views_nuevo.percepciones_views import ObtenerPercepcionesSegundoGradoDiaHoraView, ObtenerPercepcionesSegundoGradoDiaView, ObtenerPercepcionesPrimerGradoDiaView, ObtenerPercepcionesPrimerGradoHoraView
+from .views_nuevo.filters_views import FilterAnioByInversorView, FilterMesByAnioInversorView, FilterDiaByMesAnioInversorView, FilterHoraByDiaMesAnioInversorView, FilterHoraByMesAnioInversorView, FilterAnioByEstacionView, FilterMesByAnioEstacionView, FilterDiaByMesAnioEstacionView, FilterHoraByMesAnioEstacionView, FilterHoraByDiaMesAnioEstacionView
 from .views_nuevo.informes_views import GenerarInformeInversorView
 from .views_nuevo.estaciones_views import EstacionesByUserView, InversoresByUserView
 from .views import login, register
@@ -53,6 +54,18 @@ urlpatterns = [
 
     path('api/v1/estacionesByUser/', EstacionesByUserView.as_view(), name='estacionesByUser'),
     path('api/v1/inversoresByUser/', InversoresByUserView.as_view(), name='inversoresByUser'),
+
+    path('api/v1/filters/anio-by-inversor/', FilterAnioByInversorView.as_view(), name='anio-by-inversor'),
+    path('api/v1/filters/mes-by-anio-inversor/', FilterMesByAnioInversorView.as_view(), name='mes-by-anio-inversor'),
+    path('api/v1/filters/dia-by-mes-anio-inversor/', FilterDiaByMesAnioInversorView.as_view(), name='dia-by-mes-anio-inversor'),
+    path('api/v1/filters/hora-by-mes-anio-inversor/', FilterHoraByMesAnioInversorView.as_view(), name='hora-by-mes-anio-inversor'),
+    path('api/v1/filters/hora-by-dia-mes-anio-inversor/', FilterHoraByDiaMesAnioInversorView.as_view(), name='hora-by-dia-mes-anio-inversor'),
+
+    path('api/v1/filters/anio-by-estacion/', FilterAnioByEstacionView.as_view(), name='anio-by-estacion'),
+    path('api/v1/filters/mes-by-anio-estacion/', FilterMesByAnioEstacionView.as_view(), name='mes-by-anio-estacion'),
+    path('api/v1/filters/dia-by-mes-anio-estacion/', FilterDiaByMesAnioEstacionView.as_view(), name='dia-by-mes-anio-estacion'),
+    path('api/v1/filters/hora-by-mes-anio-estacion/', FilterHoraByMesAnioEstacionView.as_view(), name='hora-by-mes-anio-estacion'),
+    path('api/v1/filters/hora-by-dia-mes-anio-estacion/', FilterHoraByDiaMesAnioEstacionView.as_view(), name='hora-by-dia-mes-anio-estacion'),
     
     path('api/v1/login/', login, name='login'),
     path('api/v1/register/', register, name='register'),
