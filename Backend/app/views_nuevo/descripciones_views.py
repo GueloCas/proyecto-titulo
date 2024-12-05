@@ -4,9 +4,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from app.utils.functions import obtenerPercepcionComputacionalPrimerGrado, calcular_pertenencia_baja, calcular_pertenencia_media, calcular_pertenencia_alta, obtenerClasificacionDescripcionLinguistica 
 
+from concurrent.futures import ThreadPoolExecutor
+from django.db.models import Min, Max
+
 class CalcularDescripcionesLinguisticasInversor(APIView):
     def get(self, request, *args, **kwargs):
-        # Obtener el ID del inversor de los parámetros de la solicitud
+        # Obtener los parámetros de la solicitud
         inversor_id = request.query_params.get('inversor_id')
         anio = request.query_params.get('anio')
         mes = request.query_params.get('mes')
@@ -19,51 +22,68 @@ class CalcularDescripcionesLinguisticasInversor(APIView):
             return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            # Validar que el inversor exista
             inversor = Inversor.objects.get(pk=inversor_id)
         except Inversor.DoesNotExist:
             return Response({"error": "Inversor no encontrado"}, status=status.HTTP_404_NOT_FOUND)
         
-        cantidad_r = 0
-        suma_baja = 0
-        suma_media = 0
-        suma_alta = 0
-
         try:
-            for dia in range(1, 32):
-                for hora in range(8, 23):  # Ciclo por horas del día
+            # Cargar todas las producciones del mes
+            producciones = Produccion.objects.filter(
+                inversor=inversor, anio=anio, mes=mes
+            ).values('dia', 'hora', 'cantidad')
+            
+            # Organizar producciones en un diccionario
+            producciones_dict = {(p['dia'], p['hora']): p['cantidad'] for p in producciones}
+
+            # Obtener estadísticas por hora de forma masiva
+            estadisticas = Produccion.objects.filter(
+                inversor=inversor, anio=anio, mes=mes
+            ).values('hora').annotate(
+                cantidad_minima=Min('cantidad'),
+                cantidad_maxima=Max('cantidad')
+            )
+            
+            # Organizar estadísticas en un diccionario
+            estadisticas_dict = {e['hora']: e for e in estadisticas}
+
+            # Función para procesar un día
+            def procesar_dia(dia):
+                suma_baja = suma_media = suma_alta = cantidad_r = 0
+                for hora in range(8, 23):
                     hora_str = f'H{hora}'
-                    
-                    produccion = Produccion.objects.filter(
-                        inversor=inversor, anio=anio, mes=mes, dia=dia, hora=hora_str
-                    ).values('cantidad').first()
+                    cantidad = producciones_dict.get((dia, hora_str))
+                    if cantidad is None:
+                        continue
 
-                    if not produccion:
-                        continue  # Si no hay producción, pasar a la siguiente hora
-
-                    cantidad = produccion['cantidad']
-
-                    # Obtener estadísticas para calcular términos lingüísticos
-                    estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_str).first()
+                    estadisticas_hora = estadisticas_dict.get(hora_str)
                     if not estadisticas_hora:
-                        continue  # Si no hay estadísticas, pasar a la siguiente hora
+                        continue
 
                     TLbaja, TLmedia, TLalta = obtenerPercepcionComputacionalPrimerGrado(
                         estadisticas_hora['cantidad_minima'],
                         estadisticas_hora['cantidad_maxima']
                     )
 
-                    # Calcular las pertenencias
                     pertenencia_baja = calcular_pertenencia_baja(cantidad, TLbaja)
                     pertenencia_media = calcular_pertenencia_media(cantidad, TLmedia)
                     pertenencia_alta = calcular_pertenencia_alta(cantidad, TLalta)
 
-                    # Acumular las pertenencias
                     cantidad_r += 1
                     suma_baja += pertenencia_baja
                     suma_media += pertenencia_media
                     suma_alta += pertenencia_alta
 
-            # Devolver las sumas totales
+                return cantidad_r, suma_baja, suma_media, suma_alta
+
+            # Procesar días en paralelo
+            with ThreadPoolExecutor() as executor:
+                resultados = list(executor.map(procesar_dia, range(1, 32)))
+
+            # Sumar los resultados
+            cantidad_r, suma_baja, suma_media, suma_alta = map(sum, zip(*resultados))
+
+            # Devolver las descripciones lingüísticas
             return Response({
                 "cantidad_r": cantidad_r,
                 "suma_baja": suma_baja,
@@ -76,20 +96,18 @@ class CalcularDescripcionesLinguisticasInversor(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+   
 class CalcularDescripcionesLinguisticasEstacion(APIView):
     def get(self, request, *args, **kwargs):
-        # Obtener el ID de la estación de los parámetros de la solicitud
+        # Obtener parámetros de la solicitud
         estacion_id = request.query_params.get('estacion_id')
         anio = request.query_params.get('anio')
         mes = request.query_params.get('mes')
 
-        if not estacion_id:
-            return Response({"error": "Se requiere el parámetro 'estacion_id'"}, status=status.HTTP_400_BAD_REQUEST)
-        if not anio:
-            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
-        if not mes:
-            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
+        # Validaciones
+        if not estacion_id or not anio or not mes:
+            return Response({"error": "Faltan parámetros requeridos: 'estacion_id', 'anio' o 'mes'."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         try:
             estacion = Estacion.objects.get(pk=estacion_id)
@@ -100,51 +118,55 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
         suma_mala = 0
         suma_normal = 0
         suma_excelente = 0
-        inversores_info = []  # Lista para almacenar las descripciones de cada inversor
+        inversores_info = []  # Almacena las descripciones de cada inversor
 
         try:
-            # Obtener los inversores asociados a la estación
-            inversores = Inversor.objects.filter(estacion=estacion)
+            # Obtener inversores y sus producciones de forma optimizada
+            inversores = Inversor.objects.filter(estacion=estacion).prefetch_related('produccion_set')
 
-            for inversor in inversores:  # Iterar sobre cada inversor
-                suma_baja = 0
-                suma_media = 0
-                suma_alta = 0
-                cantidad_inversor = 0  # Para contar las producciones del inversor
+            # Agregar los datos por inversor
+            for inversor in inversores:
+                suma_baja = suma_media = suma_alta = cantidad_inversor = 0
 
-                for dia in range(1, 32):
-                    for hora in range(8, 23):  # Ciclo por horas del día
+                # Filtrar las producciones del mes y año
+                producciones = Produccion.objects.filter(
+                    inversor=inversor, anio=anio, mes=mes
+                ).values('dia', 'hora', 'cantidad')
+
+                # Organizar producciones por día y hora
+                producciones_dict = {(p['dia'], p['hora']): p['cantidad'] for p in producciones}
+
+                # Obtener estadísticas por hora de forma masiva
+                estadisticas = Produccion.objects.filter(
+                    inversor=inversor, anio=anio, mes=mes
+                ).values('hora').annotate(
+                    cantidad_minima=Min('cantidad'),
+                    cantidad_maxima=Max('cantidad')
+                )
+
+                # Organizar estadísticas por hora
+                estadisticas_dict = {e['hora']: e for e in estadisticas}
+
+                # Función para procesar los días
+                def procesar_dia(dia):
+                    suma_baja = suma_media = suma_alta = cantidad_inversor = 0
+                    for hora in range(1, 25):  # Rango de horas de 08 a 22
                         hora_str = f'H{hora}'
+                        cantidad = producciones_dict.get((dia, hora_str))
+                        if cantidad is None:
+                            continue
 
-                        produccion = Produccion.objects.filter(
-                            inversor=inversor, anio=anio, mes=mes, dia=dia, hora=hora_str
-                        ).values('cantidad').first()
-
-                        if not produccion:
-                            continue  # Si no hay producción, pasar a la siguiente hora
-
-                        cantidad = produccion['cantidad']
-
-                        # Obtener estadísticas para calcular términos lingüísticos
-                        estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_str).first()
+                        estadisticas_hora = estadisticas_dict.get(hora_str)
                         if not estadisticas_hora:
-                            continue  # Si no hay estadísticas, pasar a la siguiente hora
+                            continue
 
+                        # Calcular percepción y pertenencia
                         TLbaja, TLmedia, TLalta = obtenerPercepcionComputacionalPrimerGrado(
-                            estadisticas_hora['cantidad_minima'],
-                            estadisticas_hora['cantidad_maxima']
+                            estadisticas_hora['cantidad_minima'], estadisticas_hora['cantidad_maxima']
                         )
-
-                        # Calcular las pertenencias
                         pertenencia_baja = calcular_pertenencia_baja(cantidad, TLbaja)
                         pertenencia_media = calcular_pertenencia_media(cantidad, TLmedia)
                         pertenencia_alta = calcular_pertenencia_alta(cantidad, TLalta)
-
-                        # Acumular las pertenencias para la estación
-                        cantidad_r += 1
-                        suma_mala += pertenencia_baja
-                        suma_normal += pertenencia_media
-                        suma_excelente += pertenencia_alta
 
                         # Acumular las pertenencias para el inversor
                         suma_baja += pertenencia_baja
@@ -152,11 +174,25 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
                         suma_alta += pertenencia_alta
                         cantidad_inversor += 1
 
-                # Si el inversor tiene producciones, calcular sus descripciones
+                    return cantidad_inversor, suma_baja, suma_media, suma_alta
+
+                # Procesar días en paralelo
+                with ThreadPoolExecutor() as executor:
+                    resultados = list(executor.map(procesar_dia, range(1, 32)))  # Procesar días 1 a 31
+
+                # Sumar los resultados por cada inversor
+                cantidad_inversor, suma_baja, suma_media, suma_alta = map(sum, zip(*resultados))
+
+                cantidad_r += cantidad_inversor
+                suma_mala += suma_baja
+                suma_normal += suma_media
+                suma_excelente += suma_alta
+
+                # Calcular las descripciones lingüísticas para el inversor
                 if cantidad_inversor > 0:
                     inversor_info = {
                         'inversor_id': inversor.id,
-                        'inversor_nombre': inversor.nombre,  # Asegúrate de tener el campo nombre en el modelo Inversor
+                        'inversor_nombre': inversor.nombre,
                         'cantidad_r_inversor': cantidad_inversor,
                         'suma_baja_inversor': suma_baja,
                         'DL_baja_inversor': obtenerClasificacionDescripcionLinguistica(suma_baja / cantidad_inversor, "BAJA"),
@@ -167,7 +203,7 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
                     }
                     inversores_info.append(inversor_info)
 
-            # Devolver las sumas totales para la estación y las descripciones de cada inversor
+            # Responder con los resultados para la estación y los inversores
             return Response({
                 "cantidad_r": cantidad_r,
                 "suma_mala": suma_mala,
@@ -176,7 +212,7 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
                 "DL_normal": obtenerClasificacionDescripcionLinguistica(suma_normal / cantidad_r, "NORMAL"),
                 "suma_excelente": suma_excelente,
                 "DL_excelente": obtenerClasificacionDescripcionLinguistica(suma_excelente / cantidad_r, "EXCELENTE"),
-                "inversores_info": inversores_info  # Incluir las descripciones de cada inversor
+                "inversores_info": inversores_info  # Descripciones de cada inversor
             }, status=status.HTTP_200_OK)
 
         except Exception as e:

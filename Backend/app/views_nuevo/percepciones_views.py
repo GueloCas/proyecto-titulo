@@ -1,7 +1,8 @@
 from app.models import Inversor, Produccion, Estacion
 from rest_framework import status 
 from rest_framework.views import APIView 
-from rest_framework.response import Response 
+from rest_framework.response import Response
+from concurrent.futures import ThreadPoolExecutor 
 
 from app.utils.functions import calcular_pertenencia_baja, calcular_pertenencia_media, calcular_pertenencia_alta, obtenerPercepcionComputacionalPrimerGrado, obtenerPercepcionComputacionalSegundoGrado
 
@@ -77,7 +78,6 @@ class ObtenerPercepcionesSegundoGradoDiaHoraView(APIView):
 
 class ObtenerPercepcionesSegundoGradoDiaView(APIView):
     def get(self, request, *args, **kwargs):
-        # Obtener el día de los parámetros de la solicitud
         id_estacion = request.query_params.get('estacion')
         anio = request.query_params.get('anio')
         mes = request.query_params.get('mes')
@@ -94,41 +94,33 @@ class ObtenerPercepcionesSegundoGradoDiaView(APIView):
         
         try:
             estacion = Estacion.objects.get(pk=id_estacion)
-
-            # Lista para almacenar las percepciones por hora
-            percepciones_diarias = []
-
             inversores = Inversor.objects.filter(estacion_id=estacion)
 
-            # Recorrer cada hora desde las 8 hasta las 22
-            for hora in range(8, 23):
+            def procesar_hora(hora):
                 hora_str = f'H{hora}'
-                percepciones = []  # Lista para almacenar las percepciones de cada inversor en la hora actual
-                produccion_encontrada = False  # Bandera para verificar si se encontró producción en la hora actual
+                percepciones = []
+                produccion_encontrada = False
 
                 for inversor in inversores:
-                    # Filtrar la producción para el día y hora especificados
-                    produccion = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes, dia=dia, hora=hora_str).values('cantidad').first()
-                    
-                    # Validar si hay producción en ese día y hora para el inversor actual
+                    produccion = Produccion.objects.filter(
+                        inversor=inversor, anio=anio, mes=mes, dia=dia, hora=hora_str
+                    ).values('cantidad').first()
+
                     if produccion:
                         produccion_encontrada = True
                         cantidad = produccion['cantidad']
                         
-                        # Obtener las estadísticas de la hora para calcular los términos lingüísticos
                         estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_str).first()
                         if estadisticas_hora:
                             TLbaja, TLmedia, TLalta = obtenerPercepcionComputacionalPrimerGrado(
-                                estadisticas_hora['cantidad_minima'], 
+                                estadisticas_hora['cantidad_minima'],
                                 estadisticas_hora['cantidad_maxima']
                             )
 
-                            # Calcular las pertenencias
                             pertenencia_baja = calcular_pertenencia_baja(cantidad, TLbaja)
                             pertenencia_media = calcular_pertenencia_media(cantidad, TLmedia)
                             pertenencia_alta = calcular_pertenencia_alta(cantidad, TLalta)
 
-                            # Agregar los datos al diccionario de percepciones
                             percepciones.append({
                                 'inversor': inversor.nombre,
                                 'pertenencia_baja': pertenencia_baja,
@@ -136,20 +128,26 @@ class ObtenerPercepcionesSegundoGradoDiaView(APIView):
                                 'pertenencia_alta': pertenencia_alta
                             })
 
-                # Si se encontró producción en al menos un inversor para la hora actual, calcula el segundo grado y agrega a la lista diaria
                 if produccion_encontrada:
                     percepciones_segundo_grado = obtenerPercepcionComputacionalSegundoGrado(percepciones)
-                    percepciones_diarias.append({
+                    return {
                         'hora': hora,
                         'percepciones_segundo_grado': percepciones_segundo_grado
-                    })
+                    }
+                return None
 
-            # Preparar los datos para la respuesta
+            # Usar ThreadPoolExecutor para paralelizar el procesamiento por hora
+            with ThreadPoolExecutor() as executor:
+                resultados = list(executor.map(procesar_hora, range(1, 25)))
+
+            # Filtrar resultados no nulos
+            percepciones_diarias = [resultado for resultado in resultados if resultado is not None]
+
             return Response({
                 'estacion': estacion.nombre,
                 'percepciones': percepciones_diarias
             }, status=status.HTTP_200_OK)
-        
+
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
