@@ -113,7 +113,7 @@ export function MetricasEstacionGeneralDiaPage() {
                             <Link to="/informes">Metricas Estación</Link>
                         </li>
                         <li className="breadcrumb-item active" aria-current="page">
-                            Dia - Hora
+                            Dia - General
                         </li>
                     </ol>
                 </nav>

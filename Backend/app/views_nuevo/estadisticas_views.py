@@ -15,8 +15,10 @@ class MetricasEstacionHoraMesView(APIView):
             return Response({"error": "Se requiere el parámetro 'estacion'"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
+            estacion = Estacion.objects.get(pk=id_estacion)
+
             # Filtrar los inversores que están asociados con la estación proporcionada
-            inversores = Inversor.objects.filter(estacion_id=id_estacion)
+            inversores = Inversor.objects.filter(estacion_id=estacion)
 
             # Si no se encuentran inversores para la estación proporcionada, retornar un mensaje de error
             if not inversores.exists():
@@ -52,17 +54,14 @@ class MetricasEstacionHoraMesView(APIView):
             
             return Response({
                 "estacion": {
-                    "id_estacion": id_estacion,
+                    "nombre": estacion.nombre,
                     "total_mensual": total_mensual_estacion,
                     "promedio_inversor": promedio_inversor_estacion,
                     "mejor_inversor": mejor_inversor_estacion,
                     "peor_inversor": peor_inversor_estacion,
                 },
                 "inversores": datos_inversores,
-            })
-
-            # Retornar los datos de los inversores junto con sus producciones
-            return Response({'inversores': datos_inversores}, status=status.HTTP_200_OK)
+            }, status=status.HTTP_200_OK)
 
         except Exception as e:
             # Manejar cualquier excepción no esperada
@@ -77,8 +76,10 @@ class MetricasEstacionGeneralMesView(APIView):
             return Response({"error": "Se requiere el parámetro 'estacion'"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            estacion = Estacion.objects.get(pk=id_estacion)
+
             # Obtener inversores asociados a la estación
-            inversores = Inversor.objects.filter(estacion_id=id_estacion)
+            inversores = Inversor.objects.filter(estacion_id=estacion)
             if not inversores.exists():
                 return Response({"error": "No se encontraron inversores para la estación indicada"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -136,14 +137,14 @@ class MetricasEstacionGeneralMesView(APIView):
             # Respuesta final con datos de inversores y estación
             return Response({
                 "estacion": {
-                    "id_estacion": id_estacion,
+                    "nombre": estacion.nombre,
                     "total_mensual": total_mensual_estacion,
                     "promedio_inversor": promedio_inversor_estacion,
                     "mejor_inversor": mejor_inversor_estacion,
                     "peor_inversor": peor_inversor_estacion,
                 },
                 "inversores": datos_inversores,
-            })
+            }, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -158,7 +159,9 @@ class MetricasEstacionGeneralDiaView(APIView):
             return Response({"error": "Se requiere el parámetro 'estacion'"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            inversores = Inversor.objects.filter(estacion_id=id_estacion)
+            estacion = Estacion.objects.get(pk=id_estacion)
+
+            inversores = Inversor.objects.filter(estacion_id=estacion)
             if not inversores.exists():
                 return Response({"error": "No se encontraron inversores para la estación indicada"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -214,14 +217,14 @@ class MetricasEstacionGeneralDiaView(APIView):
 
             return Response({
                 "estacion": {
-                    "id_estacion": id_estacion,
+                    "nombre": estacion.nombre,
                     "total_diario": total_diario_estacion,
                     "promedio_inversor": promedio_diario_estacion,
                     "mejor_inversor": mejor_inversor_estacion,
                     "peor_inversor": peor_inversor_estacion,
                 },
                 "inversores": datos_inversores,
-            })
+            }, status=status.HTTP_200_OK)
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -238,7 +241,9 @@ class MetricasEstacionHoraDiaView(APIView):
             return Response({"error": "Se requiere el parámetro 'estacion'"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            inversores = Inversor.objects.filter(estacion_id=id_estacion)
+            estacion = Estacion.objects.get(pk=id_estacion)
+
+            inversores = Inversor.objects.filter(estacion_id=estacion)
             if not inversores.exists():
                 return Response({"error": "No se encontraron inversores para la estación indicada"}, status=status.HTTP_404_NOT_FOUND)
             
@@ -276,14 +281,14 @@ class MetricasEstacionHoraDiaView(APIView):
 
             return Response({
                 "estacion": {
-                    "id_estacion": id_estacion,
+                    "nombre": estacion.nombre,
                     "total_hora": total_hora_estacion,
                     "promedio_inversor": promedio_hora_estacion,
                     "mejor_inversor": mejor_inversor_estacion,
                     "peor_inversor": peor_inversor_estacion,
                 },
                 "inversores": datos_inversores,
-            })
+            }, status=status.HTTP_200_OK)
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -303,6 +308,9 @@ class MetricasInversorMesView(APIView):
             estadisticas_por_hora = inversor.obtener_MinMaxProm_producciones()
 
             response_data = {
+                "inversor":{
+                    "nombre": inversor.nombre,
+                },
                 "estadisticas": estadisticas_por_hora,
             }
 

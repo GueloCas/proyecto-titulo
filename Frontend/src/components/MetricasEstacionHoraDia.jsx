@@ -12,12 +12,11 @@ export function MetricasEstacionHoraDia({ estacionId, anio, mes, dia, hora }) {
                 setMetricas(null);
                 try {
                     const data = await getMetricasEstacionHoraDia(estacionId, dia, hora); // Cambié la función llamada
-                    console.log(data);
                     setEstacion(data.estacion);
                     setMetricas(data.inversores || []);
                 } catch (error) {
                     setMensajeError("Hubo un error al cargar las métricas.");
-                } 
+                }
             }
             loadMetricas();
         }
@@ -40,11 +39,13 @@ export function MetricasEstacionHoraDia({ estacionId, anio, mes, dia, hora }) {
 
             {/* Información general de la estación */}
             {estacion && (
-                <div>
-                    <h4 className="ms-2 mt-4">
-                        Métricas generales de la estación <strong>[nombre_estacion]</strong> el día <strong>{dia}-{mes}-{anio}</strong> a las <strong>{hora}:00</strong>
-                    </h4>
-                    <div className="row mt-2">
+                <div className="card mt-4 p-4">
+                    <div className="card-header">
+                        <h4 className="ms-2">
+                            Métricas generales de <strong>{estacion.nombre}</strong> el día <strong>{dia}-{mes}-{anio}</strong> a las <strong>{hora}:00</strong>
+                        </h4>
+                    </div>
+                    <div className="row mt-4">
                         <div className="col-sm-6 col-md-3">
                             <div className="card card-stats card-primary card-round">
                                 <div className="card-body">
@@ -60,8 +61,8 @@ export function MetricasEstacionHoraDia({ estacionId, anio, mes, dia, hora }) {
                                         </div>
                                         <div className="col-7 col-stats">
                                             <div className="numbers">
-                                                <p className="mb-0">Total Hora:</p>
-                                                <h4 className="card-title">{estacion.total_hora}</h4>
+                                                <p className="mb-0">Total Producción:</p>
+                                                <h4 className="card-title">{estacion.total_hora} kWh</h4>
                                             </div>
                                         </div>
                                     </div>
@@ -82,7 +83,7 @@ export function MetricasEstacionHoraDia({ estacionId, anio, mes, dia, hora }) {
                                         <div className="col-7 col-stats">
                                             <div className="numbers">
                                                 <p className="mb-0">Promedio Inversor:</p>
-                                                <h4 className="card-title">{estacion.promedio_inversor.toFixed(3)}</h4>
+                                                <h4 className="card-title">{estacion.promedio_inversor.toFixed(3)} kWh</h4>
                                             </div>
                                         </div>
                                     </div>
@@ -103,7 +104,7 @@ export function MetricasEstacionHoraDia({ estacionId, anio, mes, dia, hora }) {
                                         <div className="col-7 col-stats">
                                             <div className="numbers">
                                                 <p className="mb-0">Mejor Inversor:</p>
-                                                <h4 className="card-title">{estacion.mejor_inversor.nombre} ({estacion.mejor_inversor.total})</h4>
+                                                <h4 className="card-title">{estacion.mejor_inversor.nombre} ({estacion.mejor_inversor.total} kWh)</h4>
                                             </div>
                                         </div>
                                     </div>
@@ -124,7 +125,7 @@ export function MetricasEstacionHoraDia({ estacionId, anio, mes, dia, hora }) {
                                         <div className="col-7 col-stats">
                                             <div className="numbers">
                                                 <p className="mb-0">Peor Inversor:</p>
-                                                <h4 className="card-title">{estacion.peor_inversor.nombre} ({estacion.peor_inversor.total})</h4>
+                                                <h4 className="card-title">{estacion.peor_inversor.nombre} ({estacion.peor_inversor.total} kWh)</h4>
                                             </div>
                                         </div>
                                     </div>
@@ -136,66 +137,70 @@ export function MetricasEstacionHoraDia({ estacionId, anio, mes, dia, hora }) {
             )}
 
             {metricas.length > 0 && (
-                <div>
-                    <h4 className="ms-2">
-                        Tabla de inversores de la estación <strong>[nombre_estacion]</strong> el día <strong>{dia}-{mes}-{anio}</strong> a las <strong>{hora}:00</strong>
-                    </h4>
-                    <table className="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Producción</th>
-                                <th>Comparación con Promedio Diario</th>
-                                <th>Promedio Mensual</th>
-                                <th>Comparación con Promedio Mensual</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {metricas.map((inversor) => (
-                                <tr key={inversor.id_inversor}>
-                                    <td>{inversor.nombre}</td>
-                                    <td>{inversor.produccion}</td>
-                                    <td>
-                                        {/* Comparación entre el total diario y el promedio */}
-                                        <span
-                                            className={
-                                                inversor.produccion > estacion.promedio_inversor
-                                                    ? "promedio-maximo"
-                                                    : inversor.produccion < estacion.promedio_inversor
-                                                        ? "promedio-minimo"
-                                                        : "promedio-igual"
-                                            }
-                                        >
-                                            {inversor.produccion > estacion.promedio_inversor
-                                                ? "Mayor"
-                                                : inversor.produccion < estacion.promedio_inversor
-                                                    ? "Menor"
-                                                    : "Igual"}
-                                        </span>
-                                    </td>
-                                    <td>{`${inversor.promedio_mensual} `}</td>
-                                    <td>
-                                        {/* Comparación entre el total diario y el promedio */}
-                                        <span
-                                            className={
-                                                inversor.produccion > inversor.promedio_mensual
-                                                    ? "promedio-maximo"
-                                                    : inversor.produccion < inversor.promedio_mensual
-                                                        ? "promedio-minimo"
-                                                        : "promedio-igual"
-                                            }
-                                        >
-                                            {inversor.produccion > inversor.promedio_mensual
-                                                ? "Mayor"
-                                                : inversor.produccion < inversor.promedio_mensual
-                                                    ? "Menor"
-                                                    : "Igual"}
-                                        </span>
-                                    </td>
+                <div className="card p-4">
+                    <div className="card-header">
+                        <h4 className="ms-2">
+                            Tabla de inversores de <strong>{estacion.nombre}</strong> el día <strong>{dia}-{mes}-{anio}</strong> a las <strong>{hora}:00</strong>
+                        </h4>
+                    </div>
+                    <div className="table-responsive">
+                        <table className="table table-bordered mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Producción</th>
+                                    <th>Comparación con Promedio Diario</th>
+                                    <th>Promedio Mensual</th>
+                                    <th>Comparación con Promedio Mensual</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {metricas.map((inversor) => (
+                                    <tr key={inversor.id_inversor}>
+                                        <td>{inversor.nombre}</td>
+                                        <td>{inversor.produccion} kWh</td>
+                                        <td>
+                                            {/* Comparación entre el total diario y el promedio */}
+                                            <span
+                                                className={
+                                                    inversor.produccion > estacion.promedio_inversor
+                                                        ? "promedio-maximo"
+                                                        : inversor.produccion < estacion.promedio_inversor
+                                                            ? "promedio-minimo"
+                                                            : "promedio-igual"
+                                                }
+                                            >
+                                                {inversor.produccion > estacion.promedio_inversor
+                                                    ? "Mayor"
+                                                    : inversor.produccion < estacion.promedio_inversor
+                                                        ? "Menor"
+                                                        : "Igual"}
+                                            </span>
+                                        </td>
+                                        <td>{`${inversor.promedio_mensual} kWh`}</td>
+                                        <td>
+                                            {/* Comparación entre el total diario y el promedio */}
+                                            <span
+                                                className={
+                                                    inversor.produccion > inversor.promedio_mensual
+                                                        ? "promedio-maximo"
+                                                        : inversor.produccion < inversor.promedio_mensual
+                                                            ? "promedio-minimo"
+                                                            : "promedio-igual"
+                                                }
+                                            >
+                                                {inversor.produccion > inversor.promedio_mensual
+                                                    ? "Mayor"
+                                                    : inversor.produccion < inversor.promedio_mensual
+                                                        ? "Menor"
+                                                        : "Igual"}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
         </div>

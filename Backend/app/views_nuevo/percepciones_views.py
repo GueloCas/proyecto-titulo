@@ -18,6 +18,8 @@ class ObtenerPercepcionesSegundoGradoDiaHoraView(APIView):
             return Response({"error": "Se requiere el parámetro 'dia'"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
+            estacion = Estacion.objects.get(pk=id_estacion)
+            
             mes_actual = "Aug"  # Nombre del mes en inglés
             anio_actual = 2022
             dia_formateado = f"{dia_int:02d}-{mes_actual}-{anio_actual}"
@@ -25,7 +27,7 @@ class ObtenerPercepcionesSegundoGradoDiaHoraView(APIView):
             # Lista para almacenar las percepciones de cada inversor
             percepciones = []
             
-            inversores = Inversor.objects.filter(estacion_id=id_estacion)
+            inversores = Inversor.objects.filter(estacion_id=estacion)
 
             for inversor in inversores:
                 # Filtrar la producción para el día y hora especificados
@@ -60,7 +62,8 @@ class ObtenerPercepcionesSegundoGradoDiaHoraView(APIView):
 
             # Preparar los datos para la respuesta
             response_data = {
-                'percepciones_segundo_grado': percepcionesSegundoGrado
+                'estacion': estacion.nombre,
+                'percepciones': percepcionesSegundoGrado
             }
             return Response(response_data, status=status.HTTP_200_OK)
         
@@ -78,6 +81,8 @@ class ObtenerPercepcionesSegundoGradoDiaView(APIView):
             return Response({"error": "Se requiere el parámetro 'dia'"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
+            estacion = Estacion.objects.get(pk=id_estacion)
+
             mes_actual = "Aug"  # Nombre del mes en inglés
             anio_actual = 2022
             dia_formateado = f"{dia_int:02d}-{mes_actual}-{anio_actual}"
@@ -85,7 +90,7 @@ class ObtenerPercepcionesSegundoGradoDiaView(APIView):
             # Lista para almacenar las percepciones por hora
             percepciones_diarias = []
 
-            inversores = Inversor.objects.filter(estacion_id=id_estacion)
+            inversores = Inversor.objects.filter(estacion_id=estacion)
 
             # Recorrer cada hora desde las 8 hasta las 22
             for hora in range(8, 23):
@@ -132,7 +137,10 @@ class ObtenerPercepcionesSegundoGradoDiaView(APIView):
                     })
 
             # Preparar los datos para la respuesta
-            return Response(percepciones_diarias, status=status.HTTP_200_OK)
+            return Response({
+                'estacion': estacion.nombre,
+                'percepciones': percepciones_diarias
+            }, status=status.HTTP_200_OK)
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -191,7 +199,10 @@ class ObtenerPercepcionesPrimerGradoDiaView(APIView):
 
             # Iterar sobre cada producción
             
-            return Response(TLlist, status=status.HTTP_200_OK)
+            return Response({
+                'inversor': inversor.nombre,
+                'percepciones': TLlist
+            }, status=status.HTTP_200_OK)
         
         except Inversor.DoesNotExist:
             return Response({"error": "No se encontró el inversor"}, status=status.HTTP_404_NOT_FOUND)
@@ -250,7 +261,10 @@ class ObtenerPercepcionesPrimerGradoHoraView(APIView):
                 else:
                     print(f"No se encontraron estadísticas para la hora: {produccion.Hora}")
             
-            return Response(TLlist, status=status.HTTP_200_OK)
+            return Response({
+                'inversor': inversor.nombre,
+                'percepciones': TLlist
+            }, status=status.HTTP_200_OK)
         
         except Inversor.DoesNotExist:
             return Response({"error": "No se encontró el inversor"}, status=status.HTTP_404_NOT_FOUND)

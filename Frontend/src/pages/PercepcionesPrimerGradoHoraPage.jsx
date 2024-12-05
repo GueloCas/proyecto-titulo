@@ -41,6 +41,7 @@ export function PercepcionesPrimerGradoHoraPage() {
         setSelectedInversor(inversorId);
         setSelectedAnio("");
         setSelectedMes("");
+        setSelectedHora("");
         setAniosDisponibles([]);
         setMesesDisponibles([]);
         setHorasDisponibles([]);
@@ -56,6 +57,7 @@ export function PercepcionesPrimerGradoHoraPage() {
     const handleAnioChange = async (anio) => {
         setSelectedAnio(anio);
         setSelectedMes("");
+        setSelectedHora("");
         setMesesDisponibles([]);
         setHorasDisponibles([]);
 
@@ -69,6 +71,7 @@ export function PercepcionesPrimerGradoHoraPage() {
 
     const handleMesChange = async (mes) => {
         setSelectedMes(mes);
+        setSelectedHora("");
         setHorasDisponibles([]);
 
         try {

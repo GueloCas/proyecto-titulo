@@ -121,22 +121,13 @@ export function PercepcionesSegundoGradoDiaHoraPage() {
             <div className="page-inner">
                 <div className="d-flex mb-1 justify-content-between align-items-center">
                     <h1 className="mb-0 fw-bold">Percepciones Segundo Grado por Día y Hora</h1>
-                    <div className="d-flex justify-content-right align-items-end">
-                        <Link to={`/percepciones-segundo-grado/dia`} className="text-decoration-none">
-                            <button
-                                className="btn btn-outline-secondary ms-4"
-                            >
-                                Ver por Día
-                            </button>
-                        </Link>
-                        <Link to={`/percepciones-segundo-grado`} className="text-decoration-none">
-                            <button
-                                className="btn btn-secondary ms-4"
-                            >
-                                Volver
-                            </button>
-                        </Link>
-                    </div>
+                    <Link to={`/percepciones-segundo-grado`} className="text-decoration-none">
+                        <button
+                            className="btn btn-secondary ms-4"
+                        >
+                            Volver
+                        </button>
+                    </Link>
                 </div>
 
                 {/* Breadcrumb */}

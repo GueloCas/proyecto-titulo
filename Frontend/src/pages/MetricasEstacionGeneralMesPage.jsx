@@ -94,7 +94,7 @@ export function MetricasEstacionGeneralMesPage() {
                             <Link to="/informes">Metricas Estación</Link>
                         </li>
                         <li className="breadcrumb-item active" aria-current="page">
-                            Mensual - General
+                            Mes - General
                         </li>
                     </ol>
                 </nav>

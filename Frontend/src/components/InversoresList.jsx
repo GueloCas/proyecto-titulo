@@ -73,7 +73,7 @@ export function InversoresList() {
         />
       </div>
 
-      <div className="table-responsive" style={{ position: "relative", overflow: "visible" }}>
+      <div className="table-responsive" style={{ position: "relative" }}>
         {filteredInversores.length === 0 ? (
           <div className="alert alert-warning" role="alert">
             No existen inversores

@@ -76,11 +76,13 @@ export function MetricasEstacionHoraMes({ estacionId, anio, mes, hora }) {
 
       {/* Información general de la estación */}
       {estacion && (
-        <div>
-          <h4 className="ms-2 mt-4">
-            Métricas generales de la estación <strong>[nombre_estacion]</strong> el mes <strong>{mes}-{anio}</strong> a las <strong>{hora}:00</strong>
-          </h4>
-          <div className="row mt-2">
+        <div className="card mt-4 p-4">
+          <div className="card-header">
+            <h4 className="ms-2">
+              Métricas generales de <strong>{estacion.nombre}</strong> el mes <strong>{mes}-{anio}</strong> a las <strong>{hora}:00</strong>
+            </h4>
+          </div>
+          <div className="row mt-4">
             <div className="col-sm-6 col-md-3">
               <div className="card card-stats card-primary card-round">
                 <div className="card-body">
@@ -96,8 +98,8 @@ export function MetricasEstacionHoraMes({ estacionId, anio, mes, hora }) {
                     </div>
                     <div className="col-7 col-stats">
                       <div className="numbers">
-                        <p className="mb-0">Promedio Estacion:</p>
-                        <h4 className="card-title">{estacion.total_mensual.toFixed(3)}</h4>
+                        <p className="mb-0">Promedio de Estacion:</p>
+                        <h4 className="card-title">{estacion.total_mensual.toFixed(3)} kWh</h4>
                       </div>
                     </div>
                   </div>
@@ -117,8 +119,8 @@ export function MetricasEstacionHoraMes({ estacionId, anio, mes, hora }) {
                     </div>
                     <div className="col-7 col-stats">
                       <div className="numbers">
-                        <p className="mb-0">Promedio Inversor:</p>
-                        <h4 className="card-title">{estacion.promedio_inversor.toFixed(3)}</h4>
+                        <p className="mb-0">Promedio por Inversor:</p>
+                        <h4 className="card-title">{estacion.promedio_inversor.toFixed(3)} kWh</h4>
                       </div>
                     </div>
                   </div>
@@ -139,7 +141,7 @@ export function MetricasEstacionHoraMes({ estacionId, anio, mes, hora }) {
                     <div className="col-7 col-stats">
                       <div className="numbers">
                         <p className="mb-0">Mejor Inversor:</p>
-                        <h4 className="card-title">{estacion.mejor_inversor.nombre} ({estacion.mejor_inversor.total.toFixed(3)})</h4>
+                        <h4 className="card-title">{estacion.mejor_inversor.nombre} ({estacion.mejor_inversor.total.toFixed(3)} kWh)</h4>
                       </div>
                     </div>
                   </div>
@@ -160,7 +162,7 @@ export function MetricasEstacionHoraMes({ estacionId, anio, mes, hora }) {
                     <div className="col-7 col-stats">
                       <div className="numbers">
                         <p className="mb-0">Peor Inversor:</p>
-                        <h4 className="card-title">{estacion.peor_inversor.nombre} ({estacion.peor_inversor.total.toFixed(3)})</h4>
+                        <h4 className="card-title">{estacion.peor_inversor.nombre} ({estacion.peor_inversor.total.toFixed(3)} kWh)</h4>
                       </div>
                     </div>
                   </div>
@@ -172,93 +174,89 @@ export function MetricasEstacionHoraMes({ estacionId, anio, mes, hora }) {
       )}
 
       {/* Tabla de métricas */}
-      <h4 className="ms-2">
-        Tabla de inversores de la estación <strong>[nombre_estacion]</strong> el mes <strong>{mes}-{anio}</strong> a las <strong>{hora}:00</strong>
-      </h4>
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-            <th>Inversor</th>
-            <th>Promedio</th>
-            <th>Mínimo</th>
-            <th>Máximo</th>
-            <th>Ver Gráfico</th>
-          </tr>
-        </thead>
-        <tbody>
-          {metricas.map((inversor) => {
-            // Buscar la producción correspondiente a la hora seleccionada
-            const produccionHora = inversor.produccion.find(
-              (produccion) => produccion.hora_num === parseInt(hora)
-            );
-            if (!produccionHora) {
-              return (
-                <tr key={inversor.id}>
-                  <td>{inversor.nombre}</td>
-                  <td>Sin Información</td>
-                  <td>Sin Información</td>
-                  <td>Sin Información</td>
-                  <td>Sin Información</td>
-                </tr>
-              );
-            }
-
-            // Verificar si este promedio es el mayor o el menor
-            const esMaximoProm = produccionHora.cantidad_promedio === maxPromedio;
-            const esMinimoProm = produccionHora.cantidad_promedio === minPromedio;
-
-            // Verificar si el mínimo es el mayor o el menor
-            const esMaximoMin = produccionHora.cantidad_minima === maxMinima;
-            const esMinimoMin = produccionHora.cantidad_minima === minMinima;
-
-            // Verificar si el máximo es el mayor o el menor
-            const esMaximoMax = produccionHora.cantidad_maxima === maxMaxima;
-            const esMinimoMax = produccionHora.cantidad_maxima === minMaxima;
-
-            return (
-              <tr key={inversor.id}>
-                <td>{inversor.nombre}</td>
-
-                {/* Promedio */}
-                <td>
-                  <span
-                    className={esMaximoProm ? "promedio-maximo" : esMinimoProm ? "promedio-minimo" : ""}
-                  >
-                    {produccionHora.cantidad_promedio.toFixed(3)}
-                  </span>
-                </td>
-
-                {/* Mínimo */}
-                <td>
-                  <span
-                    className={esMaximoMin ? "promedio-maximo" : esMinimoMin ? "promedio-minimo" : ""}
-                  >
-                    {produccionHora.cantidad_minima}
-                  </span>
-                </td>
-
-                {/* Máximo */}
-                <td>
-                  <span
-                    className={esMaximoMax ? "promedio-maximo" : esMinimoMax ? "promedio-minimo" : ""}
-                  >
-                    {produccionHora.cantidad_maxima}
-                  </span>
-                </td>
-                {/* Ver gráfico */}
-                <td>
-                  <Link
-                    to={`/inversor/${inversor.id}/produccion/grafico?hora=H${hora}`}
-                    className="btn btn-secondary"
-                  >
-                    Ver Gráfico
-                  </Link>
-                </td>
+      <div className="card p-4">
+        <div className="card-header">
+          <h4 className="ms-2">
+            Tabla de inversores de <strong>{estacion?.nombre}</strong> el mes <strong>{mes}-{anio}</strong> a las <strong>{hora}:00</strong>
+          </h4>
+        </div>
+        <div className="table-responsive">
+          <table className="table table-bordered mt-4">
+            <thead>
+              <tr>
+                <th>Inversor</th>
+                <th>Promedio</th>
+                <th>Mínimo</th>
+                <th>Máximo</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            </thead>
+            <tbody>
+              {metricas.map((inversor) => {
+                // Buscar la producción correspondiente a la hora seleccionada
+                const produccionHora = inversor.produccion.find(
+                  (produccion) => produccion.hora_num === parseInt(hora)
+                );
+                if (!produccionHora) {
+                  return (
+                    <tr key={inversor.id}>
+                      <td>{inversor.nombre}</td>
+                      <td>Sin Información</td>
+                      <td>Sin Información</td>
+                      <td>Sin Información</td>
+                      <td>Sin Información</td>
+                    </tr>
+                  );
+                }
+
+                // Verificar si este promedio es el mayor o el menor
+                const esMaximoProm = produccionHora.cantidad_promedio === maxPromedio;
+                const esMinimoProm = produccionHora.cantidad_promedio === minPromedio;
+
+                // Verificar si el mínimo es el mayor o el menor
+                const esMaximoMin = produccionHora.cantidad_minima === maxMinima;
+                const esMinimoMin = produccionHora.cantidad_minima === minMinima;
+
+                // Verificar si el máximo es el mayor o el menor
+                const esMaximoMax = produccionHora.cantidad_maxima === maxMaxima;
+                const esMinimoMax = produccionHora.cantidad_maxima === minMaxima;
+
+                return (
+                  <tr key={inversor.id}>
+                    <td>{inversor.nombre}</td>
+
+                    {/* Promedio */}
+                    <td>
+                      <span
+                        className={esMaximoProm ? "promedio-maximo" : esMinimoProm ? "promedio-minimo" : ""}
+                      >
+                        {produccionHora.cantidad_promedio.toFixed(3)} kWh
+                      </span>
+                    </td>
+
+                    {/* Mínimo */}
+                    <td>
+                      <span
+                        className={esMaximoMin ? "promedio-maximo" : esMinimoMin ? "promedio-minimo" : ""}
+                      >
+                        {produccionHora.cantidad_minima} kWh
+                      </span>
+                    </td>
+
+                    {/* Máximo */}
+                    <td>
+                      <span
+                        className={esMaximoMax ? "promedio-maximo" : esMinimoMax ? "promedio-minimo" : ""}
+                      >
+                        {produccionHora.cantidad_maxima} kWh
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

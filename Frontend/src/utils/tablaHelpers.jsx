@@ -47,10 +47,10 @@ export const determinarClaseCPEstacion = (percepcion) => {
             className: "alta-mayor fs-07",
             content: (
                 <div>
-                    M: {pertenencia_mala.toFixed(2)}<br />
-                    N: {pertenencia_normal.toFixed(2)}<br />
-                    E: {pertenencia_excelente.toFixed(2)}<br />
-                    <strong>R: {pertenencia_regular.toFixed(2)}</strong>
+                    Mala: {pertenencia_mala.toFixed(2)}<br />
+                    Normal: {pertenencia_normal.toFixed(2)}<br />
+                    Excelente: {pertenencia_excelente.toFixed(2)}<br />
+                    <strong>Regular: {pertenencia_regular.toFixed(2)}</strong>
                 </div>
             ),
         };
@@ -59,10 +59,10 @@ export const determinarClaseCPEstacion = (percepcion) => {
             className: "baja-mayor fs-07",
             content: (
                 <div>
-                    <strong>M: {pertenencia_mala}</strong><br />
-                    N: {pertenencia_normal}<br />
-                    E: {pertenencia_excelente}<br />
-                    R: {pertenencia_regular}
+                    <strong>Mala: {pertenencia_mala.toFixed(2)}</strong><br />
+                    Normal: {pertenencia_normal.toFixed(2)}<br />
+                    Excelente: {pertenencia_excelente.toFixed(2)}<br />
+                    Regular: {pertenencia_regular.toFixed(2)}
                 </div>
             ),
         };
@@ -71,10 +71,10 @@ export const determinarClaseCPEstacion = (percepcion) => {
             className: "media-mayor fs-07",
             content: (
                 <div>
-                    M: {pertenencia_mala}<br />
-                    <strong>N: {pertenencia_normal}</strong><br />
-                    E: {pertenencia_excelente}<br />
-                    R: {pertenencia_regular}
+                    Mala: {pertenencia_mala.toFixed(2)}<br />
+                    <strong>Normal: {pertenencia_normal.toFixed(2)}</strong><br />
+                    Excelente: {pertenencia_excelente.toFixed(2)}<br />
+                    Regular: {pertenencia_regular.toFixed(2)}
                 </div>
             ),
         };
@@ -83,10 +83,10 @@ export const determinarClaseCPEstacion = (percepcion) => {
             className: "alta-mayor fs-07",
             content: (
                 <div>
-                    M: {pertenencia_mala}<br />
-                    N: {pertenencia_normal}<br />
-                    <strong>E: {pertenencia_excelente}</strong><br />
-                    R: {pertenencia_regular}
+                    Mala: {pertenencia_mala.toFixed(2)}<br />
+                    Normal: {pertenencia_normal.toFixed(2)}<br />
+                    <strong>Excelente: {pertenencia_excelente.toFixed(2)}</strong><br />
+                    Regular: {pertenencia_regular.toFixed(2)}
                 </div>
             ),
         };

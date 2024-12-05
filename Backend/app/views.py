@@ -30,15 +30,15 @@ class InversorProduccionView(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener el ID del inversor de los parámetros de la solicitud
         inversor_id = request.query_params.get('inversor_id')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
+
         if not inversor_id:
             return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             # Obtener el inversor por ID
             inversor = Inversor.objects.get(pk=inversor_id)
-
-            # Agrupar las producciones por hora y calcular estadísticas agregadas
-            estadisticas_por_hora = inversor.obtener_MinMaxProm_producciones()
 
             producciones = inversor.obtener_producciones_ordenHora()
             
@@ -48,7 +48,6 @@ class InversorProduccionView(APIView):
             response_data = {
                 'nombre_inversor': inversor.nombre,  # Nombre del inversor
                 'producciones': serializer.data,  # Producciones completas
-                'estadisticas_por_hora': list(estadisticas_por_hora)  # Estadísticas agrupadas por hora
             }
 
             return Response(response_data, status=status.HTTP_200_OK)

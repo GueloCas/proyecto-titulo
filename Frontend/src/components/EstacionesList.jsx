@@ -61,7 +61,7 @@ export function EstacionesList() {
   };
 
   return (
-    <div>
+    <div className="table-responsive" style={{ position: "relative"}}>
       <div className="d-flex justify-content-end mb-3">
         <input
           type="text"
@@ -72,7 +72,7 @@ export function EstacionesList() {
         />
       </div>
 
-      <div className="table-responsive" style={{ position: "relative", overflow: "visible" }}>
+      <div className="table-responsive" style={{ position: "relative"}}>
         {filteredEstaciones.length === 0 ? (
           <div className="alert alert-warning" role="alert">
             No existen estaciones

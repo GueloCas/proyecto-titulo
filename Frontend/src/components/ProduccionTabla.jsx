@@ -14,7 +14,7 @@ export function ProduccionTabla({ inversor, anio, mes }) {
 
     useEffect(() => {
         async function loadProduccion() {
-            const data = await getProduccionPorInversor(inversor);
+            const data = await getProduccionPorInversor(inversor, anio, mes);
 
             // `data` incluye 'nombre_inversor' y 'producciones'
             setNombreInversor(data.nombre_inversor);  // Guarda el nombre del inversor
@@ -28,7 +28,7 @@ export function ProduccionTabla({ inversor, anio, mes }) {
             setHorasUnicas(horas);
         }
         loadProduccion();
-    }, [inversor]);
+    }, [inversor, anio, mes]);
 
     useEffect(() => {
         const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -105,9 +105,9 @@ export function ProduccionTabla({ inversor, anio, mes }) {
                     }
                 `}
             </style>
-            <div className="table-responsive mt-4" style={{ overflowX: 'auto' }}>
-                <div className="d-flex justify-content-between mb-2 align-items-center">
-                    <h4 className="ms-2 mb-0">
+            <div className="card p-4 mt-4">
+                <div className="card-header d-flex justify-content-between mb-2 align-items-center">
+                    <h4 className="ms-2">
                         Tabla producción del inversor: <strong>{nombreInversor}</strong> el mes <strong>{mes}-{anio}</strong>
                         {/* Icono con Tooltip */}
                         <i
@@ -122,46 +122,48 @@ export function ProduccionTabla({ inversor, anio, mes }) {
                         Descargar CSV
                     </button>
                 </div>
-                <table className="mb-0 table table-striped table-bordered table-hover">
-                    <thead>
-                        <tr>
-                            <th>Día/Hora</th>
-                            {horasUnicas.map(hora => (
-                                <th key={hora}>
-                                    <button className="btn p-0" onClick={() => abrirModal("hora", hora)}>
-                                        <strong>{hora}</strong>
-                                    </button>
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {diasUnicos.map(dia => (
-                            <tr key={dia}>
-                                <td>
-                                    <button className="btn p-0" onClick={() => abrirModal("dia", dia)}>
-                                        <strong>{dia}</strong>
-                                    </button>
-                                </td>
-                                {horasUnicas.map(hora => {
-                                    const produccionDiaHora = produccion.find(p => p.Dia === dia && p.Hora === hora);
-                                    return (
-                                        <td key={hora}>
-                                            {produccionDiaHora ? (
-                                                <Link
-                                                    to={`/ProduccionInversor/VLinguisticas?hora=${produccionDiaHora.Hora}&cantidad=${produccionDiaHora.cantidad}&dia=${produccionDiaHora.Dia}&inversor=${inversor}`}
-                                                    className="text-dark text-decoration-none d-flex justify-content-center"
-                                                >
-                                                    {produccionDiaHora.cantidad}
-                                                </Link>
-                                            ) : "-"}
-                                        </td>
-                                    );
-                                })}
+                <div className="table-responsive" style={{ overflowX: 'auto' }}>
+                    <table className="mb-0 mt-4 table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Día/Hora</th>
+                                {horasUnicas.map(hora => (
+                                    <th key={hora}>
+                                        <button className="btn p-0" onClick={() => abrirModal("hora", hora)}>
+                                            <strong>{hora}</strong>
+                                        </button>
+                                    </th>
+                                ))}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {diasUnicos.map(dia => (
+                                <tr key={dia}>
+                                    <td>
+                                        <button className="btn p-0" onClick={() => abrirModal("dia", dia)}>
+                                            <strong>{dia}</strong>
+                                        </button>
+                                    </td>
+                                    {horasUnicas.map(hora => {
+                                        const produccionDiaHora = produccion.find(p => p.Dia === dia && p.Hora === hora);
+                                        return (
+                                            <td key={hora}>
+                                                {produccionDiaHora ? (
+                                                    <Link
+                                                        to={`/ProduccionInversor/VLinguisticas?hora=${produccionDiaHora.Hora}&cantidad=${produccionDiaHora.cantidad}&dia=${produccionDiaHora.Dia}&inversor=${inversor}`}
+                                                        className="text-dark text-decoration-none d-flex justify-content-center"
+                                                    >
+                                                        {produccionDiaHora.cantidad}
+                                                    </Link>
+                                                ) : "-"}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
 
                 {/* Modal de gráfico */}
                 {modalData.visible && (
