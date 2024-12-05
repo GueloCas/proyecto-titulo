@@ -1,10 +1,10 @@
 import {React} from "react";
 import {useForm} from "react-hook-form";
 import {useNavigate} from "react-router-dom";
-import axios from "axios";
 import {useEffect, useState} from "react";
+import { updateUser } from "../api/users.api";
 
-export function EditarPerfilForm() {
+export function CambiarUserForm() {
 
     const {register, handleSubmit} = useForm();
     const navigate = useNavigate();
@@ -12,17 +12,27 @@ export function EditarPerfilForm() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const response = await axios.get('http://localhost:3001/api/user');
-            setUser(response.data);
+            const storedUser = JSON.parse(localStorage.getItem('user'));
+            if (!storedUser) {
+                navigate('/login');
+                return;
+            }else{
+                setUser(storedUser);
+            }
         };
         fetchUser();
+        console.log(user);
     }, []);
 
     const onSubmit = async (data) => {
-        console.log(data);
-        const response = await axios.put('http://localhost:3001/api/user', data);
+        console.log("onsubmit",data);
+        
+        const response = await updateUser({
+            id: user.id,
+            username: data.username,
+            password: user.password,
+        });
         console.log(response.data);
-        navigate('/inversores');
     };
 
     return (
@@ -38,27 +48,7 @@ export function EditarPerfilForm() {
                     required
                 />
             </div>
-            <div className="mb-3">
-                <label htmlFor="email" className="form-label">Correo electrónico</label>
-                <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    defaultValue={user?.email}
-                    {...register('email')}
-                    required
-                />
-            </div>
-            <div className="mb-3">
-                <label htmlFor="password" className="form-label">Contraseña</label>
-                <input
-                    type="password"
-                    className="form-control"
-                    id="password"
-                    {...register('password')}
-                    required
-                />
-            </div>
+            
             <div className="d-grid gap-2">
                 <button type="submit" className="btn btn-primary">
                     Guardar cambios
