@@ -7,11 +7,11 @@ export function MetricasEstacionHoraDia({ estacionId, anio, mes, dia, hora }) {
     const [mensajeError, setMensajeError] = useState("");
 
     useEffect(() => {
-        if (estacionId && dia && hora) {
+        if (estacionId && anio && mes && dia && hora) {
             async function loadMetricas() {
                 setMetricas(null);
                 try {
-                    const data = await getMetricasEstacionHoraDia(estacionId, dia, hora); // Cambié la función llamada
+                    const data = await getMetricasEstacionHoraDia(estacionId, anio, mes, dia, hora);
                     setEstacion(data.estacion);
                     setMetricas(data.inversores || []);
                 } catch (error) {
@@ -20,7 +20,7 @@ export function MetricasEstacionHoraDia({ estacionId, anio, mes, dia, hora }) {
             }
             loadMetricas();
         }
-    }, [estacionId, dia, hora]); // Ahora la dependencia es el "dia"
+    }, [estacionId, anio, mes, dia, hora]); // Ahora la dependencia es el "dia"
 
     if (!metricas) {
         return (

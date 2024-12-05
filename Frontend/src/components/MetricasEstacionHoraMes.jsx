@@ -18,7 +18,7 @@ export function MetricasEstacionHoraMes({ estacionId, anio, mes, hora }) {
       async function loadMetricas() {
         setMetricas(null);
         try {
-          const data = await getMetricasEstacionHoraMes(estacionId, hora);
+          const data = await getMetricasEstacionHoraMes(estacionId, anio, mes, hora);
           setEstacion(data.estacion);
           setMetricas(data.inversores || []);
 

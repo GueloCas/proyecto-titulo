@@ -13,7 +13,7 @@ export function DescripcionesInversor({ inversor, anio, mes }) {
                 setDescripciones(null); // Resetear descripciones para mostrar el mensaje "Cargando..."
                 setError(""); // Limpiar errores anteriores
                 try {
-                    const data = await getDescripcionesInversor(inversor);
+                    const data = await getDescripcionesInversor(inversor, anio, mes);
                     setDescripciones(data);
                 } catch (error) {
                     setError("Hubo un error al cargar las descripciones.");
@@ -47,7 +47,7 @@ export function DescripcionesInversor({ inversor, anio, mes }) {
                 (descripciones.suma_media / descripciones.cantidad_r) * 100,
                 (descripciones.suma_alta / descripciones.cantidad_r) * 100,
             ],
-            colors: ["#007bff", "#ffc107", "#28a745"],
+            colors: ["#F25961", "#ffc107", "#28a745"],
             title: {
                 text: "Distribución Lingüística",
                 align: "center",
@@ -91,7 +91,7 @@ export function DescripcionesInversor({ inversor, anio, mes }) {
                     <div className="card w-100 text-center">
                         <div className="card-body">
                             <h4 className="card-title mb-4">Descripciones</h4>
-                            <p className="fs-5 text-primary">
+                            <p className="fs-5 text-danger">
                                 <strong>Baja:</strong> {descripciones.DL_baja}
                                 <br />
                                 <span className="fw-semibold">{promedioBaja} %</span>

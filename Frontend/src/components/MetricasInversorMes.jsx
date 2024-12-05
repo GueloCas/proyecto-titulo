@@ -11,7 +11,7 @@ export function MetricasInversorMes({ inversorId, anio, mes }) {
             async function loadMetricas() {
                 setMetricas(null);
                 try {
-                    const data = await getMetricasInversorMes(inversorId);
+                    const data = await getMetricasInversorMes(inversorId, anio, mes);
                     setInversor(data.inversor);
                     setMetricas(data.estadisticas);
                 } catch (error) {

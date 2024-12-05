@@ -179,8 +179,8 @@ export function MetricasEstacionGeneralMes({ estacionId, anio, mes }) {
                                                         : "Igual"}
                                             </span>
                                         </td>
-                                        <td>{`${inversor.mejor_dia.dia} (${inversor.mejor_dia.produccion} kWh)`}</td>
-                                        <td>{`${inversor.peor_dia.dia} (${inversor.peor_dia.produccion} kWh)`}</td>
+                                        <td>{`Día ${inversor.mejor_dia.dia} (${inversor.mejor_dia.produccion} kWh)`}</td>
+                                        <td>{`Día ${inversor.peor_dia.dia} (${inversor.peor_dia.produccion} kWh)`}</td>
                                     </tr>
                                 ))}
                             </tbody>

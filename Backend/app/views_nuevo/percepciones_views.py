@@ -9,20 +9,25 @@ class ObtenerPercepcionesSegundoGradoDiaHoraView(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener el día y la hora de los parámetros de la solicitud
         id_estacion = request.query_params.get('estacion')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
         dia = request.query_params.get('dia')
-        dia_int = int(dia) if isinstance(dia, str) else dia
         hora = request.query_params.get('hora')
         hora_formateada = f"H{hora}" 
 
+        if not id_estacion:
+            return Response({"error": "Se requiere el parámetro 'estacion'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not anio:
+            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not mes:
+            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
         if not dia:
             return Response({"error": "Se requiere el parámetro 'dia'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not hora:
+            return Response({"error": "Se requiere el parámetro 'hora'"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             estacion = Estacion.objects.get(pk=id_estacion)
-            
-            mes_actual = "Aug"  # Nombre del mes en inglés
-            anio_actual = 2022
-            dia_formateado = f"{dia_int:02d}-{mes_actual}-{anio_actual}"
 
             # Lista para almacenar las percepciones de cada inversor
             percepciones = []
@@ -31,14 +36,14 @@ class ObtenerPercepcionesSegundoGradoDiaHoraView(APIView):
 
             for inversor in inversores:
                 # Filtrar la producción para el día y hora especificados
-                produccion = Produccion.objects.filter(Dia=dia_formateado, inversor=inversor, Hora=hora_formateada).values('cantidad').first()
+                produccion = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes, dia=dia, hora=hora_formateada).values('cantidad').first()
                 
                 # Validar si hay producción en ese día y hora
                 if produccion:
                     cantidad = produccion['cantidad']
                     
                     # Obtener las estadísticas de la hora para calcular los términos lingüísticos
-                    estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(hora_formateada).first()
+                    estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_formateada).first()
                     if estadisticas_hora:
                         TLbaja, TLmedia, TLalta = obtenerPercepcionComputacionalPrimerGrado(
                             estadisticas_hora['cantidad_minima'], 
@@ -74,18 +79,21 @@ class ObtenerPercepcionesSegundoGradoDiaView(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener el día de los parámetros de la solicitud
         id_estacion = request.query_params.get('estacion')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
         dia = request.query_params.get('dia')
-        dia_int = int(dia) if isinstance(dia, str) else dia
 
+        if not id_estacion:
+            return Response({"error": "Se requiere el parámetro 'estacion'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not anio:
+            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not mes:
+            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
         if not dia:
             return Response({"error": "Se requiere el parámetro 'dia'"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             estacion = Estacion.objects.get(pk=id_estacion)
-
-            mes_actual = "Aug"  # Nombre del mes en inglés
-            anio_actual = 2022
-            dia_formateado = f"{dia_int:02d}-{mes_actual}-{anio_actual}"
 
             # Lista para almacenar las percepciones por hora
             percepciones_diarias = []
@@ -100,7 +108,7 @@ class ObtenerPercepcionesSegundoGradoDiaView(APIView):
 
                 for inversor in inversores:
                     # Filtrar la producción para el día y hora especificados
-                    produccion = Produccion.objects.filter(Dia=dia_formateado, inversor=inversor, Hora=hora_str).values('cantidad').first()
+                    produccion = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes, dia=dia, hora=hora_str).values('cantidad').first()
                     
                     # Validar si hay producción en ese día y hora para el inversor actual
                     if produccion:
@@ -108,7 +116,7 @@ class ObtenerPercepcionesSegundoGradoDiaView(APIView):
                         cantidad = produccion['cantidad']
                         
                         # Obtener las estadísticas de la hora para calcular los términos lingüísticos
-                        estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(hora_str).first()
+                        estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_str).first()
                         if estadisticas_hora:
                             TLbaja, TLmedia, TLalta = obtenerPercepcionComputacionalPrimerGrado(
                                 estadisticas_hora['cantidad_minima'], 
@@ -149,27 +157,32 @@ class ObtenerPercepcionesPrimerGradoDiaView(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener el ID del inversor de los parámetros de la solicitud
         inversor_id = request.query_params.get('inversor')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
         dia = request.query_params.get('dia')
-        dia_int = int(dia) if isinstance(dia, str) else dia
         
         if not inversor_id:
             return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not anio:
+            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not mes:
+            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not dia:
+            return Response({"error": "Se requiere el parámetro 'dia'"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            mes_actual = "Aug"  # Nombre del mes en inglés
-            anio_actual = 2022
-            dia_formateado = f"{dia_int:02d}-{mes_actual}-{anio_actual}"
-
             # Obtener el inversor
             inversor = Inversor.objects.get(pk=inversor_id)
 
             TLlist = []
             
             for hora in range(1,25):
-                produccion = Produccion.objects.filter(Dia=dia_formateado, inversor=inversor, Hora=f"H{hora}").first()
+                hora_str = f'H{hora}'
+                produccion = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes, dia=dia, hora=hora_str).first()
                 
                 if produccion:
-                    estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(f"H{hora}").first()
+                    estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_str).first()
+                    print (estadisticas_hora)
 
                     if estadisticas_hora:
                         # Obtener los términos lingüísticos basados en los valores mínimos y máximos de esa hora
@@ -185,8 +198,8 @@ class ObtenerPercepcionesPrimerGradoDiaView(APIView):
 
                         # Agregar los datos al listado final
                         TLlist.append({
-                            'Dia': produccion.Dia,
-                            'Hora': produccion.Hora,
+                            'Dia': produccion.fecha,
+                            'Hora': produccion.hora,
                             'cantidad': produccion.cantidad,
                             'pertenencia': {
                                 'baja': round(pertenencia_baja, 2),
@@ -195,7 +208,7 @@ class ObtenerPercepcionesPrimerGradoDiaView(APIView):
                             }
                         })
                     else:
-                        print(f"No se encontraron estadísticas para la hora: {produccion.Hora}")
+                        print(f"No se encontraron estadísticas para la hora: {produccion.hora}")
 
             # Iterar sobre cada producción
             
@@ -214,21 +227,29 @@ class ObtenerPercepcionesPrimerGradoHoraView(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener el ID del inversor de los parámetros de la solicitud
         inversor_id = request.query_params.get('inversor')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
         hora = request.query_params.get('hora')
         hora_formateada = f"H{hora}"
         
         if not inversor_id:
             return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)
-        
+        if not anio:
+            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not mes:
+            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not hora:
+            return Response({"error": "Se requiere el parámetro 'hora'"}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             # Obtener el inversor
             inversor = Inversor.objects.get(pk=inversor_id)
             
             # Obtener las estadísticas por hora del inversor
-            estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(hora_formateada).first()
+            estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_formateada).first()
             
             # Obtener las producciones del inversor
-            producciones = inversor.obtener_producciones_hora(hora_formateada)
+            producciones = inversor.obtener_producciones_hora(anio, mes, hora_formateada)
             
             TLlist = []
 
@@ -249,8 +270,8 @@ class ObtenerPercepcionesPrimerGradoHoraView(APIView):
 
                     # Agregar los datos al listado final
                     TLlist.append({
-                        'Dia': produccion.Dia,
-                        'Hora': produccion.Hora,
+                        'Dia': produccion.fecha,
+                        'Hora': produccion.hora,
                         'cantidad': produccion.cantidad,
                         'pertenencia': {
                             'baja': round(pertenencia_baja, 2),
@@ -259,7 +280,7 @@ class ObtenerPercepcionesPrimerGradoHoraView(APIView):
                         }
                     })
                 else:
-                    print(f"No se encontraron estadísticas para la hora: {produccion.Hora}")
+                    print(f"No se encontraron estadísticas para la hora: {produccion.hora}")
             
             return Response({
                 'inversor': inversor.nombre,

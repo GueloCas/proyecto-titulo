@@ -20,14 +20,13 @@ class FilterAnioByInversorView(APIView):
 
             anios = []
             for produccion in producciones:
-                fecha = convertToDatetime(produccion.Dia)
-                anio = fecha.year
+                anio = produccion.anio
                 if anio not in anios:
                     anios.append(anio)
 
-            anios_ordenadas = sorted(anios)
+            anios_ordenados = sorted(anios)
             
-            return Response({'anios': anios_ordenadas}, status=status.HTTP_200_OK)
+            return Response({'anios': anios_ordenados}, status=status.HTTP_200_OK)
         except Inversor.DoesNotExist:
             return Response({'error': 'No se ha encontrado el inversor'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -44,19 +43,17 @@ class FilterMesByAnioInversorView(APIView):
         try:
             inversor = Inversor.objects.get(id=id_inversor)
 
-            producciones = Produccion.objects.filter(inversor=inversor)
+            producciones = Produccion.objects.filter(inversor=inversor, anio=anio)
 
             meses = []
 
             for produccion in producciones:
-                fecha = convertToDatetime(produccion.Dia)  # Asumimos que la fecha está en formato adecuado
-                if fecha.year == int(anio):
-                    mes = fecha.month
-                    if mes not in [m['value'] for m in meses]:  # Verifica si el mes ya ha sido agregado
-                        meses.append({
-                            'value': mes,
-                            'label': mes_dict.get(mes)  # Obtiene el nombre del mes
-                        })
+                mes = produccion.mes
+                if mes not in [m['value'] for m in meses]:  # Verifica si el mes ya ha sido agregado
+                    meses.append({
+                        'value': mes,
+                        'label': mes_dict.get(mes)  # Obtiene el nombre del mes
+                    })
             
             meses_ordenados = sorted(meses, key=lambda x: x['value'])
 
@@ -80,15 +77,13 @@ class FilterDiaByMesAnioInversorView(APIView):
         try:
             inversor = Inversor.objects.get(id=id_inversor)
 
-            producciones = Produccion.objects.filter(inversor=inversor)
+            producciones = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes)
 
             dias = []
             for produccion in producciones:
-                fecha = convertToDatetime(produccion.Dia)
-                if fecha.year == int(anio) and fecha.month == int(mes):
-                    dia = fecha.day
-                    if dia not in dias:
-                        dias.append(dia)
+                dia = produccion.dia
+                if dia not in dias:
+                    dias.append(dia)
 
             dias_ordenadas = sorted(dias)
             
@@ -112,15 +107,13 @@ class FilterHoraByMesAnioInversorView(APIView):
         try:
             inversor = Inversor.objects.get(id=id_inversor)
 
-            producciones = Produccion.objects.filter(inversor=inversor)
+            producciones = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes)
 
             horas = []
             for produccion in producciones:
-                fecha = convertToDatetime(produccion.Dia)
-                if fecha.year == int(anio) and fecha.month == int(mes):
-                    hora = int(produccion.Hora[1:]) if produccion.Hora.startswith("H") else int(produccion.Hora)
-                    if hora not in horas:
-                        horas.append(hora)
+                hora = int(produccion.hora[1:]) if produccion.hora.startswith("H") else int(produccion.hora)
+                if hora not in horas:
+                    horas.append(hora)
             
             horas_ordenadas = sorted(horas)  # Ordena las horas de menor a mayor
 
@@ -147,15 +140,13 @@ class FilterHoraByDiaMesAnioInversorView(APIView):
         try:
             inversor = Inversor.objects.get(id=id_inversor)
 
-            producciones = Produccion.objects.filter(inversor=inversor)
+            producciones = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes, dia=dia)
 
             horas = []
             for produccion in producciones:
-                fecha = convertToDatetime(produccion.Dia)
-                if fecha.year == int(anio) and fecha.month == int(mes) and fecha.day == int(dia):
-                    hora = int(produccion.Hora[1:]) if produccion.Hora.startswith("H") else int(produccion.Hora)
-                    if hora not in horas:
-                        horas.append(hora)
+                hora = int(produccion.hora[1:]) if produccion.hora.startswith("H") else int(produccion.hora)
+                if hora not in horas:
+                    horas.append(hora)
             
             horas_ordenadas = sorted(horas)  # Ordena las horas de menor a mayor
 
@@ -180,8 +171,7 @@ class FilterAnioByEstacionView(APIView):
 
                 anios = []
                 for produccion in producciones:
-                    fecha = convertToDatetime(produccion.Dia)
-                    anio = fecha.year
+                    anio = produccion.anio
                     if anio not in anios:
                         anios.append(anio)
 
@@ -209,17 +199,15 @@ class FilterMesByAnioEstacionView(APIView):
             meses = []
 
             for inversor in inversores:
-                producciones = Produccion.objects.filter(inversor=inversor)
+                producciones = Produccion.objects.filter(inversor=inversor, anio=anio)
 
                 for produccion in producciones:
-                    fecha = convertToDatetime(produccion.Dia)  # Asumimos que la fecha está en formato adecuado
-                    if fecha.year == int(anio):
-                        mes = fecha.month
-                        if mes not in [m['value'] for m in meses]:  # Verifica si el mes ya ha sido agregado
-                            meses.append({
-                                'value': mes,
-                                'label': mes_dict.get(mes)  # Obtiene el nombre del mes
-                            })
+                    mes = produccion.mes
+                    if mes not in [m['value'] for m in meses]:  # Verifica si el mes ya ha sido agregado
+                        meses.append({
+                            'value': mes,
+                            'label': mes_dict.get(mes)  # Obtiene el nombre del mes
+                        })
             
             meses_ordenados = sorted(meses, key=lambda x: x['value'])
 
@@ -247,14 +235,12 @@ class FilterDiaByMesAnioEstacionView(APIView):
 
             dias = []
             for inversor in inversores:
-                producciones = Produccion.objects.filter(inversor=inversor)
+                producciones = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes)
 
                 for produccion in producciones:
-                    fecha = convertToDatetime(produccion.Dia)
-                    if fecha.year == int(anio) and fecha.month == int(mes):
-                        dia = fecha.day
-                        if dia not in dias:
-                            dias.append(dia)
+                    dia = produccion.dia
+                    if dia not in dias:
+                        dias.append(dia)
             
             dias_ordenadas = sorted(dias)
             
@@ -282,14 +268,12 @@ class FilterHoraByMesAnioEstacionView(APIView):
 
             horas = []
             for inversor in inversores:
-                producciones = Produccion.objects.filter(inversor=inversor)
+                producciones = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes)
 
                 for produccion in producciones:
-                    fecha = convertToDatetime(produccion.Dia)
-                    if fecha.year == int(anio) and fecha.month == int(mes):
-                        hora = int(produccion.Hora[1:]) if produccion.Hora.startswith("H") else int(produccion.Hora)
-                        if hora not in horas:
-                            horas.append(hora)
+                    hora = int(produccion.hora[1:]) if produccion.hora.startswith("H") else int(produccion.hora)
+                    if hora not in horas:
+                        horas.append(hora)
             
             horas_ordenadas = sorted(horas)  # Ordena las horas de menor a mayor
 
@@ -320,14 +304,12 @@ class FilterHoraByDiaMesAnioEstacionView(APIView):
 
             horas = []
             for inversor in inversores:
-                producciones = Produccion.objects.filter(inversor=inversor)
+                producciones = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes, dia=dia)
 
                 for produccion in producciones:
-                    fecha = convertToDatetime(produccion.Dia)
-                    if fecha.year == int(anio) and fecha.month == int(mes) and fecha.day == int(dia):
-                        hora = int(produccion.Hora[1:]) if produccion.Hora.startswith("H") else int(produccion.Hora)
-                        if hora not in horas:
-                            horas.append(hora)
+                    hora = int(produccion.hora[1:]) if produccion.hora.startswith("H") else int(produccion.hora)
+                    if hora not in horas:
+                        horas.append(hora)
             
             horas_ordenadas = sorted(horas)  # Ordena las horas de menor a mayor
 

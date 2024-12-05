@@ -40,7 +40,7 @@ class InversorProduccionView(APIView):
             # Obtener el inversor por ID
             inversor = Inversor.objects.get(pk=inversor_id)
 
-            producciones = inversor.obtener_producciones_ordenHora()
+            producciones = inversor.obtener_producciones_ordenHora(anio, mes)
             
             serializer = ProduccionSerializer(producciones, many=True)
 

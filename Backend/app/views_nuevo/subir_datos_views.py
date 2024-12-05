@@ -7,9 +7,9 @@ import os
 from io import StringIO
 from django.contrib.auth.models import User
 import json
+from app.utils.filters import meses_a_numero
 
 class ExcelUploadView(APIView):
-
     def post(self, request, *args, **kwargs):
         file = request.FILES.get('file')
         user_json = request.POST.get('user')  # Cambiado a request.POST
@@ -48,11 +48,32 @@ class ExcelUploadView(APIView):
                             periodo = df.iloc[row_index, 0]
                             fecha, hora = periodo.split(', ')
                             
+                            # Separar la fecha y convertir a enteros
+                            input_dia = int(fecha.split('-')[0])
+                            input_mes = (fecha.split('-')[1])
+                            input_anio = int(fecha.split('-')[2])
+
+                             # Convertir mes a número
+                            try:
+                                # Si el mes es un número directamente
+                                if input_mes.isdigit():
+                                    input_mes = int(input_mes)
+                                else:
+                                    # Convertir el mes a minúsculas y buscar en el diccionario
+                                    input_mes = meses_a_numero[input_mes.lower()]
+                            except KeyError:
+                                raise ValueError(f"Formato de mes no válido: {input_mes}")
+                            
+                            print("separado: ", fecha, input_dia, input_mes, input_anio)
+                            
                             produccion = Produccion(
-                                Dia=fecha,
-                                Hora=hora,
+                                fecha=fecha,
+                                hora=hora,
                                 cantidad=valor,
-                                inversor=inversor
+                                inversor=inversor,
+                                anio=input_anio,  # Asignar valores enteros
+                                mes=input_mes,
+                                dia=input_dia
                             )
                             producciones.append(produccion)
 
@@ -135,6 +156,22 @@ class CSVUploadView(APIView):
             for row_index in range(1, len(df)):
                 fecha = df.iloc[row_index, 0]
                 hora = df.iloc[row_index, 1]
+
+                # Separar la fecha y convertir a enteros
+                input_dia = int(fecha.split('-')[0])
+                input_mes = (fecha.split('-')[1])
+                input_anio = int(fecha.split('-')[2])
+
+                 # Convertir mes a número
+                try:
+                    # Si el mes es un número directamente
+                    if input_mes.isdigit():
+                        input_mes = int(input_mes)
+                    else:
+                        # Convertir el mes a minúsculas y buscar en el diccionario
+                        input_mes = meses_a_numero[input_mes.lower()]
+                except KeyError:
+                    raise ValueError(f"Formato de mes no válido: {input_mes}")
                 
                 for col_index in range(2, len(df.columns)):
                     valor = df.iloc[row_index, col_index]
@@ -142,10 +179,13 @@ class CSVUploadView(APIView):
                         inversor = inversores.get(col_index - 2)
                         if inversor:  # Validar que el inversor exista
                             produccion = Produccion(
-                                Dia=fecha,
-                                Hora=hora,
+                                fecha=fecha,
+                                hora=hora,
                                 cantidad=valor,
-                                inversor=inversor
+                                inversor=inversor,
+                                anio=input_anio,  # Asignar valores enteros
+                                mes=input_mes,
+                                dia=input_dia
                             )
                             producciones.append(produccion)
 

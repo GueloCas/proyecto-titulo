@@ -7,12 +7,20 @@ class MetricasEstacionHoraMesView(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener el parámetro 'estacion' desde los parámetros de la consulta
         id_estacion = request.query_params.get('estacion')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
         hora = request.query_params.get('hora')
         hora_formateada = f"H{hora}" 
 
         # Si no se proporciona el parámetro 'estacion', se retorna un error
         if not id_estacion:
             return Response({"error": "Se requiere el parámetro 'estacion'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not anio:
+            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not mes:
+            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not hora:
+            return Response({"error": "Se requiere el parámetro 'hora'"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             estacion = Estacion.objects.get(pk=id_estacion)
@@ -34,7 +42,7 @@ class MetricasEstacionHoraMesView(APIView):
             # Recorrer cada inversor y obtener los datos de producción
             for inversor in inversores:
                 # Llamar al método 'obtener_MinMaxProm_producciones' del inversor
-                datos_produccion = inversor.obtener_MinMaxProm_producciones_hora(hora_formateada)
+                datos_produccion = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_formateada)
                 total_produccion = datos_produccion[0]['cantidad_promedio']
                 total_mensual_estacion += total_produccion
 
@@ -71,9 +79,15 @@ class MetricasEstacionGeneralMesView(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener el parámetro 'estacion'
         id_estacion = request.query_params.get('estacion')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
 
         if not id_estacion:
             return Response({"error": "Se requiere el parámetro 'estacion'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not anio:
+            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not mes:
+            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             estacion = Estacion.objects.get(pk=id_estacion)
@@ -90,10 +104,6 @@ class MetricasEstacionGeneralMesView(APIView):
             
             datos_inversores = []
 
-            # Mes y año actual (puedes ajustarlo si necesitas otro mes o año)
-            mes_actual = "Aug"  # Nombre del mes en inglés
-            anio_actual = 2022
-
             # Recorrer los inversores
             for inversor in inversores:
                 total_mensual_inversor = 0
@@ -102,18 +112,15 @@ class MetricasEstacionGeneralMesView(APIView):
 
                 # Calcular total mensual y días extremos por inversor
                 for dia in range(1, 32):
-                    # Formatear el día como '01-Aug-2022'
-                    dia_formateado = f"{dia:02d}-{mes_actual}-{anio_actual}"
-                    
                     # Obtener la producción diaria
-                    total_diario = inversor.obtener_cantidad_total_diaria(dia_formateado)
+                    total_diario = inversor.obtener_cantidad_total_diaria(anio, mes, dia)
                     total_mensual_inversor += total_diario
                     
                     # Actualizar mejor y peor día del inversor
                     if total_diario > mejor_dia_inversor["produccion"]:
-                        mejor_dia_inversor = {"dia": dia_formateado, "produccion": total_diario}
+                        mejor_dia_inversor = {"dia": dia, "produccion": total_diario}
                     if total_diario < peor_dia_inversor["produccion"]:
-                        peor_dia_inversor = {"dia": dia_formateado, "produccion": total_diario}
+                        peor_dia_inversor = {"dia": dia, "produccion": total_diario}
 
                 if total_mensual_inversor > mejor_inversor_estacion["total"]:
                     mejor_inversor_estacion = {"nombre": inversor.nombre, "total": total_mensual_inversor}
@@ -152,11 +159,18 @@ class MetricasEstacionGeneralMesView(APIView):
 class MetricasEstacionGeneralDiaView(APIView):
     def get(self, request, *args, **kwargs):
         id_estacion = request.query_params.get('estacion')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
         dia = request.query_params.get('dia')
-        dia_int = int(dia) if isinstance(dia, str) else dia
 
         if not id_estacion:
             return Response({"error": "Se requiere el parámetro 'estacion'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not anio:
+            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not mes:
+            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not dia:
+            return Response({"error": "Se requiere el parámetro 'dia'"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             estacion = Estacion.objects.get(pk=id_estacion)
@@ -164,12 +178,6 @@ class MetricasEstacionGeneralDiaView(APIView):
             inversores = Inversor.objects.filter(estacion_id=estacion)
             if not inversores.exists():
                 return Response({"error": "No se encontraron inversores para la estación indicada"}, status=status.HTTP_404_NOT_FOUND)
-
-            # Día formateado
-            # Mes y año actual (ajustable según lo necesites)
-            mes_actual = "Aug"  # Nombre del mes en inglés
-            anio_actual = 2022
-            dia_formateado = f"{dia_int:02d}-{mes_actual}-{anio_actual}"
 
             # Variables para el total diario de la estación y horas extremas
             total_diario_estacion = 0
@@ -180,7 +188,7 @@ class MetricasEstacionGeneralDiaView(APIView):
 
             for inversor in inversores:
                 # Filtrar producciones para el inversor en el día dado
-                producciones = Produccion.objects.filter(inversor=inversor, Dia=dia_formateado)
+                producciones = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes, dia=dia)
                 total_diario_inversor = sum(produccion.cantidad for produccion in producciones)
                 total_diario_estacion += total_diario_inversor
 
@@ -195,8 +203,7 @@ class MetricasEstacionGeneralDiaView(APIView):
 
                 # Iterar sobre las producciones por hora de ese día
                 for produccion in producciones:
-                    hora_str = produccion.Hora  # "H1", "H2", "H3", etc.
-                    hora_num = int(hora_str[1:])  # Extraemos el número, p.ej. "H1" -> 1
+                    hora_str = produccion.hora  # "H1", "H2", "H3", etc.
 
                     total_hora = produccion.cantidad
 
@@ -232,13 +239,20 @@ class MetricasEstacionGeneralDiaView(APIView):
 class MetricasEstacionHoraDiaView(APIView):
     def get(self, request, *args, **kwargs):
         id_estacion = request.query_params.get('estacion')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
+        dia = request.query_params.get('dia')
         hora = request.query_params.get('hora')
         hora_formateada = f"H{hora}" 
-        dia = request.query_params.get('dia')
-        dia_int = int(dia) if isinstance(dia, str) else dia
 
         if not id_estacion:
             return Response({"error": "Se requiere el parámetro 'estacion'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not anio:
+            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not mes:
+            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not dia:
+            return Response({"error": "Se requiere el parámetro 'dia'"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             estacion = Estacion.objects.get(pk=id_estacion)
@@ -246,12 +260,6 @@ class MetricasEstacionHoraDiaView(APIView):
             inversores = Inversor.objects.filter(estacion_id=estacion)
             if not inversores.exists():
                 return Response({"error": "No se encontraron inversores para la estación indicada"}, status=status.HTTP_404_NOT_FOUND)
-            
-            # Día formateado
-            # Mes y año actual (ajustable según lo necesites)
-            mes_actual = "Aug"  # Nombre del mes en inglés
-            anio_actual = 2022
-            dia_formateado = f"{dia_int:02d}-{mes_actual}-{anio_actual}"
 
             total_hora_estacion = 0
             mejor_inversor_estacion = {"nombre": None, "total": float('-inf')}
@@ -261,8 +269,8 @@ class MetricasEstacionHoraDiaView(APIView):
 
             for inversor in inversores:
                  # Filtrar producciones para el inversor en el día dado
-                produccion = Produccion.objects.filter(inversor=inversor, Dia=dia_formateado, Hora=hora_formateada).first()
-                promedio_mensual = inversor.obtener_MinMaxProm_producciones_hora(hora_formateada)
+                produccion = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes, dia=dia, hora=hora_formateada).first()
+                promedio_mensual = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_formateada)
                 total_hora_estacion += produccion.cantidad
 
                 if produccion.cantidad > mejor_inversor_estacion["total"]:
@@ -296,16 +304,22 @@ class MetricasEstacionHoraDiaView(APIView):
 class MetricasInversorMesView(APIView):
     def get(self, request, *args, **kwargs):
         id_inversor = request.query_params.get('inversor')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
 
         if not id_inversor:
             return Response({"error": "Se requiere el parámetro 'inversor'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not anio:
+            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not mes:
+            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             # Obtener el inversor por ID
             inversor = Inversor.objects.get(pk=id_inversor)
 
             # Agrupar las producciones por hora y calcular estadísticas agregadas
-            estadisticas_por_hora = inversor.obtener_MinMaxProm_producciones()
+            estadisticas_por_hora = inversor.obtener_MinMaxProm_producciones(anio, mes)
 
             response_data = {
                 "inversor":{

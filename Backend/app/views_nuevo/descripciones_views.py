@@ -8,8 +8,15 @@ class CalcularDescripcionesLinguisticasInversor(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener el ID del inversor de los parámetros de la solicitud
         inversor_id = request.query_params.get('inversor_id')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
+
         if not inversor_id:
             return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not anio:
+            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not mes:
+            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             inversor = Inversor.objects.get(pk=inversor_id)
@@ -22,16 +29,12 @@ class CalcularDescripcionesLinguisticasInversor(APIView):
         suma_alta = 0
 
         try:
-            for dia in range(1, 32):  # Ciclo por días del mes
-                mes_actual = "Aug"  # Cambiar esto según sea necesario
-                anio_actual = 2022
-                dia_formateado = f"{dia:02d}-{mes_actual}-{anio_actual}"
-
+            for dia in range(1, 32):
                 for hora in range(8, 23):  # Ciclo por horas del día
                     hora_str = f'H{hora}'
                     
                     produccion = Produccion.objects.filter(
-                        Dia=dia_formateado, inversor=inversor, Hora=hora_str
+                        inversor=inversor, anio=anio, mes=mes, dia=dia, hora=hora_str
                     ).values('cantidad').first()
 
                     if not produccion:
@@ -40,7 +43,7 @@ class CalcularDescripcionesLinguisticasInversor(APIView):
                     cantidad = produccion['cantidad']
 
                     # Obtener estadísticas para calcular términos lingüísticos
-                    estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(hora_str).first()
+                    estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_str).first()
                     if not estadisticas_hora:
                         continue  # Si no hay estadísticas, pasar a la siguiente hora
 
@@ -78,8 +81,15 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener el ID de la estación de los parámetros de la solicitud
         estacion_id = request.query_params.get('estacion_id')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
+
         if not estacion_id:
             return Response({"error": "Se requiere el parámetro 'estacion_id'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not anio:
+            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not mes:
+            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             estacion = Estacion.objects.get(pk=estacion_id)
@@ -102,16 +112,12 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
                 suma_alta = 0
                 cantidad_inversor = 0  # Para contar las producciones del inversor
 
-                for dia in range(1, 32):  # Ciclo por días del mes
-                    mes_actual = "Aug"  # Cambiar esto según sea necesario
-                    anio_actual = 2022
-                    dia_formateado = f"{dia:02d}-{mes_actual}-{anio_actual}"
-
+                for dia in range(1, 32):
                     for hora in range(8, 23):  # Ciclo por horas del día
                         hora_str = f'H{hora}'
 
                         produccion = Produccion.objects.filter(
-                            Dia=dia_formateado, inversor=inversor, Hora=hora_str
+                            inversor=inversor, anio=anio, mes=mes, dia=dia, hora=hora_str
                         ).values('cantidad').first()
 
                         if not produccion:
@@ -120,7 +126,7 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
                         cantidad = produccion['cantidad']
 
                         # Obtener estadísticas para calcular términos lingüísticos
-                        estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(hora_str).first()
+                        estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_str).first()
                         if not estadisticas_hora:
                             continue  # Si no hay estadísticas, pasar a la siguiente hora
 

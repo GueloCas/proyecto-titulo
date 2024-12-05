@@ -14,7 +14,7 @@ const GenerarPDF = ({ inversor, anio, mes }) => {
       setEstadoInforme("Generando...");
       try {
         setMostrarBoton(false);
-        const datos = await getDatosInformeInversor(inversor);
+        const datos = await getDatosInformeInversor(inversor, anio, mes);
         setData(datos);
         setMostrarBoton(true); // Activar botón una vez cargados los datos
         setEstadoInforme("Informe listo."); // Cambiar mensaje cuando se termine el PDF

@@ -13,7 +13,7 @@ export function PCTablaDia({ estacionId, anio, mes, dia }) {
             setPercepciones(null);
             try {
                 setError(null);
-                const data = await getPercepcionesSegundoGradoDia(estacionId, dia);
+                const data = await getPercepcionesSegundoGradoDia(estacionId, anio, mes, dia);
                 setEstacion(data.estacion);
                 setPercepciones(data.percepciones);
 
@@ -36,7 +36,7 @@ export function PCTablaDia({ estacionId, anio, mes, dia }) {
         if (dia) {
             obtenerPC(dia);
         }
-    }, [dia]);
+    }, [estacionId, anio, mes, dia]);
 
     if (!percepciones) {
         return (

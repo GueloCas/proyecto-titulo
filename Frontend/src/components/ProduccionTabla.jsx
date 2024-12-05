@@ -21,8 +21,8 @@ export function ProduccionTabla({ inversor, anio, mes }) {
             setProduccion(data.producciones);  // Guarda las producciones
 
             // Extraer días y horas únicos
-            const dias = [...new Set(data.producciones.map(produccion => produccion.Dia))].sort();
-            const horas = [...new Set(data.producciones.map(produccion => produccion.Hora))];
+            const dias = [...new Set(data.producciones.map(produccion => produccion.fecha))].sort();
+            const horas = [...new Set(data.producciones.map(produccion => produccion.hora))];
 
             setDiasUnicos(dias);
             setHorasUnicas(horas);
@@ -41,13 +41,13 @@ export function ProduccionTabla({ inversor, anio, mes }) {
     const abrirModal = (aux, data) => {
         if (aux === "hora") {
             const datosHora = diasUnicos.map(dia => {
-                const produccionDiaHora = produccion.find(p => p.Dia === dia && p.Hora === data);
+                const produccionDiaHora = produccion.find(p => p.fecha === dia && p.hora === data);
                 return { dia, cantidad: produccionDiaHora ? produccionDiaHora.cantidad : 0 };
             });
             setModalData({ visible: true, hora: data, dia: false, datos: datosHora });
         } else {
             const datosDia = horasUnicas.map(hora => {
-                const produccionDiaHora = produccion.find(p => p.Dia === data && p.Hora === hora);
+                const produccionDiaHora = produccion.find(p => p.fecha === data && p.hora === hora);
                 return { hora, cantidad: produccionDiaHora ? produccionDiaHora.cantidad : 0 };
             });
             setModalData({ visible: true, hora: false, dia: data, datos: datosDia });
@@ -71,7 +71,7 @@ export function ProduccionTabla({ inversor, anio, mes }) {
             const row = [hora];
 
             diasUnicos.forEach(dia => {
-                const produccionDiaHora = produccion.find(p => p.Dia === dia && p.Hora === hora);
+                const produccionDiaHora = produccion.find(p => p.fecha === dia && p.hora === hora);
                 row.push(produccionDiaHora ? produccionDiaHora.cantidad : "-");
             });
 
@@ -145,12 +145,12 @@ export function ProduccionTabla({ inversor, anio, mes }) {
                                         </button>
                                     </td>
                                     {horasUnicas.map(hora => {
-                                        const produccionDiaHora = produccion.find(p => p.Dia === dia && p.Hora === hora);
+                                        const produccionDiaHora = produccion.find(p => p.fecha === dia && p.hora === hora);
                                         return (
                                             <td key={hora}>
                                                 {produccionDiaHora ? (
                                                     <Link
-                                                        to={`/ProduccionInversor/VLinguisticas?hora=${produccionDiaHora.Hora}&cantidad=${produccionDiaHora.cantidad}&dia=${produccionDiaHora.Dia}&inversor=${inversor}`}
+                                                        to={`/ProduccionInversor/VLinguisticas?hora=${produccionDiaHora.hora}&cantidad=${produccionDiaHora.cantidad}&dia=${produccionDiaHora.fecha}&inversor=${inversor}`}
                                                         className="text-dark text-decoration-none d-flex justify-content-center"
                                                     >
                                                         {produccionDiaHora.cantidad}

@@ -12,7 +12,7 @@ export function PCPrimerGradoDia({ inversorId, anio, mes, dia }) {
         async function obtenerPC() {
             setPercepciones(null);
             try {
-                const data = await getPercepcionesPrimerGradoDia(inversorId, dia);
+                const data = await getPercepcionesPrimerGradoDia(inversorId, anio, mes, dia);
                 setInversor(data.inversor);
                 setPercepciones(data.percepciones);
             } catch (error) {
@@ -20,7 +20,7 @@ export function PCPrimerGradoDia({ inversorId, anio, mes, dia }) {
             }
         }
         obtenerPC();
-    }, [inversorId, dia]);
+    }, [inversorId, anio, mes, dia]);
 
     if (!percepciones) {
         return (

@@ -13,7 +13,7 @@ export function DescripcionesEstacion({ estacion, anio, mes }) {
                 setDescripciones(null); // Resetear descripciones para mostrar el mensaje "Cargando..."
                 setError(""); // Limpiar errores anteriores
                 try {
-                    const data = await getDescripcionesEstacion(estacion);
+                    const data = await getDescripcionesEstacion(estacion, anio, mes);
                     setDescripciones(data);
                 } catch (error) {
                     setError("Hubo un error al cargar las descripciones.");

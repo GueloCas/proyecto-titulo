@@ -8,9 +8,15 @@ class GenerarInformeInversorView(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener el ID del inversor de los parámetros de la solicitud
         inversor_id = request.query_params.get('inversor')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
 
         if not inversor_id:
             return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not anio:
+            return Response({"error": "Se requiere el parámetro 'anio'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not mes:
+            return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
         
         try: 
             # Obtener el inversor
@@ -25,12 +31,8 @@ class GenerarInformeInversorView(APIView):
             suma_alta = 0
 
             for dia in range(1, 32):
-                mes_actual = "Aug"  # Cambiar esto según sea necesario
-                anio_actual = 2022
-                dia_formateado = f"{dia:02d}-{mes_actual}-{anio_actual}"
-
-                produccion = inversor.obtener_cantidad_total_diaria(dia_formateado)
-                produccion_diaria.append((dia_formateado, produccion))
+                produccion = inversor.obtener_cantidad_total_diaria(anio, mes, dia)
+                produccion_diaria.append((dia, produccion))
                 produccion_total_mes += produccion
 
                 # Cálculo de descripciones lingüísticas para cada día
@@ -38,7 +40,7 @@ class GenerarInformeInversorView(APIView):
                     hora_str = f'H{hora}'
 
                     produccion_hora = Produccion.objects.filter(
-                        Dia=dia_formateado, inversor=inversor, Hora=hora_str
+                        inversor=inversor, anio=anio, mes=mes, dia=dia, hora=hora_str
                     ).values('cantidad').first()
 
                     if not produccion_hora:
@@ -47,7 +49,7 @@ class GenerarInformeInversorView(APIView):
                     cantidad = produccion_hora['cantidad']
 
                     # Obtener estadísticas para calcular términos lingüísticos
-                    estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(hora_str).first()
+                    estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_str).first()
                     if not estadisticas_hora:
                         continue  # Si no hay estadísticas, pasar a la siguiente hora
 
@@ -85,8 +87,7 @@ class GenerarInformeInversorView(APIView):
             for inv in todos_inversores:
                 produccion_total_inversor = 0
                 for dia in range(1, 32):
-                    dia_formateado = f"{dia:02d}-{mes_actual}-{anio_actual}"
-                    produccion_total_inversor += inv.obtener_cantidad_total_diaria(dia_formateado)
+                    produccion_total_inversor += inv.obtener_cantidad_total_diaria(anio, mes, dia)
                 produccion_totales.append((inv.nombre, produccion_total_inversor))
 
             # Ordenar los inversores por producción total
@@ -100,7 +101,7 @@ class GenerarInformeInversorView(APIView):
             DL_media = obtenerClasificacionDescripcionLinguistica(suma_media / cantidad_r, "media")
             DL_alta = obtenerClasificacionDescripcionLinguistica(suma_alta / cantidad_r, "alta")
 
-            estadisticas = inversor.obtener_MinMaxProm_producciones()
+            estadisticas = inversor.obtener_MinMaxProm_producciones(anio, mes)
 
             return Response({
                 "inversor": inversor.nombre,

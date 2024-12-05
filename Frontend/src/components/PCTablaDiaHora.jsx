@@ -11,7 +11,7 @@ export function PCTablaDiaHora({ estacionId, anio, mes, dia, hora }) {
             setPercepciones(null);
             try {
                 setError(null); // Resetea el error
-                const data = await getPercepcionesSegundoGradoDiaHora(estacionId, dia, hora);
+                const data = await getPercepcionesSegundoGradoDiaHora(estacionId, anio, mes, dia, hora);
                 setEstacion(data.estacion); // Almacena la estación en el estado
                 setPercepciones(data.percepciones); // Almacena los datos en el estado
             } catch (err) {
@@ -20,7 +20,7 @@ export function PCTablaDiaHora({ estacionId, anio, mes, dia, hora }) {
             }
         }
         obtenerPC();
-    }, [dia, hora]);
+    }, [estacionId, anio, mes, dia, hora]);
 
     if (!percepciones) {
         return (
