@@ -85,7 +85,7 @@ const GuiaSubirArchivo = () => {
 
   return (
     <div>
-      <button onClick={handleShowModal}>Guía de subida de archivos</button>
+      <button className='btn btn-info' onClick={handleShowModal}>Guía de subida de archivos</button>
     </div>
   );
 };

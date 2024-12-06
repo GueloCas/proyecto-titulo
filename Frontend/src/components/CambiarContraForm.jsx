@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { updatePassword } from "../api/users.api";
+import Swal from "sweetalert2";
 
 export function CambiarContraForm() {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
@@ -11,12 +12,21 @@ export function CambiarContraForm() {
       await updatePassword({
         current_password: data.currentPassword,
         new_password: data.newPassword,
+        confirm_new_password: data.confirmNewPassword,
       });
-      alert("Contraseña actualizada exitosamente");
-      navigate("/perfil");
+      Swal.fire({
+        icon: "success",
+        title: "Éxito",
+        text: "Contraseña actualizada exitosamente",
+      });
+      navigate("/estaciones");
     } catch (error) {
       console.error("Error al actualizar la contraseña", error);
-      alert("No se pudo actualizar la contraseña. Verifique los datos.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo actualizar la contraseña. Verifique los datos.",
+      });
     }
   };
 

@@ -19,7 +19,6 @@ export function DescripcionesInversor({ inversor, anio, mes }) {
                 setError(""); // Limpiar errores anteriores
                 try {
                     const data = await getDescripcionesInversor(inversor, anio, mes);
-                    console.log(data);
                     setDescripciones(data);
                     setPercepciones(data.percepciones);
 

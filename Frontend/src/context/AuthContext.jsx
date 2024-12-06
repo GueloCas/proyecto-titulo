@@ -1,6 +1,7 @@
 // AuthProvider.jsx
 import { createContext, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { getUser } from '../api/users.api';
 
 const AuthContext = createContext();
 
@@ -29,4 +30,18 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
+}
+
+export async function reloadUserStorage({ id }) {
+  console.log('id: ', id);
+
+  try {
+    const data = await getUser(id); // Esperar a que la promesa se resuelva
+    console.log('reloadUserStorage', data);
+
+    // Actualizar la información del usuario en el localStorage
+    localStorage.setItem('user', JSON.stringify(data));
+  } catch (error) {
+    console.error('Error al cargar el usuario:', error);
+  }
 }

@@ -9,7 +9,7 @@ from .views_nuevo.filters_views import FilterAnioByInversorView, FilterMesByAnio
 from .views_nuevo.informes_views import GenerarInformeInversorView
 from .views_nuevo.estaciones_views import EstacionesByUserView, InversoresByUserView
 from .views import login, register
-from .views import UserViewSet, CambiarContraView
+from .views import UserViewSet
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -71,6 +71,5 @@ urlpatterns = [
     
     path('api/v1/login/', login, name='login'),
     path('api/v1/register/', register, name='register'),
-    path('user/change-password/', CambiarContraView.as_view(), name='change-password'),
 ]
 

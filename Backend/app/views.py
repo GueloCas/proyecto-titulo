@@ -1,14 +1,16 @@
 from .models import Inversor, Produccion, Estacion
 from django.contrib.auth.models import User # type: ignore
-from .serializer import InversorSerializer, ProduccionSerializer, UserSerializer, EstacionSerializer, CambiarContraSerializer
+from .serializer import InversorSerializer, ProduccionSerializer, UserSerializer, EstacionSerializer, ChangePasswordSerializer
 from rest_framework import viewsets, status # type: ignore
 from rest_framework.views import APIView # type: ignore
-from rest_framework.decorators import api_view # type: ignore
+from rest_framework.decorators import api_view, permission_classes, action# type: ignore
 from rest_framework.response import Response # type: ignore
 from rest_framework.authtoken.models import Token # type: ignore
 from django.db.models import IntegerField, Min, Max, Avg # type: ignore
 from django.db.models.functions import Cast, Substr # type: ignore
 import pandas as pd # type: ignore
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import AuthenticationFailed
 
 from django.shortcuts import get_object_or_404 # type: ignore
 
@@ -28,19 +30,39 @@ class ProduccionViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
 
-class CambiarContraView(APIView):
+    # Acción personalizada para cambiar la contraseña
+    @action(detail=False, methods=['post'], url_path='change-password')
+    def change_password(self, request):
+        # Obtener el token desde el cuerpo de la solicitud (o encabezado, según prefieras)
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def post(self, request):
-        serializer = CambiarContraSerializer(data=request.data, context={'request': request})
+        try:
+            # Buscar el token en la base de datos
+            user_token = Token.objects.get(key=token)
+            user = user_token.user  # Obtén el usuario asociado con el token
+
+            print(user)
+        except Token.DoesNotExist:
+            raise AuthenticationFailed("Token inválido o no encontrado")
+
+        # Aquí puedes validar si el usuario tiene permisos para cambiar la contraseña si lo deseas.
+        # Por ejemplo: if user != request.user: raise PermissionDenied("No autorizado")
+
+        # Ahora que tenemos al usuario, validamos la nueva contraseña.
+        serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
+
         if serializer.is_valid():
-            user = request.user
-            user.set_password(serializer.validated_data['new_password'])
-            user.save()
+            new_password = serializer.validated_data['new_password']
+            user.set_password(new_password)  # Establecer la nueva contraseña
+            user.save()  # Guardar el usuario con la nueva contraseña
             return Response({"message": "Contraseña actualizada exitosamente"}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class InversorProduccionView(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener el ID del inversor de los parámetros de la solicitud
@@ -298,10 +320,14 @@ def register(request):
         user.set_password(serializer.data['password'])
         user.save()
 
+        # Crear un token para el usuario
         token = Token.objects.create(user=user)
-        return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_201_CREATED)
+
+        # Eliminar la contraseña de los datos serializados
+        user_data = serializer.data.copy()
+        user_data.pop('password', None)
+
+        return Response({'token': token.key, 'user': user_data}, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
