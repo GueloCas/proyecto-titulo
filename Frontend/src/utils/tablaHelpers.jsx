@@ -2,7 +2,7 @@ import React from 'react';
 
 export const getClassAndContent = (percepcion) => {
     const { pertenencia_baja, pertenencia_media, pertenencia_alta } = percepcion;
-    
+
     if (pertenencia_baja >= pertenencia_media && pertenencia_baja >= pertenencia_alta) {
         return {
             className: "baja-mayor fs-07",
@@ -35,6 +35,42 @@ export const getClassAndContent = (percepcion) => {
                     <strong>Alta: {pertenencia_alta.toFixed(2)}</strong>
                 </div>
             ),
+        };
+    }
+};
+
+export const getClassAndContentTooltip = (dia, hora, percepcion) => {
+    const { pertenencia_baja, pertenencia_media, pertenencia_alta } = percepcion;
+
+    if (pertenencia_baja >= pertenencia_media && pertenencia_baja >= pertenencia_alta) {
+        return {
+            className: "baja-mayor fs-07",
+            content: `
+                <div>Día: ${dia} - Hora: ${hora}</div>
+                <div><strong>BAJA: ${pertenencia_baja.toFixed(2)}</strong></div>
+                <div>Media: ${pertenencia_media.toFixed(2)}</div>
+                <div>Alta: ${pertenencia_alta.toFixed(2)}</div>
+            `
+        };
+    } else if (pertenencia_media >= pertenencia_baja && pertenencia_media >= pertenencia_alta) {
+        return {
+            className: "media-mayor fs-07",
+            content: `
+                <div>Día: ${dia} - Hora: ${hora}</div>
+                <div>Baja: ${pertenencia_baja.toFixed(2)}</div>
+                <div><strong>MEDIA: ${pertenencia_media.toFixed(2)}</strong> </div>
+                <div>Alta: ${pertenencia_alta.toFixed(2)}</div>
+            `
+        };
+    } else {
+        return {
+            className: "alta-mayor fs-07",
+            content: `
+                <div>Día: ${dia} - Hora: ${hora}</div>
+                <div>Baja: ${pertenencia_baja.toFixed(2)}</div>
+                <div>Media: ${pertenencia_media.toFixed(2)}</div>
+                <div><strong>ALTA: ${pertenencia_alta.toFixed(2)}</strong></div>
+            `
         };
     }
 };

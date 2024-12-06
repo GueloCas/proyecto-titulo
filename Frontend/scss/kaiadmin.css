@@ -10955,6 +10955,9 @@ body[data-background-color="dark2"] .jvm-zoom-btn {
   width: 100%;
 }
 
-
+.tooltip-custom .tooltip-inner {
+  font-size: 1.25rem;  /* Tamaño de fuente más grande */
+  padding: 10px;       /* Espaciado adicional */
+}
 
 /*# sourceMappingURL=kaiadmin.css.map */

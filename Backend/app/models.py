@@ -57,12 +57,12 @@ class Inversor(models.Model):
             cantidad_promedio=Avg('cantidad')
         ).order_by('hora_num')
     
-    def obtener_MinMaxProm_producciones_dia(self, dia):
-        return Produccion.objects.filter(inversor=self, Dia=dia).values('Hora').annotate(
+    def obtener_MinMaxProm_producciones_dia(self, anio, mes, dia):
+        return Produccion.objects.filter(inversor=self, anio=anio, mes=mes, dia=dia).values('hora').annotate(
             cantidad_minima=Min('cantidad'),
             cantidad_maxima=Max('cantidad'),
             cantidad_promedio=Avg('cantidad')
-        ).order_by('Hora')
+        ).order_by('hora')
 
 class Produccion(models.Model):
     fecha = models.CharField(max_length=50)  # Puede ser DateField
