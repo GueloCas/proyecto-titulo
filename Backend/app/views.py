@@ -1,6 +1,6 @@
 from .models import Inversor, Produccion, Estacion
 from django.contrib.auth.models import User # type: ignore
-from .serializer import InversorSerializer, ProduccionSerializer, UserSerializer, EstacionSerializer
+from .serializer import InversorSerializer, ProduccionSerializer, UserSerializer, EstacionSerializer, CambiarContraSerializer
 from rest_framework import viewsets, status # type: ignore
 from rest_framework.views import APIView # type: ignore
 from rest_framework.decorators import api_view # type: ignore
@@ -25,6 +25,21 @@ class InversorViewSet(viewsets.ModelViewSet):
 class ProduccionViewSet(viewsets.ModelViewSet):
     queryset = Produccion.objects.all()
     serializer_class = ProduccionSerializer
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class CambiarContraView(APIView):
+
+    def post(self, request):
+        serializer = CambiarContraSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            user = request.user
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+            return Response({"message": "Contraseña actualizada exitosamente"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class InversorProduccionView(APIView):
     def get(self, request, *args, **kwargs):
