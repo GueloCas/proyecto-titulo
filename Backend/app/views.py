@@ -9,7 +9,6 @@ from rest_framework.authtoken.models import Token # type: ignore
 from django.db.models import IntegerField, Min, Max, Avg # type: ignore
 from django.db.models.functions import Cast, Substr # type: ignore
 import pandas as pd # type: ignore
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import AuthenticationFailed
 
 from django.shortcuts import get_object_or_404 # type: ignore

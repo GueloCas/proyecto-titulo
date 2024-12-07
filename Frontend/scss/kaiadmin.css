@@ -5166,6 +5166,20 @@ label.error {
   -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 
+.table-responsive-e {
+  width: 100% !important;
+  overflow-x: visible;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+@media (max-width: 767.98px) {
+  .table-responsive-e {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /*     Navbar     */
 .navbar .navbar-nav .nav-item {
   padding: 0 4px;

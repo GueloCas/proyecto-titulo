@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getEstacionesByUser } from "../api/estacion.api";
 import { Link, useSearchParams } from "react-router-dom";
 import { getAnioByEstacion, getMesByAnioEstacion } from "../api/filtros.api";
+import GenerarPDF from "../components/InformeEstacionPDF";
 
 export function InformeEstacionPage() {
     const [estaciones, setEstaciones] = useState([]);
@@ -92,12 +93,10 @@ export function InformeEstacionPage() {
                         <div className="card w-100 h-100">
                             <div className="card-body">
                                 <h4 className="card-title mb-4 text-center">Estructura del Informe</h4>
-                                <p className="text-primary-kai"><strong>1. Información del Inversor: </strong><span> muestra la información básica del inversor junto con la cantidad total del mes</span></p>
-                                <p className="text-primary-kai"><strong>2. Días con Mayor Producción: </strong><span> muestra los 3 días con mayor producción del mes</span></p>
-                                <p className="text-primary-kai"><strong>3. Días con Menor Producción: </strong><span> muestra los 3 días con menor producción del mes</span></p>
-                                <p className="text-primary-kai"><strong>4. Producción por Hora: </strong><span> muestra el cantidad promedio, máxima y mínima en cada hora durante el mes</span></p>
-                                <p className="text-primary-kai"><strong>5. Comparación con el resto de estaciones: </strong><span> muestra la producción total del inversor y la producción total de todos los estaciones</span></p>
-                                <p className="text-primary-kai"><strong>6. Resumen Percepciones:</strong><span> muestra el resumen de las percepciones del inversor, mostrando el porcentaje de cada conjunto</span></p>
+                                <p className="text-primary-kai"><strong>1. Producción Mensual: </strong><span> muestra la cantidad total de producción de la estación y de cada una de sus inversores en el mes.</span></p>
+                                <p className="text-primary-kai"><strong>2. Producción Diaria: </strong><span> muestra la cantidad diaria promedio de producción de la estación en el mes y el total de cada día</span></p>
+                                <p className="text-primary-kai"><strong>3. Resumen Estación: </strong><span> muestra el resumen de las percepciones de segundo grado en el mes de la estación </span></p>
+                                <p className="text-primary-kai"><strong>4. Resumen por Inversor: </strong><span> muestra el resumen de las percepcines de primer grado en el mes de los inversores de la estación </span></p>
                             </div>
                         </div>
                     </div>
@@ -159,6 +158,7 @@ export function InformeEstacionPage() {
                                         </select>
                                     </div>
 
+                                    <GenerarPDF estacion={selectedEstacion} anio={selectedAnio} mes={selectedMes} />
                                 </div>
                             </div>
                         </div>

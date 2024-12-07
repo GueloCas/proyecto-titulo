@@ -34,6 +34,10 @@ class Inversor(models.Model):
         total = Produccion.objects.filter(inversor=self, anio=anio, mes=mes, dia=dia).aggregate(total=Sum('cantidad'))
         return total['total'] if total['total'] is not None else 0
     
+    def obtener_cantidad_total_mensual(self, anio, mes):
+        total = Produccion.objects.filter(inversor=self, anio=anio, mes=mes).aggregate(total=Sum('cantidad'))
+        return total['total'] if total['total'] is not None else 0
+    
     def obtener_producciones_ordenHora(self, anio, mes):
         return Produccion.objects.filter(inversor=self, anio=anio, mes=mes).annotate(
             hora_num=Cast(Substr('hora', 2), IntegerField())  # Extraer número de la hora para poder ordenar

@@ -57,5 +57,6 @@ export const register = async (username, email, password) => {
 
 export const logout = () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     delete api.defaults.headers.common['Authorization'];
 };

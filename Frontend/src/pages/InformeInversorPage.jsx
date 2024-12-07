@@ -94,11 +94,10 @@ export function InformeInversorPage() {
                             <div className="card-body">
                                 <h4 className="card-title mb-4 text-center">Estructura del Informe</h4>
                                 <p className="text-primary-kai"><strong>1. Información del Inversor: </strong><span> muestra la información básica del inversor junto con la cantidad total del mes</span></p>
-                                <p className="text-primary-kai"><strong>2. Días con Mayor Producción: </strong><span> muestra los 3 días con mayor producción del mes</span></p>
-                                <p className="text-primary-kai"><strong>3. Días con Menor Producción: </strong><span> muestra los 3 días con menor producción del mes</span></p>
-                                <p className="text-primary-kai"><strong>4. Producción por Hora: </strong><span> muestra el cantidad promedio, máxima y mínima en cada hora durante el mes</span></p>
-                                <p className="text-primary-kai"><strong>5. Comparación con el resto de inversores: </strong><span> muestra la producción total del inversor y la producción total de todos los inversores</span></p>
-                                <p className="text-primary-kai"><strong>6. Resumen Percepciones:</strong><span> muestra el resumen de las percepciones del inversor, mostrando el porcentaje de cada conjunto</span></p>
+                                <p className="text-primary-kai"><strong>2. Producción Diaria: </strong><span> muestra el promedio diario de producción y la cantidad total de producción por día en el mes</span></p>
+                                <p className="text-primary-kai"><strong>3. Estadísticas por Hora: </strong><span> muestra la cantidad promedio, máxima y mínima en cada hora durante el mes</span></p>
+                                <p className="text-primary-kai"><strong>4. Comparación con  inversores: </strong><span> compara la cantidad total de producción en el mes con el resto de inversores de la estación asociada</span></p>
+                                <p className="text-primary-kai"><strong>5. Resumen:</strong><span> muestra el resumen de las percepcines de primer grado en el mes del inversor</span></p>
                             </div>
                         </div>
                     </div>

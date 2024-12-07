@@ -138,15 +138,15 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
         except Estacion.DoesNotExist:
             return Response({"error": "Estación no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 
-        cantidad_r = 0
-        suma_mala = 0
-        suma_normal = 0
-        suma_excelente = 0
-        inversores_info = []  # Almacena las descripciones de cada inversor
-
         try:
             # Obtener inversores y sus producciones de forma optimizada
             inversores = Inversor.objects.filter(estacion=estacion).prefetch_related('produccion_set')
+
+            cantidad_r = 0
+            suma_mala = 0
+            suma_normal = 0
+            suma_excelente = 0
+            inversores_info = []  # Almacena las descripciones de cada inversor
 
             # Agregar los datos por inversor
             for inversor in inversores:

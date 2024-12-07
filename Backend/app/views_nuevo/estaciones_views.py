@@ -3,14 +3,16 @@ from rest_framework import status
 from rest_framework.views import APIView 
 from rest_framework.response import Response
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token # type: ignore
 
 class EstacionesByUserView(APIView):
     def get(self, request):
-        user_id = request.headers.get('User-ID')  # Obtener el ID del encabezado
-        if user_id:
-            try:
-                user = User.objects.get(id=user_id)  # Buscar el usuario por ID
+        token = request.headers.get('Authorization')  # Obtener el ID del encabezado
+        user_token = Token.objects.get(key=token)
+        user = user_token.user
 
+        if user:
+            try:
                 estaciones = Estacion.objects.filter(usuario=user)
 
                 return Response({'estaciones': estaciones.values()}, status=200)
@@ -21,11 +23,12 @@ class EstacionesByUserView(APIView):
 
 class InversoresByUserView(APIView):
     def get(self, request):
-        user_id = request.headers.get('User-ID')  # Obtener el ID del encabezado
-        if user_id:
-            try:
-                user = User.objects.get(id=user_id)  # Buscar el usuario por ID
+        token = request.headers.get('Authorization')  # Obtener el ID del encabezado
+        user_token = Token.objects.get(key=token)
+        user = user_token.user
 
+        if user:
+            try:
                 # Filtrar estaciones asociadas al usuario
                 estaciones = Estacion.objects.filter(usuario=user)
 
