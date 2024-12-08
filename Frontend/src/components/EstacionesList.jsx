@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { deleteEstacion, getEstacionesByUser } from "../api/estacion.api";
+import { deleteEstacion, getEstaciones, getEstacionesByUser } from "../api/estacion.api";
 import { Link, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 
@@ -15,8 +15,8 @@ export function EstacionesList() {
     setSearchTerm(initialSearch);
 
     const fetchEstaciones = async () => {
-      const data = await getEstacionesByUser();
-      setEstaciones(data.estaciones);
+      const data = await getEstaciones();
+      setEstaciones(data);
     };
     fetchEstaciones();
   }, [location.search]);

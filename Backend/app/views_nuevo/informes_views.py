@@ -3,9 +3,8 @@ from rest_framework import status
 from rest_framework.views import APIView 
 from rest_framework.response import Response
 from app.utils.functions import obtenerPercepcionComputacionalPrimerGrado, calcular_pertenencia_baja, calcular_pertenencia_media, calcular_pertenencia_alta, obtenerClasificacionDescripcionLinguistica
-from django.db.models import Min, Max
-
-from django.db.models import Sum
+from django.db.models import Min, Max, Sum
+import calendar
 
 class GenerarInformeInversorView(APIView):
     def get(self, request, *args, **kwargs):
@@ -22,10 +21,12 @@ class GenerarInformeInversorView(APIView):
         try:
             inversor = Inversor.objects.get(pk=inversor_id)
 
+            num_dias_mes = calendar.monthrange(int(anio), int(mes))[1] 
+
             # Producción diaria y total
             produccion_diaria = [
                 (dia, inversor.obtener_cantidad_total_diaria(anio, mes, dia))
-                for dia in range(1, 32)
+                for dia in range(1, num_dias_mes + 1)
             ]
             produccion_total_mes = sum(p[1] for p in produccion_diaria)
             produccion_diaria_ordenada = sorted(produccion_diaria, key=lambda x: x[1], reverse=True)
@@ -35,7 +36,7 @@ class GenerarInformeInversorView(APIView):
             for dia, produccion in produccion_diaria:
                 if produccion is None:
                     continue
-                for hora in range(8, 23):
+                for hora in range(0, 24):
                     estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, f'H{hora}').first()
                     if not estadisticas_hora:
                         continue
@@ -60,7 +61,7 @@ class GenerarInformeInversorView(APIView):
             produccion_totales = [
                 (
                     inv.nombre,
-                    sum(inv.obtener_cantidad_total_diaria(anio, mes, dia) for dia in range(1, 32))
+                    sum(inv.obtener_cantidad_total_diaria(anio, mes, dia) for dia in range(1, num_dias_mes + 1))
                 )
                 for inv in Inversor.objects.filter(estacion=inversor.estacion)
             ]
@@ -114,8 +115,10 @@ class GenerarInformeEstacionView(APIView):
             estacion = Estacion.objects.get(pk=estacion_id)
             inversores = Inversor.objects.filter(estacion=estacion)
 
+            num_dias_mes = calendar.monthrange(int(anio), int(mes))[1] 
+
             total_mensual_estacion = 0
-            produccion_diaria_estacion = {dia: 0 for dia in range(1, 32)}
+            produccion_diaria_estacion = {dia: 0 for dia in range(1, num_dias_mes + 1)}
             descripciones_inversores = []
             produccion_mensual_inversores = []  # Lista separada para la suma mensual por inversor
 
@@ -208,7 +211,7 @@ class GenerarInformeEstacionView(APIView):
             # Preparar respuesta
             produccion_diaria_ordenada = sorted(
                 [{"dia": dia, "produccion": produccion_diaria_estacion[dia]}
-                 for dia in range(1, 32) if produccion_diaria_estacion[dia] > 0],
+                 for dia in range(1, num_dias_mes + 1) if produccion_diaria_estacion[dia] > 0],
                 key=lambda x: x["produccion"], reverse=True
             )
 

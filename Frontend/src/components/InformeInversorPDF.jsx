@@ -193,7 +193,7 @@ const GenerarPDF = ({ inversor, anio, mes }) => {
     yOffset += 5;
 
     // Guardar PDF
-    doc.save(`informe_inversor_${data.inversor}.pdf`);
+    doc.save(`Informe inversor ${data.inversor} ${mesNombre} ${anio}.pdf`);
     setTimeout(() => setEstadoInforme(""), 3000); // Ocultar mensaje después de 3 segundos
 
   };

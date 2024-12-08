@@ -138,7 +138,7 @@ class ObtenerPercepcionesSegundoGradoDiaView(APIView):
 
             # Usar ThreadPoolExecutor para paralelizar el procesamiento por hora
             with ThreadPoolExecutor() as executor:
-                resultados = list(executor.map(procesar_hora, range(1, 25)))
+                resultados = list(executor.map(procesar_hora, range(0, 24)))
 
             # Filtrar resultados no nulos
             percepciones_diarias = [resultado for resultado in resultados if resultado is not None]
@@ -174,7 +174,7 @@ class ObtenerPercepcionesPrimerGradoDiaView(APIView):
 
             TLlist = []
             
-            for hora in range(1,25):
+            for hora in range(0,24):
                 hora_str = f'H{hora}'
                 produccion = Produccion.objects.filter(inversor=inversor, anio=anio, mes=mes, dia=dia, hora=hora_str).first()
                 

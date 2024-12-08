@@ -2,6 +2,7 @@ from app.models import Inversor, Produccion, Estacion
 from rest_framework import status 
 from rest_framework.views import APIView 
 from rest_framework.response import Response 
+import calendar
 
 class MetricasEstacionHoraMesView(APIView):
     def get(self, request, *args, **kwargs):
@@ -90,6 +91,8 @@ class MetricasEstacionGeneralMesView(APIView):
             return Response({"error": "Se requiere el parámetro 'mes'"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            num_dias_mes = calendar.monthrange(int(anio), int(mes))[1] 
+
             estacion = Estacion.objects.get(pk=id_estacion)
 
             # Obtener inversores asociados a la estación
@@ -111,7 +114,7 @@ class MetricasEstacionGeneralMesView(APIView):
                 peor_dia_inversor = {"dia": None, "produccion": float('inf')}
 
                 # Calcular total mensual y días extremos por inversor
-                for dia in range(1, 32):
+                for dia in range(1, num_dias_mes + 1):
                     # Obtener la producción diaria
                     total_diario = inversor.obtener_cantidad_total_diaria(anio, mes, dia)
                     total_mensual_inversor += total_diario

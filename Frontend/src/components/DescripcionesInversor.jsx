@@ -6,7 +6,6 @@ import { determinarClaseCPEstacion, getClassAndContent, getClassAndContentToolti
 
 export function DescripcionesInversor({ inversor, anio, mes }) {
     const [descripciones, setDescripciones] = useState(null);
-    const [percepciones, setPercepciones] = useState(null);
     const [error, setError] = useState("");
     const tablaRef = useRef(null); // Usamos useRef para referenciar la tabla
 
@@ -20,7 +19,6 @@ export function DescripcionesInversor({ inversor, anio, mes }) {
                 try {
                     const data = await getDescripcionesInversor(inversor, anio, mes);
                     setDescripciones(data);
-                    setPercepciones(data.percepciones);
 
                 } catch (error) {
                     setError("Hubo un error al cargar las descripciones.");

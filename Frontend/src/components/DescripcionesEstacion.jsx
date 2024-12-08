@@ -153,6 +153,7 @@ export function DescripcionesEstacion({ estacion, anio, mes }) {
                             <th>Descripción Baja</th>
                             <th>Descripción Media</th>
                             <th>Descripción Alta</th>
+                            <th>Ver Resumen</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -162,6 +163,16 @@ export function DescripcionesEstacion({ estacion, anio, mes }) {
                                 <td>{(inversor.suma_baja_inversor * 100 / inversor.cantidad_r_inversor).toFixed(1)}%</td>
                                 <td>{(inversor.suma_media_inversor * 100 / inversor.cantidad_r_inversor).toFixed(1)}%</td>
                                 <td>{(inversor.suma_alta_inversor * 100 / inversor.cantidad_r_inversor).toFixed(1)}%</td>
+                                <td>
+                                    <a
+                                        href={`/resumenes/resumenes-inversor/?inversor=${inversor.inversor_id}&anio=${anio}&mes=${mes}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn btn-secondary text-white"
+                                    >
+                                        Ver Resumen
+                                    </a>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

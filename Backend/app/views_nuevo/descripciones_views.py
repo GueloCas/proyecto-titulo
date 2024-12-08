@@ -7,6 +7,8 @@ from app.utils.functions import obtenerPercepcionComputacionalPrimerGrado, calcu
 from concurrent.futures import ThreadPoolExecutor
 from django.db.models import Min, Max
 
+import calendar
+
 class CalcularDescripcionesLinguisticasInversor(APIView):
     def get(self, request, *args, **kwargs):
         # Obtener los parámetros de la solicitud
@@ -28,6 +30,8 @@ class CalcularDescripcionesLinguisticasInversor(APIView):
             return Response({"error": "Inversor no encontrado"}, status=status.HTTP_404_NOT_FOUND)
         
         try:
+            num_dias_mes = calendar.monthrange(int(anio), int(mes))[1]
+
             # Cargar todas las producciones del mes
             producciones = Produccion.objects.filter(
                 inversor=inversor, anio=anio, mes=mes
@@ -55,7 +59,7 @@ class CalcularDescripcionesLinguisticasInversor(APIView):
             def procesar_dia(dia):
                 dia_pertenencias = {}
 
-                for hora in range(1, 25):
+                for hora in range(0, 24):
                     hora_str = f'H{hora}'
                     cantidad = producciones_dict.get((dia, hora_str))
                     if cantidad is None:
@@ -89,7 +93,7 @@ class CalcularDescripcionesLinguisticasInversor(APIView):
 
             # Procesar días en paralelo
             with ThreadPoolExecutor() as executor:
-                resultados = list(executor.map(procesar_dia, range(1, 32)))
+                resultados = list(executor.map(procesar_dia, range(1, num_dias_mes + 1)))
 
             # Agrupar los resultados por día
             percepciones_dias = {dia: dia_pertenencias for dia, dia_pertenencias in resultados}
@@ -139,6 +143,8 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
             return Response({"error": "Estación no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 
         try:
+            num_dias_mes = calendar.monthrange(int(anio), int(mes))[1]
+            
             # Obtener inversores y sus producciones de forma optimizada
             inversores = Inversor.objects.filter(estacion=estacion).prefetch_related('produccion_set')
 
@@ -174,7 +180,7 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
                 # Función para procesar los días
                 def procesar_dia(dia):
                     suma_baja = suma_media = suma_alta = cantidad_inversor = 0
-                    for hora in range(1, 25):  # Rango de horas de 08 a 22
+                    for hora in range(0, 24):  # Rango de horas de 08 a 22
                         hora_str = f'H{hora}'
                         cantidad = producciones_dict.get((dia, hora_str))
                         if cantidad is None:
@@ -202,7 +208,7 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
 
                 # Procesar días en paralelo
                 with ThreadPoolExecutor() as executor:
-                    resultados = list(executor.map(procesar_dia, range(1, 32)))  # Procesar días 1 a 31
+                    resultados = list(executor.map(procesar_dia, range(1, num_dias_mes + 1)))  # Procesar días 1 a 31
 
                 # Sumar los resultados por cada inversor
                 cantidad_inversor, suma_baja, suma_media, suma_alta = map(sum, zip(*resultados))

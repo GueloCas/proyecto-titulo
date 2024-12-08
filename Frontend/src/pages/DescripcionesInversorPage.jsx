@@ -23,17 +23,40 @@ export function DescripcionesInversorPage() {
                 const data = await getInversoresByUser();
                 setInversores(data.inversores);
 
+                // Leer parámetros de la URL
                 const inversorFromUrl = urlParams.get("inversor");
+                const anioFromUrl = urlParams.get("anio");
+                const mesFromUrl = urlParams.get("mes");
+
+                // Si el inversor existe y es válido
                 if (inversorFromUrl && data.inversores.some((inv) => inv.id.toString() === inversorFromUrl)) {
                     setSelectedInversor(inversorFromUrl);
-                    handleInversorChange(inversorFromUrl);
+
+                    // Cargar años disponibles
+                    const aniosData = await getAnioByInversor(inversorFromUrl);
+                    setAniosDisponibles(aniosData.anios);
+
+                    // Si el año existe y es válido
+                    if (anioFromUrl && aniosData.anios.includes(parseInt(anioFromUrl))) {
+                        setSelectedAnio(anioFromUrl);
+
+                        // Cargar meses disponibles
+                        const mesesData = await getMesByAnioInversor(inversorFromUrl, anioFromUrl);
+                        setMesesDisponibles(mesesData.meses);
+
+                        // Si el mes existe y es válido
+                        if (mesFromUrl && mesesData.meses.some((mes) => mes.value.toString() === mesFromUrl)) {
+                            setSelectedMes(mesFromUrl);
+                        }
+                    }
                 }
             } catch (error) {
-                setMensajeError("Hubo un error al cargar las estaciones.");
+                setMensajeError("Hubo un error al cargar los datos desde la URL.");
             }
         }
+
         loadInversores();
-    }, []);
+    }, [urlParams]);
 
     const handleInversorChange = async (inversorId) => {
         setSelectedInversor(inversorId);
