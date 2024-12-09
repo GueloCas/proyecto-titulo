@@ -5,13 +5,13 @@ const cardData = [
   {
     to: "informe-inversor",
     title: "Informes por Inversor",
-    description: "Congrats and best wishes for success in your brand new life! I knew that you would do this!",
+    description: "Podrás decargar un informe en PDF con los datos de un inversor en un mes especifico.",
     button: "Generar por Inversor",
   },
   {
     to: "informe-estacion",
     title: "Informes por Estación",
-    description: "Congrats and best wishes for success in your brand new life! I knew that you would do this!",
+    description: "Podrás decargar un informe en PDF con los datos de una estación y sus inversores en un mes especifico.",
     button: "Generar por Estación",
   },
 ];
@@ -34,7 +34,7 @@ export function InformesPage() {
           </ol>
         </nav>
 
-        <div className="row">
+        <div className="row align-items-stretch">
           {cardData.map((card, index) => (
             <Card key={index} {...card} />
           ))}

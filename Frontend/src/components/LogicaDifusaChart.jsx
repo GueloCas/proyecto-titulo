@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import ApexCharts from 'apexcharts';
-import { getProduccionVLinguisticas } from '../api/percepciones.api';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getProduccionPorInversorHora } from '../api/produccion.api';
 
@@ -10,10 +9,9 @@ const LogicaDifusaChart = () => {
     const [dataVL, setDataVL] = useState(null);
     const queryParams = new URLSearchParams(location.search);
     const hora = queryParams.get('hora');
-    const [min, setMin] = useState(parseFloat(queryParams.get('min')));
-    const [max, setMax] = useState(parseFloat(queryParams.get('max')));
-    const [cantidad, setCantidad] = useState(parseFloat(queryParams.get('cantidad')) !== undefined ? parseFloat(queryParams.get('cantidad')) : null);
     const dia = queryParams.get('dia');
+    const mes = queryParams.get('mes');
+    const anio = queryParams.get('anio');
     const id = queryParams.get('inversor');
     const [dataLabel, setDataLabel] = useState(cantidad);
     const [inputValue, setInputValue] = useState(cantidad);

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { getProduccionPorInversor } from "../api/produccion.api";
 import { ModalProduccionGrafico } from "./ModalProduccionGrafico";
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { Modal } from "bootstrap";
+import { ModalLogicaDifusa } from "./ModalLogicaDifusa";
 
 export function ProduccionTabla({ inversor, anio, mes }) {
     const [produccion, setProduccion] = useState([]);
@@ -11,6 +13,7 @@ export function ProduccionTabla({ inversor, anio, mes }) {
     const [diasUnicos, setDiasUnicos] = useState([]);
     const [horasUnicas, setHorasUnicas] = useState([]);
     const [modalData, setModalData] = useState({ visible: false, hora: null, datos: [] });
+    const [modalDataLD, setModalDataLD] = useState({ visible: false, hora: null, dia: null});
 
     useEffect(() => {
         async function loadProduccion() {
@@ -54,8 +57,16 @@ export function ProduccionTabla({ inversor, anio, mes }) {
         }
     };
 
+    const abrirModalLogicaDifusa = (dia, hora) => {
+        setModalDataLD({ visible: true, hora: hora, dia: dia,});
+    };
+
     const cerrarModal = () => {
-        setModalData({ visible: false, hora: null, datos: [] });
+        setModalData({ visible: false, hora: null, dia: null, datos: [] });
+    };
+
+    const cerrarModalLD = () => {
+        setModalDataLD({ visible: false, hora: null, dia: null});
     };
 
     const exportToCSV = () => {
@@ -149,12 +160,9 @@ export function ProduccionTabla({ inversor, anio, mes }) {
                                         return (
                                             <td key={hora}>
                                                 {produccionDiaHora ? (
-                                                    <Link
-                                                        to={`/ProduccionInversor/VLinguisticas?hora=${produccionDiaHora.hora}&cantidad=${produccionDiaHora.cantidad}&dia=${produccionDiaHora.fecha}&inversor=${inversor}`}
-                                                        className="text-dark text-decoration-none d-flex justify-content-center"
-                                                    >
+                                                    <button className="btn p-0" onClick={() => abrirModalLogicaDifusa(produccionDiaHora.dia, hora)}>
                                                         {produccionDiaHora.cantidad}
-                                                    </Link>
+                                                    </button>
                                                 ) : "-"}
                                             </td>
                                         );
@@ -176,6 +184,18 @@ export function ProduccionTabla({ inversor, anio, mes }) {
                         datos={modalData.datos}
                         onClose={cerrarModal}
                     />
+                )}
+
+                {/* Modal de lógica difusa */}
+                {modalDataLD.visible && (
+                    <ModalLogicaDifusa
+                        inversor={inversor}
+                        anio={anio}
+                        mes={mes}
+                        dia={modalDataLD.dia}
+                        hora={modalDataLD.hora}
+                        onClose={cerrarModalLD}     
+                    /> 
                 )}
             </div>
         </div>

@@ -3,11 +3,6 @@ import ApexCharts from "apexcharts";
 
 export function ModalProduccionGrafico({ nombreInv, mes, anio, horaSeleccionada, diaSeleccionado, datos, onClose }) {
     useEffect(() => {
-        let filteredData = [];
-
-        // Si hay una hora seleccionada, filtrar los datos por hora
-        
-
         // Configuración del gráfico
         const series = [{
             name: "Producción",

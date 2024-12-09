@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { getPercepcionesPrimerGradoDia } from "../api/percepciones.api";
-import { Link } from "react-router-dom";
-import { set } from "react-hook-form";
+import { ModalLogicaDifusa } from "./ModalLogicaDifusa";
 
 export function PCPrimerGradoDia({ inversorId, anio, mes, dia }) {
     const [percepciones, setPercepciones] = useState([]);
     const [inversor, setInversor] = useState(null);
+    const [modalDataLD, setModalDataLD] = useState({ visible: false, hora: null, dia: null });
     const [mensajeError, setMensajeError] = useState("");
 
     useEffect(() => {
@@ -33,6 +33,14 @@ export function PCPrimerGradoDia({ inversorId, anio, mes, dia }) {
         );
     }
 
+    const abrirModalLogicaDifusa = (dia, hora) => {
+        setModalDataLD({ visible: true, hora: hora, dia: dia, });
+    };
+
+    const cerrarModalLD = () => {
+        setModalDataLD({ visible: false, hora: null, dia: null });
+    };
+
     return (
         <>
             <div className="card mt-4 p-4">
@@ -50,7 +58,7 @@ export function PCPrimerGradoDia({ inversorId, anio, mes, dia }) {
                                 <th>TLbaja</th>
                                 <th>TLmedia</th>
                                 <th>TLalta</th>
-                                <th>Ver TL</th>
+                                <th>Ver Gráfico</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -62,10 +70,10 @@ export function PCPrimerGradoDia({ inversorId, anio, mes, dia }) {
                                         <td>{percepcion.pertenencia.baja.toFixed(2)}</td>
                                         <td>{percepcion.pertenencia.media.toFixed(2)}</td>
                                         <td>{percepcion.pertenencia.alta.toFixed(2)}</td>
-                                        <td style={{ backgroundColor: '#c0c0c0' }}>
-                                            <Link to={`/ProduccionInversor/VLinguisticas?hora=${percepcion.Hora}&cantidad=${percepcion.cantidad}&inversor=${inversorId}&dia=${dia}`} className="text-dark text-decoration-none d-flex justify-content-center">
-                                                Ver TL
-                                            </Link>
+                                        <td>
+                                            <button className="btn btn-secondary text-white" onClick={() => abrirModalLogicaDifusa(dia, percepcion.Hora)}>
+                                                Ver Gráfico
+                                            </button>
                                         </td>
                                     </tr>
                                 );
@@ -73,6 +81,18 @@ export function PCPrimerGradoDia({ inversorId, anio, mes, dia }) {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Modal de lógica difusa */}
+                {modalDataLD.visible && (
+                    <ModalLogicaDifusa
+                        inversor={inversorId}
+                        anio={anio}
+                        mes={mes}
+                        dia={modalDataLD.dia}
+                        hora={modalDataLD.hora}
+                        onClose={cerrarModalLD}     
+                    /> 
+                )}
             </div>
         </>
     );

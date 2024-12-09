@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { getPercepcionesPrimerGradoHora } from "../api/percepciones.api";
+import { ModalLogicaDifusa } from "./ModalLogicaDifusa";
 import { Link } from "react-router-dom";
-import { set } from "react-hook-form";
 
 export function PCPrimerGradoHora({ inversorId, anio, mes, hora }) {
     const [percepciones, setPercepciones] = useState([]);
     const [inversor, setInversor] = useState(null);
+    const [modalDataLD, setModalDataLD] = useState({ visible: false, hora: null, dia: null });
     const [mensajeError, setMensajeError] = useState("");
 
     useEffect(() => {
@@ -33,6 +34,14 @@ export function PCPrimerGradoHora({ inversorId, anio, mes, hora }) {
         );
     }
 
+    const abrirModalLogicaDifusa = (dia, hora) => {
+        setModalDataLD({ visible: true, hora: hora, dia: dia, });
+    };
+
+    const cerrarModalLD = () => {
+        setModalDataLD({ visible: false, hora: null, dia: null });
+    };
+
     return (
         <>
             <div className="card mt-4 p-4">
@@ -55,6 +64,9 @@ export function PCPrimerGradoHora({ inversorId, anio, mes, hora }) {
                         </thead>
                         <tbody>
                             {percepciones.map((percepcion, index) => {
+                                // Extraer solo el día y convertirlo a número para eliminar el 0 inicial
+                                const diaSolo = parseInt(percepcion.Dia.split("-")[0], 10);
+
                                 return (
                                     <tr key={index}>
                                         <td>{percepcion.Dia}</td>
@@ -62,17 +74,33 @@ export function PCPrimerGradoHora({ inversorId, anio, mes, hora }) {
                                         <td>{percepcion.pertenencia.baja.toFixed(2)}</td>
                                         <td>{percepcion.pertenencia.media.toFixed(2)}</td>
                                         <td>{percepcion.pertenencia.alta.toFixed(2)}</td>
-                                        <td style={{ backgroundColor: '#c0c0c0' }}>
-                                            <Link to={`/ProduccionInversor/VLinguisticas?hora=H${hora}&cantidad=${percepcion.cantidad}&inversor=${inversorId}&dia=${percepcion.Dia}`} className="text-dark text-decoration-none d-flex justify-content-center">
-                                                Ver TL
-                                            </Link>
+                                        <td>
+                                            <button
+                                                className="btn btn-secondary text-white"
+                                                onClick={() => abrirModalLogicaDifusa(diaSolo, `H${hora}`)} // Enviar solo el día sin el 0 inicial
+                                            >
+                                                Ver Gráfico
+                                            </button>
                                         </td>
                                     </tr>
                                 );
                             })}
                         </tbody>
+
                     </table>
                 </div>
+
+                {/* Modal de lógica difusa */}
+                {modalDataLD.visible && (
+                    <ModalLogicaDifusa
+                        inversor={inversorId}
+                        anio={anio}
+                        mes={mes}
+                        dia={modalDataLD.dia}
+                        hora={modalDataLD.hora}
+                        onClose={cerrarModalLD}
+                    />
+                )}
             </div>
         </>
     );

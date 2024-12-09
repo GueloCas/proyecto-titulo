@@ -88,7 +88,7 @@ export function InformeInversorPage() {
                 {/* Mostrar mensaje de error */}
                 {mensajeError && <div className="alert alert-danger">{mensajeError}</div>}
 
-                <div className="row mt-2 align-items-stretch">
+                <div className="row mt-2">
                     <div className="col-md-6 d-flex">
                         <div className="card w-100 h-100">
                             <div className="card-body">

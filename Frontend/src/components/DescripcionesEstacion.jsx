@@ -165,7 +165,7 @@ export function DescripcionesEstacion({ estacion, anio, mes }) {
                                 <td>{(inversor.suma_alta_inversor * 100 / inversor.cantidad_r_inversor).toFixed(1)}%</td>
                                 <td>
                                     <a
-                                        href={`/resumenes/resumenes-inversor/?inversor=${inversor.inversor_id}&anio=${anio}&mes=${mes}`}
+                                        href={`/resumenes/resumenes-inversor?inversor=${inversor.inversor_id}&anio=${anio}&mes=${mes}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="btn btn-secondary text-white"

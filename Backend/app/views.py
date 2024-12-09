@@ -187,46 +187,86 @@ class InversorMinMaxHoraView(APIView):
 
 class VariableLinguisticaHoraView(APIView):
     def get(self, request, *args, **kwargs):
-        # Obtener el valor, min y max de los parámetros de la solicitud
-        valor = request.query_params.get('valor')
-        min_value = request.query_params.get('min')
-        max_value = request.query_params.get('max')
-        print(f"valor: {valor}, min: {min_value}, max: {max_value}")
+        # Obtener parámetros de la solicitud
+        inversor_id = request.query_params.get('inversor')
+        anio = request.query_params.get('anio')
+        mes = request.query_params.get('mes')
+        dia = request.query_params.get('dia')
+        hora = request.query_params.get('hora')
 
-        if valor is None or min_value is None or max_value is None:
-            return Response({"error": "Se requiere el parámetro 'valor', 'min' y 'max'"}, status=status.HTTP_400_BAD_REQUEST)
-        
+        # Validar parámetro obligatorio
+        if not inversor_id:
+            return Response({"error": "Se requiere el parámetro 'inversor'"}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            # Convertir los valores de valor, min y max a flotantes
-            valor = float(valor)
-            min_value = float(min_value)
-            max_value = float(max_value)
+            inversor = Inversor.objects.get(pk=inversor_id)
+            # Convertir parámetros a enteros
+            anio = int(anio) if anio else None
+            mes = int(mes) if mes else None
+            dia = int(dia) if dia else None
 
+            # Filtrar producción específica
+            filtro = {
+                "inversor": inversor_id,
+                "anio": anio,
+                "mes": mes,
+                "dia": dia,
+                "hora": hora
+            }
+
+            produccion = Produccion.objects.filter(**filtro).first()
+
+            if not produccion:
+                return Response({"error": "No se encontró producción para los parámetros dados."},
+                                status=status.HTTP_404_NOT_FOUND)
+
+            # Obtener valor específico
+            valor = float(produccion.cantidad)
+
+            # Calcular mínimos y máximos para ese inversor, año, mes y hora
+            qs_min_max = Produccion.objects.filter(
+                inversor=inversor_id,
+                anio=anio,
+                mes=mes,
+                hora=hora
+            ).aggregate(
+                minimo=Min('cantidad'),
+                maximo=Max('cantidad')
+            )
+
+            min_value = float(qs_min_max['minimo']) if qs_min_max['minimo'] is not None else 0.0
+            max_value = float(qs_min_max['maximo']) if qs_min_max['maximo'] is not None else 0.0
+
+            # Calcular percepciones lingüísticas
             TLbaja, TLmedia, TLalta = obtenerPercepcionComputacionalPrimerGrado(min_value, max_value)
 
-            # Calcular el grado de pertenencia del valor
+            # Calcular grados de pertenencia
             pertenencia_baja = calcular_pertenencia_baja(valor, TLbaja)
             pertenencia_media = calcular_pertenencia_media(valor, TLmedia)
             pertenencia_alta = calcular_pertenencia_alta(valor, TLalta)
 
             # Preparar la respuesta
             response_data = {
-                'TLbaja': TLbaja,
-                'TLmedia': TLmedia,
-                'TLalta': TLalta,
-                'pertenencia': {
-                    'baja': round(pertenencia_baja, 2),
-                    'media': round(pertenencia_media, 2),
-                    'alta': round(pertenencia_alta, 2)
-                }
+                "inversor": inversor.nombre,
+                "valor": valor,
+                "min": min_value,
+                "max": max_value,
+                "TLbaja": TLbaja,
+                "TLmedia": TLmedia,
+                "TLalta": TLalta,
+                "pertenencia": {
+                    "baja": round(pertenencia_baja, 2),
+                    "media": round(pertenencia_media, 2),
+                    "alta": round(pertenencia_alta, 2),
+                },
             }
             return Response(response_data, status=status.HTTP_200_OK)
-        
-        except ValueError:
-            return Response({"error": "Los parámetros 'valor', 'min' y 'max' deben ser numéricos"}, status=status.HTTP_400_BAD_REQUEST)
+
+        except ValueError as e:
+            return Response({"error": "Parámetros incorrectos o faltantes"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+     
 class InversorProduccionGradoPertenenciaView(APIView): 
     def get(self, request, *args, **kwargs):
         # Obtener el ID del inversor de los parámetros de la solicitud
