@@ -23,9 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'password']
-        extra_kwargs = {
-            'password': {'write_only': True, 'required': False}  # La contraseña no es obligatoria y solo se utiliza para escritura
-        }
     
     def update(self, instance, validated_data):
         # Manejar la contraseña solo si se proporciona
