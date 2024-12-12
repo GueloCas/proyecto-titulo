@@ -5,9 +5,18 @@ from rest_framework.response import Response
 from app.utils.functions import obtenerPercepcionComputacionalPrimerGrado, calcular_pertenencia_baja, calcular_pertenencia_media, calcular_pertenencia_alta, obtenerClasificacionDescripcionLinguistica
 from django.db.models import Min, Max, Sum
 import calendar
+from rest_framework.authtoken.models import Token 
 
 class GenerarInformeInversorView(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         # Validar los parámetros
         parametros_requeridos = ['inversor', 'anio', 'mes']
         for param in parametros_requeridos:
@@ -20,6 +29,9 @@ class GenerarInformeInversorView(APIView):
 
         try:
             inversor = Inversor.objects.get(pk=inversor_id)
+
+            if inversor.estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a este inversor"}, status=status.HTTP_403_FORBIDDEN)
 
             num_dias_mes = calendar.monthrange(int(anio), int(mes))[1] 
 
@@ -100,6 +112,14 @@ class GenerarInformeInversorView(APIView):
 
 class GenerarInformeEstacionView(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         estacion_id = request.query_params.get('estacion')
         anio = request.query_params.get('anio')
         mes = request.query_params.get('mes')
@@ -113,6 +133,10 @@ class GenerarInformeEstacionView(APIView):
 
         try:
             estacion = Estacion.objects.get(pk=estacion_id)
+
+            if estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a esta estación"}, status=status.HTTP_403_FORBIDDEN)
+
             inversores = Inversor.objects.filter(estacion=estacion)
 
             num_dias_mes = calendar.monthrange(int(anio), int(mes))[1] 

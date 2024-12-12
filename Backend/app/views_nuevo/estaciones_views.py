@@ -8,6 +8,10 @@ from rest_framework.authtoken.models import Token # type: ignore
 class EstacionesByUserView(APIView):
     def get(self, request):
         token = request.headers.get('Authorization')  # Obtener el ID del encabezado
+
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
         user_token = Token.objects.get(key=token)
         user = user_token.user
 
@@ -24,6 +28,10 @@ class EstacionesByUserView(APIView):
 class InversoresByUserView(APIView):
     def get(self, request):
         token = request.headers.get('Authorization')  # Obtener el ID del encabezado
+
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+        
         user_token = Token.objects.get(key=token)
         user = user_token.user
 

@@ -1,8 +1,4 @@
-import axios from "axios";
-
-const api = axios.create({
-    baseURL: "http://localhost:8000/api/v1/",
-});
+import api from './root.api';
 
 export const getAnioByInversor = (id) => api.get(`filters/anio-by-inversor/?inversor=${id}`).then(response => response.data);
 export const getMesByAnioInversor = (id,anio) => api.get(`filters/mes-by-anio-inversor/?inversor=${id}&anio=${anio}`).then(response => response.data);

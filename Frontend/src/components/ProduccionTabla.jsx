@@ -13,7 +13,8 @@ export function ProduccionTabla({ inversor, anio, mes }) {
     const [diasUnicos, setDiasUnicos] = useState([]);
     const [horasUnicas, setHorasUnicas] = useState([]);
     const [modalData, setModalData] = useState({ visible: false, hora: null, datos: [] });
-    const [modalDataLD, setModalDataLD] = useState({ visible: false, hora: null, dia: null});
+    const [modalDataLD, setModalDataLD] = useState({ visible: false, hora: null, dia: null });
+    const [showAlert, setShowAlert] = useState(true);
 
     useEffect(() => {
         async function loadProduccion() {
@@ -33,13 +34,6 @@ export function ProduccionTabla({ inversor, anio, mes }) {
         loadProduccion();
     }, [inversor, anio, mes]);
 
-    useEffect(() => {
-        const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.forEach(tooltipTriggerEl => {
-            new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-    }, []);
-
     // Función para manejar la apertura del modal
     const abrirModal = (aux, data) => {
         if (aux === "hora") {
@@ -58,7 +52,7 @@ export function ProduccionTabla({ inversor, anio, mes }) {
     };
 
     const abrirModalLogicaDifusa = (dia, hora) => {
-        setModalDataLD({ visible: true, hora: hora, dia: dia,});
+        setModalDataLD({ visible: true, hora: hora, dia: dia, });
     };
 
     const cerrarModal = () => {
@@ -66,7 +60,11 @@ export function ProduccionTabla({ inversor, anio, mes }) {
     };
 
     const cerrarModalLD = () => {
-        setModalDataLD({ visible: false, hora: null, dia: null});
+        setModalDataLD({ visible: false, hora: null, dia: null });
+    };
+
+    const closeAlert = () => {
+        setShowAlert(false);  // Cambia el estado para ocultar el alert
     };
 
     const exportToCSV = () => {
@@ -120,20 +118,18 @@ export function ProduccionTabla({ inversor, anio, mes }) {
                 <div className="card-header d-flex justify-content-between mb-2 align-items-center">
                     <h4 className="ms-2">
                         Tabla producción del inversor: <strong>{nombreInversor}</strong> el mes <strong>{mes}-{anio}</strong>
-                        {/* Icono con Tooltip */}
-                        <i
-                            className="bi bi-info-circle ms-2"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            title="Presiona una hora para ver gráfico con la producción en esa hora en el mes, o presiona un día para ver la producción por hora en ese día."
-                            style={{ fontSize: "1.5rem", cursor: "pointer" }}
-                        ></i>
                     </h4>
                     <button onClick={exportToCSV} className="btn btn-info btn-border">
                         Descargar CSV
                     </button>
                 </div>
                 <div className="table-responsive" style={{ overflowX: 'auto' }}>
+                    {showAlert && (
+                        <div className="alert alert-info mt-2 d-flex justify-content-between" role="alert">
+                            Haga clic en una celda para ver el gráfico de producción en ese día/hora
+                            <button type="button" className="btn-close" onClick={closeAlert} aria-label="Close"></button>
+                        </div>
+                    )}
                     <table className="mb-0 mt-4 table table-striped table-bordered table-hover">
                         <thead>
                             <tr>
@@ -194,8 +190,8 @@ export function ProduccionTabla({ inversor, anio, mes }) {
                         mes={mes}
                         dia={modalDataLD.dia}
                         hora={modalDataLD.hora}
-                        onClose={cerrarModalLD}     
-                    /> 
+                        onClose={cerrarModalLD}
+                    />
                 )}
             </div>
         </div>

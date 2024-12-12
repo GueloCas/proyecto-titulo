@@ -64,6 +64,14 @@ class UserViewSet(viewsets.ModelViewSet):
     
 class InversorProduccionView(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         # Obtener el ID del inversor de los parámetros de la solicitud
         inversor_id = request.query_params.get('inversor_id')
         anio = request.query_params.get('anio')
@@ -75,6 +83,11 @@ class InversorProduccionView(APIView):
         try:
             # Obtener el inversor por ID
             inversor = Inversor.objects.get(pk=inversor_id)
+
+            estacion = inversor.estacion
+
+            if estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a este recurso"}, status=status.HTTP_403_FORBIDDEN)
 
             producciones = inversor.obtener_producciones_ordenHora(anio, mes)
             

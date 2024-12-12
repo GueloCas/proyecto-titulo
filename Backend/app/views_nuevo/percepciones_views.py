@@ -2,12 +2,21 @@ from app.models import Inversor, Produccion, Estacion
 from rest_framework import status 
 from rest_framework.views import APIView 
 from rest_framework.response import Response
-from concurrent.futures import ThreadPoolExecutor 
+from concurrent.futures import ThreadPoolExecutor
+from rest_framework.authtoken.models import Token 
 
 from app.utils.functions import calcular_pertenencia_baja, calcular_pertenencia_media, calcular_pertenencia_alta, obtenerPercepcionComputacionalPrimerGrado, obtenerPercepcionComputacionalSegundoGrado
 
 class ObtenerPercepcionesSegundoGradoDiaHoraView(APIView): 
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         # Obtener el día y la hora de los parámetros de la solicitud
         id_estacion = request.query_params.get('estacion')
         anio = request.query_params.get('anio')
@@ -29,6 +38,9 @@ class ObtenerPercepcionesSegundoGradoDiaHoraView(APIView):
         
         try:
             estacion = Estacion.objects.get(pk=id_estacion)
+
+            if estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a esta estación"}, status=status.HTTP_403_FORBIDDEN)
 
             # Lista para almacenar las percepciones de cada inversor
             percepciones = []
@@ -78,6 +90,14 @@ class ObtenerPercepcionesSegundoGradoDiaHoraView(APIView):
 
 class ObtenerPercepcionesSegundoGradoDiaView(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         id_estacion = request.query_params.get('estacion')
         anio = request.query_params.get('anio')
         mes = request.query_params.get('mes')
@@ -94,6 +114,10 @@ class ObtenerPercepcionesSegundoGradoDiaView(APIView):
         
         try:
             estacion = Estacion.objects.get(pk=id_estacion)
+
+            if estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a esta estación"}, status=status.HTTP_403_FORBIDDEN)
+
             inversores = Inversor.objects.filter(estacion_id=estacion)
 
             def procesar_hora(hora):
@@ -153,6 +177,14 @@ class ObtenerPercepcionesSegundoGradoDiaView(APIView):
 
 class ObtenerPercepcionesPrimerGradoDiaView(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         # Obtener el ID del inversor de los parámetros de la solicitud
         inversor_id = request.query_params.get('inversor')
         anio = request.query_params.get('anio')
@@ -171,6 +203,9 @@ class ObtenerPercepcionesPrimerGradoDiaView(APIView):
         try:
             # Obtener el inversor
             inversor = Inversor.objects.get(pk=inversor_id)
+
+            if inversor.estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a este inversor"}, status=status.HTTP_403_FORBIDDEN)
 
             TLlist = []
             
@@ -223,6 +258,14 @@ class ObtenerPercepcionesPrimerGradoDiaView(APIView):
             
 class ObtenerPercepcionesPrimerGradoHoraView(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         # Obtener el ID del inversor de los parámetros de la solicitud
         inversor_id = request.query_params.get('inversor')
         anio = request.query_params.get('anio')
@@ -242,6 +285,10 @@ class ObtenerPercepcionesPrimerGradoHoraView(APIView):
         try:
             # Obtener el inversor
             inversor = Inversor.objects.get(pk=inversor_id)
+
+            if inversor.estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a este inversor"}, status=status.HTTP_403_FORBIDDEN)
+
             
             # Obtener las estadísticas por hora del inversor
             estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_formateada).first()

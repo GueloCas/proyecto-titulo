@@ -1,8 +1,4 @@
-import axios from "axios";
-
-const api = axios.create({
-    baseURL: "http://localhost:8000/api/v1/",
-    });
+import api from './root.api';
 
 export const getMetricasEstacionHoraMes = (id, anio, mes, hora) => api.get(`metricas-estacion-hora-mes/?estacion=${id}&anio=${anio}&mes=${mes}&hora=${hora}`).then(response => response.data);
 export const getMetricasEstacionGeneralMes = (id, anio, mes) => api.get(`metricas-estacion-general-mes/?estacion=${id}&anio=${anio}&mes=${mes}`).then(response => response.data);

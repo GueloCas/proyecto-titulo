@@ -3,9 +3,18 @@ from rest_framework import status
 from rest_framework.views import APIView 
 from rest_framework.response import Response 
 import calendar
+from rest_framework.authtoken.models import Token
 
 class MetricasEstacionHoraMesView(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         # Obtener el parámetro 'estacion' desde los parámetros de la consulta
         id_estacion = request.query_params.get('estacion')
         anio = request.query_params.get('anio')
@@ -25,6 +34,9 @@ class MetricasEstacionHoraMesView(APIView):
         
         try:
             estacion = Estacion.objects.get(pk=id_estacion)
+
+            if estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a esta estación"}, status=status.HTTP_403_FORBIDDEN)
 
             # Filtrar los inversores que están asociados con la estación proporcionada
             inversores = Inversor.objects.filter(estacion_id=estacion)
@@ -78,6 +90,14 @@ class MetricasEstacionHoraMesView(APIView):
         
 class MetricasEstacionGeneralMesView(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         # Obtener el parámetro 'estacion'
         id_estacion = request.query_params.get('estacion')
         anio = request.query_params.get('anio')
@@ -94,6 +114,9 @@ class MetricasEstacionGeneralMesView(APIView):
             num_dias_mes = calendar.monthrange(int(anio), int(mes))[1] 
 
             estacion = Estacion.objects.get(pk=id_estacion)
+
+            if estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a esta estación"}, status=status.HTTP_403_FORBIDDEN)
 
             # Obtener inversores asociados a la estación
             inversores = Inversor.objects.filter(estacion_id=estacion)
@@ -161,6 +184,14 @@ class MetricasEstacionGeneralMesView(APIView):
                 
 class MetricasEstacionGeneralDiaView(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         id_estacion = request.query_params.get('estacion')
         anio = request.query_params.get('anio')
         mes = request.query_params.get('mes')
@@ -177,6 +208,9 @@ class MetricasEstacionGeneralDiaView(APIView):
 
         try:
             estacion = Estacion.objects.get(pk=id_estacion)
+
+            if estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a esta estación"}, status=status.HTTP_403_FORBIDDEN)
 
             inversores = Inversor.objects.filter(estacion_id=estacion)
             if not inversores.exists():
@@ -241,6 +275,14 @@ class MetricasEstacionGeneralDiaView(APIView):
         
 class MetricasEstacionHoraDiaView(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         id_estacion = request.query_params.get('estacion')
         anio = request.query_params.get('anio')
         mes = request.query_params.get('mes')
@@ -259,6 +301,9 @@ class MetricasEstacionHoraDiaView(APIView):
 
         try:
             estacion = Estacion.objects.get(pk=id_estacion)
+
+            if estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a esta estación"}, status=status.HTTP_403_FORBIDDEN)
 
             inversores = Inversor.objects.filter(estacion_id=estacion)
             if not inversores.exists():
@@ -306,6 +351,14 @@ class MetricasEstacionHoraDiaView(APIView):
 
 class MetricasInversorMesView(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         id_inversor = request.query_params.get('inversor')
         anio = request.query_params.get('anio')
         mes = request.query_params.get('mes')
@@ -320,6 +373,9 @@ class MetricasInversorMesView(APIView):
         try:
             # Obtener el inversor por ID
             inversor = Inversor.objects.get(pk=id_inversor)
+
+            if inversor.estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a este inversor"}, status=status.HTTP_403_FORBIDDEN)
 
             # Agrupar las producciones por hora y calcular estadísticas agregadas
             estadisticas_por_hora = inversor.obtener_MinMaxProm_producciones(anio, mes)

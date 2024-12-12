@@ -1,8 +1,4 @@
-import axios from 'axios';
-
-const api = axios.create({
-    baseURL: 'http://localhost:8000/api/v1/',
-});
+import api from './root.api';
 
 export const getProduccionPorInversor = (id, anio, mes) => api.get(`produccion-por-inversor/?inversor_id=${id}&anio=${anio}&mes=${mes}`).then(response => response.data);
 export const getProduccionPorInversorGrados = (id) => api.get(`produccion-por-inversor-grados/?inversor_id=${id}`).then(response => response.data);

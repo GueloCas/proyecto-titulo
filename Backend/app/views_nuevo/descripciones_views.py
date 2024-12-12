@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.views import APIView 
 from rest_framework.response import Response
 from app.utils.functions import obtenerPercepcionComputacionalPrimerGrado, calcular_pertenencia_baja, calcular_pertenencia_media, calcular_pertenencia_alta, obtenerClasificacionDescripcionLinguistica 
+from rest_framework.authtoken.models import Token 
 
 from concurrent.futures import ThreadPoolExecutor
 from django.db.models import Min, Max
@@ -11,6 +12,14 @@ import calendar
 
 class CalcularDescripcionesLinguisticasInversor(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         # Obtener los parámetros de la solicitud
         inversor_id = request.query_params.get('inversor_id')
         anio = request.query_params.get('anio')
@@ -28,6 +37,9 @@ class CalcularDescripcionesLinguisticasInversor(APIView):
             inversor = Inversor.objects.get(pk=inversor_id)
         except Inversor.DoesNotExist:
             return Response({"error": "Inversor no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if inversor.estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a este inversor"}, status=status.HTTP_403_FORBIDDEN)
         
         try:
             num_dias_mes = calendar.monthrange(int(anio), int(mes))[1]
@@ -127,6 +139,14 @@ class CalcularDescripcionesLinguisticasInversor(APIView):
 
 class CalcularDescripcionesLinguisticasEstacion(APIView):
     def get(self, request, *args, **kwargs):
+        token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_token = Token.objects.get(key=token)
+        user = user_token.user  # Obtén el usuario asociado con el token
+
         # Obtener parámetros de la solicitud
         estacion_id = request.query_params.get('estacion_id')
         anio = request.query_params.get('anio')
@@ -141,6 +161,9 @@ class CalcularDescripcionesLinguisticasEstacion(APIView):
             estacion = Estacion.objects.get(pk=estacion_id)
         except Estacion.DoesNotExist:
             return Response({"error": "Estación no encontrada"}, status=status.HTTP_404_NOT_FOUND)
+        
+        if estacion.usuario != user:
+                return Response({"error": "No tienes permiso para acceder a esta estación"}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             num_dias_mes = calendar.monthrange(int(anio), int(mes))[1]
