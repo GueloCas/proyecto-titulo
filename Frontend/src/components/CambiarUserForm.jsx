@@ -40,23 +40,33 @@ export function CambiarUserForm() {
 
         // Si el usuario confirma, procede con la actualización
         if (result.isConfirmed) {
+            try {
+                const response = await updateUsername({
+                    id: user.id,
+                    username: data.username,
+                    email: user.email,
+                    password: user.password,
+                });
 
-            const response = await updateUsername({
-                id: user.id,
-                username: data.username,
-                email: user.email,
-                password: user.password,
-            });
+                reloadUserStorage({ id: user.id });
 
-            reloadUserStorage({ id: user.id });
-
-            // Muestra un mensaje de éxito
-            Swal.fire({
-                title: "¡Actualización exitosa!",
-                text: "Tu nombre de usuario ha sido cambiado correctamente.",
-                icon: "success",
-                confirmButtonText: "Aceptar",
-            });
+                // Muestra un mensaje de éxito
+                Swal.fire({
+                    title: "¡Actualización exitosa!",
+                    text: "Tu nombre de usuario ha sido cambiado correctamente.",
+                    icon: "success",
+                    confirmButtonText: "Aceptar",
+                });
+            } catch (error) {
+                console.error(error.response?.data?.non_field_errors);
+                // Muestra un mensaje de error en caso de fallo
+                Swal.fire({
+                    title: "Error",
+                    text: error.response?.data?.non_field_errors[0] || "Ocurrió un error al actualizar tu nombre de usuario.",
+                    icon: "error",
+                    confirmButtonText: "Aceptar",
+                });
+            }
         }
     };
 
