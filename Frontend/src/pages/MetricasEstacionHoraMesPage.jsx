@@ -12,9 +12,9 @@ export function MetricasEstacionHoraMesPage() {
     const [selectedEstacion, setSelectedEstacion] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
     const [selectedMes, setSelectedMes] = useState("");
-    const [selectedHora, setSelectedHora] = useState(""); // Nuevo estado para la hora
+    const [selectedHora, setSelectedHora] = useState("");
     const [mensajeError, setMensajeError] = useState("");
-    const [mostrarMetricas, setMostrarMetricas] = useState(false); // Estado para mostrar el componente MetricasEstacion
+    const [mostrarMetricas, setMostrarMetricas] = useState(false); 
     const [isAccordionOpen, setIsAccordionOpen] = useState(true);
     const [searchParams, setSearchParams] = useState(null);
     const [urlParams, setUrlParams] = useSearchParams();
@@ -86,10 +86,10 @@ export function MetricasEstacionHoraMesPage() {
 
     const handleSearch = () => {
         if (isFormValid) {
-            setSearchParams({ estacion: selectedEstacion, anio: selectedAnio, mes: selectedMes, hora: selectedHora }); // Actualizar parámetros de búsqueda
+            setSearchParams({ estacion: selectedEstacion, anio: selectedAnio, mes: selectedMes, hora: selectedHora }); 
             setMostrarMetricas(true);
-            setIsAccordionOpen(false); // Cierra el acordeón cuando se hace clic en "Buscar"
-            setMensajeError(""); // Limpiar mensajes de error
+            setIsAccordionOpen(false); 
+            setMensajeError("");
         } else {
             setMensajeError("Por favor, seleccione todos los campos.");
         }
@@ -107,7 +107,7 @@ export function MetricasEstacionHoraMesPage() {
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-4">
                         <li className="breadcrumb-item">
-                            <Link to="/dashboard">Dashboard</Link>
+                            <Link to="/editar-perfil">Perfil</Link>
                         </li>
                         <li className="breadcrumb-item">
                             <Link to="/informes">Metricas Estación</Link>
@@ -149,7 +149,7 @@ export function MetricasEstacionHoraMesPage() {
                                             <label className="form-label">Estación</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }}  
                                                 value={selectedEstacion}
                                                 onChange={(e) => handleEstacionChange(e.target.value)}
                                             >
@@ -166,7 +166,7 @@ export function MetricasEstacionHoraMesPage() {
                                             <label className="form-label">Año</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }}  
                                                 value={selectedAnio}
                                                 onChange={(e) => handleAnioChange(e.target.value)}
                                                 disabled={!aniosDisponibles.length}
@@ -184,7 +184,7 @@ export function MetricasEstacionHoraMesPage() {
                                             <label className="form-label">Mes</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }}  
                                                 value={selectedMes}
                                                 onChange={(e) => handleMesChange(e.target.value)}
                                                 disabled={!mesesDisponibles.length}
@@ -202,7 +202,7 @@ export function MetricasEstacionHoraMesPage() {
                                             <label className="form-label">Hora</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }}  
                                                 value={selectedHora}
                                                 onChange={(e) => setSelectedHora(e.target.value)}
                                                 disabled={!horasDisponibles.length}
@@ -221,7 +221,7 @@ export function MetricasEstacionHoraMesPage() {
                                                 className="btn btn-success w-100"
                                                 onClick={handleSearch}
                                                 disabled={!isFormValid}
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }}  
                                             >
                                                 Buscar
                                             </button>

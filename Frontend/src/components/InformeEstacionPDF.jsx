@@ -21,7 +21,6 @@ const GenerarPDF = ({ estacion, anio, mes }) => {
 
                 setMostrarBoton(false);
                 const datos = await getDatosInformeEstacion(estacion, anio, mes);
-                console.log(datos);
                 setData(datos);
                 setMostrarBoton(true); // Activar botón una vez cargados los datos
                 setEstadoInforme("Informe listo."); // Cambiar mensaje cuando se termine el PDF

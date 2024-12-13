@@ -26,7 +26,7 @@ export function ResumenesPage() {
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-4">
             <li className="breadcrumb-item">
-              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/editar-perfil">Perfil</Link>
             </li>
             <li className="breadcrumb-item active" aria-current="page">
               Resúmenes
@@ -35,6 +35,14 @@ export function ResumenesPage() {
         </nav>
 
         <div className="row">
+          <div className="col-md-12">
+            <div className="card card-warning card-annoucement card-round">
+              <div className="card-body text-center">
+                <div className="card-opening">¿Qué son los Resúmenes Lingüisticos?</div>
+                <div className="card-desc">Un resumen lingüistico sirve para describir la calidad de la producción en un mes. Indicando en que porcentajes se dividió la calidad de producción en los conjuntos de calidad baja, media y alta para inversores, y calidad mala, normal y excelente para estaciones</div>
+              </div>
+            </div>
+          </div>
           {cardData.map((card, index) => (
             <Card key={index} {...card} />
           ))}

@@ -1,10 +1,7 @@
-import { Link } from "react-router-dom";
-import Papa from 'papaparse';
 import { useEffect, useState } from "react";
 import { getProduccionPorInversor } from "../api/produccion.api";
 import { ModalProduccionGrafico } from "./ModalProduccionGrafico";
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { Modal } from "bootstrap";
 import { ModalLogicaDifusa } from "./ModalLogicaDifusa";
 
 export function ProduccionTabla({ inversor, anio, mes }) {
@@ -21,8 +18,8 @@ export function ProduccionTabla({ inversor, anio, mes }) {
             const data = await getProduccionPorInversor(inversor, anio, mes);
 
             // `data` incluye 'nombre_inversor' y 'producciones'
-            setNombreInversor(data.nombre_inversor);  // Guarda el nombre del inversor
-            setProduccion(data.producciones);  // Guarda las producciones
+            setNombreInversor(data.nombre_inversor);  
+            setProduccion(data.producciones);  
 
             // Extraer días y horas únicos
             const dias = [...new Set(data.producciones.map(produccion => produccion.fecha))].sort();
@@ -64,44 +61,7 @@ export function ProduccionTabla({ inversor, anio, mes }) {
     };
 
     const closeAlert = () => {
-        setShowAlert(false);  // Cambia el estado para ocultar el alert
-    };
-
-    const exportToCSV = () => {
-        // Crear los encabezados: Hora/Día + días únicos
-        const csvRows = [];
-
-        // Primera fila (encabezados)
-        const headers = ["Hora/Día", ...diasUnicos];
-        csvRows.push(headers);
-
-        // Filas de datos (hora como la primera columna)
-        horasUnicas.forEach(hora => {
-            const row = [hora];
-
-            diasUnicos.forEach(dia => {
-                const produccionDiaHora = produccion.find(p => p.fecha === dia && p.hora === hora);
-                row.push(produccionDiaHora ? produccionDiaHora.cantidad : "-");
-            });
-
-            // Agregar la fila al CSV
-            csvRows.push(row);
-        });
-
-        // Convertir los datos a CSV
-        const csv = Papa.unparse(csvRows);
-
-        // Crear un blob de los datos CSV
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-
-        // Crear un enlace temporal para descargar el archivo
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.href = url;
-        link.setAttribute("download", "produccion-" + nombreInversor + ".csv");
-
-        // Simular un clic para descargar el archivo
-        link.click();
+        setShowAlert(false);  
     };
 
     return (
@@ -119,9 +79,6 @@ export function ProduccionTabla({ inversor, anio, mes }) {
                     <h4 className="ms-2">
                         Tabla producción del inversor: <strong>{nombreInversor}</strong> el mes <strong>{mes}-{anio}</strong>
                     </h4>
-                    <button onClick={exportToCSV} className="btn btn-info btn-border">
-                        Descargar CSV
-                    </button>
                 </div>
                 <div className="table-responsive" style={{ overflowX: 'auto' }}>
                     {showAlert && (

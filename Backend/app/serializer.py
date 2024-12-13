@@ -33,7 +33,6 @@ class ChangePasswordSerializer(serializers.Serializer):
         current_password = attrs.get('current_password')
         new_password = attrs.get('new_password')
         confirm_new_password = attrs.get('confirm_new_password')
-        print(attrs)
 
         # Verificar si las contraseñas coinciden
         if new_password != confirm_new_password:
@@ -41,7 +40,6 @@ class ChangePasswordSerializer(serializers.Serializer):
 
         # Obtener el token desde los datos de la solicitud
         token = self.context.get('request').headers.get('Authorization')
-        print(token)
 
         if not token:
             raise ValidationError("Token no proporcionado")

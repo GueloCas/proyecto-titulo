@@ -20,7 +20,7 @@ export function MetricasEstacionHoraDia({ estacionId, anio, mes, dia, hora }) {
             }
             loadMetricas();
         }
-    }, [estacionId, anio, mes, dia, hora]); // Ahora la dependencia es el "dia"
+    }, [estacionId, anio, mes, dia, hora]); 
 
     if (!metricas) {
         return (

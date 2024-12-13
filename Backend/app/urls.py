@@ -1,13 +1,13 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import EstacionViewSet, InversorViewSet, ProduccionViewSet, InversorProduccionView, InversorProduccionHoraView, VariableLinguisticaHoraView, InversorMinMaxHoraView, InversorProduccionEstadisticasView, InversorProduccionGradoPertenenciaView
-from .views_nuevo.subir_datos_views import ExcelUploadView, CSVUploadView
-from .views_nuevo.estadisticas_views import MetricasEstacionHoraMesView, MetricasEstacionGeneralMesView, MetricasEstacionGeneralDiaView, MetricasEstacionHoraDiaView, MetricasInversorMesView
-from .views_nuevo.descripciones_views import CalcularDescripcionesLinguisticasInversor, CalcularDescripcionesLinguisticasEstacion
-from .views_nuevo.percepciones_views import ObtenerPercepcionesSegundoGradoDiaHoraView, ObtenerPercepcionesSegundoGradoDiaView, ObtenerPercepcionesPrimerGradoDiaView, ObtenerPercepcionesPrimerGradoHoraView
-from .views_nuevo.filters_views import FilterAnioByInversorView, FilterMesByAnioInversorView, FilterDiaByMesAnioInversorView, FilterHoraByDiaMesAnioInversorView, FilterHoraByMesAnioInversorView, FilterAnioByEstacionView, FilterMesByAnioEstacionView, FilterDiaByMesAnioEstacionView, FilterHoraByMesAnioEstacionView, FilterHoraByDiaMesAnioEstacionView
-from .views_nuevo.informes_views import GenerarInformeInversorView, GenerarInformeEstacionView
-from .views_nuevo.estaciones_views import EstacionesByUserView, InversoresByUserView
+from .views import EstacionViewSet, InversorViewSet, ProduccionViewSet, InversorProduccionView, VariableLinguisticaHoraView
+from .views_folder.subir_datos_views import ExcelUploadView, CSVUploadView
+from .views_folder.estadisticas_views import MetricasEstacionHoraMesView, MetricasEstacionGeneralMesView, MetricasEstacionGeneralDiaView, MetricasEstacionHoraDiaView, MetricasInversorMesView
+from .views_folder.descripciones_views import CalcularDescripcionesLinguisticasInversor, CalcularDescripcionesLinguisticasEstacion
+from .views_folder.percepciones_views import ObtenerPercepcionesSegundoGradoDiaHoraView, ObtenerPercepcionesSegundoGradoDiaView, ObtenerPercepcionesPrimerGradoDiaView, ObtenerPercepcionesPrimerGradoHoraView
+from .views_folder.filters_views import FilterAnioByInversorView, FilterMesByAnioInversorView, FilterDiaByMesAnioInversorView, FilterHoraByDiaMesAnioInversorView, FilterHoraByMesAnioInversorView, FilterAnioByEstacionView, FilterMesByAnioEstacionView, FilterDiaByMesAnioEstacionView, FilterHoraByMesAnioEstacionView, FilterHoraByDiaMesAnioEstacionView
+from .views_folder.informes_views import GenerarInformeInversorView, GenerarInformeEstacionView
+from .views_folder.estaciones_views import EstacionesByUserView, InversoresByUserView
 from .views import login, register
 from .views import UserViewSet
 
@@ -30,11 +30,8 @@ urlpatterns = [
     path('docs/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('api/v1/upload-excel/', ExcelUploadView.as_view(), name='upload-excel'),
     path('api/v1/upload-csv/', CSVUploadView.as_view(), name='upload-csv'),
+
     path("api/v1/produccion-por-inversor/", InversorProduccionView.as_view(), name="produccion-por-inversor"),
-    path("api/v1/produccion-por-inversor-estadisticas/", InversorProduccionEstadisticasView.as_view(), name="produccion-por-inversor-estadisticas"),
-    path("api/v1/produccion-por-inversor-hora/", InversorProduccionHoraView.as_view(), name="produccion-por-inversor-hora"),
-    path("api/v1/produccion-por-inversor-grados/", InversorProduccionGradoPertenenciaView.as_view(), name="produccion-por-inversor-grados"),
-    path("api/v1/min-max-hora/", InversorMinMaxHoraView.as_view(), name="min-max-hora"),
     path('api/v1/variable-linguistica-hora/', VariableLinguisticaHoraView.as_view(), name='variable-linguistica-hora'),
     
     path('api/v1/percepciones-segundo-grado-dia-hora/', ObtenerPercepcionesSegundoGradoDiaHoraView.as_view(), name='percepciones-segundo-grado-dia-hora'),

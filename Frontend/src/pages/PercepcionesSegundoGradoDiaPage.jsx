@@ -11,8 +11,8 @@ export function PercepcionesSegundoGradoDiaPage() {
     const [diasDisponibles, setDiasDisponibles] = useState([]);
     const [selectedEstacion, setSelectedEstacion] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
-    const [selectedMes, setSelectedMes] = useState(""); // Se mantiene el selector de mes
-    const [selectedDia, setSelectedDia] = useState(""); // Selección del día (1-31)
+    const [selectedMes, setSelectedMes] = useState(""); 
+    const [selectedDia, setSelectedDia] = useState(""); 
     const [mensajeError, setMensajeError] = useState("");
     const [mostrar, setMostrar] = useState(false);
     const [isAccordionOpen, setIsAccordionOpen] = useState(true);
@@ -86,10 +86,10 @@ export function PercepcionesSegundoGradoDiaPage() {
 
     const handleSearch = () => {
         if (isFormValid) {
-            setSearchParams({ estacion: selectedEstacion, anio: selectedAnio, mes: selectedMes, dia: selectedDia }); // Actualizar parámetros de búsqueda
+            setSearchParams({ estacion: selectedEstacion, anio: selectedAnio, mes: selectedMes, dia: selectedDia }); 
             setMostrar(true);
-            setIsAccordionOpen(false); // Cierra el acordeón cuando se hace clic en "Buscar"
-            setMensajeError(""); // Limpiar mensajes de error
+            setIsAccordionOpen(false);
+            setMensajeError(""); 
         } else {
             setMensajeError("Por favor, seleccione todos los campos.");
         }
@@ -113,7 +113,7 @@ export function PercepcionesSegundoGradoDiaPage() {
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-4">
                         <li className="breadcrumb-item">
-                            <Link to="/dashboard">Dashboard</Link>
+                            <Link to="/editar-perfil">Perfil</Link>
                         </li>
                         <li className="breadcrumb-item">
                             <Link to="/percepciones-segundo-grado">Percepciones 2°</Link>
@@ -153,7 +153,7 @@ export function PercepcionesSegundoGradoDiaPage() {
                                             <label className="form-label">Estación</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }}  
                                                 value={selectedEstacion}
                                                 onChange={(e) => handleEstacionChange(e.target.value)}
                                             >
@@ -170,7 +170,7 @@ export function PercepcionesSegundoGradoDiaPage() {
                                             <label className="form-label">Año</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }}  
                                                 value={selectedAnio}
                                                 onChange={(e) => handleAnioChange(e.target.value)}
                                                 disabled={!aniosDisponibles.length}
@@ -188,7 +188,7 @@ export function PercepcionesSegundoGradoDiaPage() {
                                             <label className="form-label">Mes</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }}  
                                                 value={selectedMes}
                                                 onChange={(e) => handleMesChange(e.target.value)}
                                                 disabled={!mesesDisponibles.length}
@@ -225,7 +225,7 @@ export function PercepcionesSegundoGradoDiaPage() {
                                                 className={`btn ${isFormValid ? 'btn-success' : 'btn-secondary'} w-100`}
                                                 onClick={handleSearch}
                                                 disabled={!isFormValid}
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }}  
                                             >
                                                 Buscar
                                             </button>

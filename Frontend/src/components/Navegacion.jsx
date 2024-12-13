@@ -33,9 +33,6 @@ export function Navegacion() {
                 <div className="container-fluid" id="navbarSupportedContent">
                     <ul className="navbar-nav topbar-nav ms-md-auto align-items-end nav-me">
                         <li className="nav-item">
-                            <a className="nav-link text-light border border-light border-opacity-50 rounded" href="#">Guia de Uso</a>
-                        </li>
-                        <li className="nav-item">
                             <a className="nav-link text-light border border-light border-opacity-50 rounded" href="#" onClick={handleLogout}>Cerrar Sesión</a>
                         </li>
                     </ul>

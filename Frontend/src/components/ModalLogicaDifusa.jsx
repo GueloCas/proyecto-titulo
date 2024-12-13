@@ -10,9 +10,7 @@ export function ModalLogicaDifusa({ inversor, anio, mes, dia, hora, onClose }) {
     useEffect(() => {
         async function loadPercepciones() {
             try {
-                console.log(inversor, anio, mes, dia, hora);
                 const data = await getPercepcionesPrimerGrado(inversor, anio, mes, dia, hora);
-                console.log(data);
                 setPercepciones(data);
                 setDataLabel(data.valor);
             } catch (error) {
@@ -172,13 +170,13 @@ export function ModalLogicaDifusa({ inversor, anio, mes, dia, hora, onClose }) {
             <div
                 className="modal-backdrop fade show"
                 style={{
-                    backgroundColor: "rgba(0, 0, 0, 0.8)",  // Fondo oscuro
+                    backgroundColor: "rgba(0, 0, 0, 0.8)",  
                     position: "fixed",
                     top: 0,
                     left: 0,
                     width: "100%",
                     height: "100%",
-                    zIndex: 1040,  // Asegúrate de que esté detrás del modal
+                    zIndex: 1040,  
                 }}
             ></div>
 

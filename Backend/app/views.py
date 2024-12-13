@@ -34,7 +34,6 @@ class UserViewSet(viewsets.ModelViewSet):
     # Acción personalizada para cambiar la contraseña
     @action(detail=False, methods=['post'], url_path='change-password')
     def change_password(self, request):
-        print("Cambiando contraseña")
         # Obtener el token desde el cuerpo de la solicitud (o encabezado, según prefieras)
         token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
         
@@ -56,20 +55,16 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
 
         if serializer.is_valid():
-            print("Datos válidos")
             new_password = serializer.validated_data['new_password']
             user.set_password(new_password)  # Establecer la nueva contraseña
             user.save()  # Guardar el usuario con la nueva contraseña
             return Response({"message": "Contraseña actualizada exitosamente"}, status=status.HTTP_200_OK)
         
-        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     # Acción personalizada para cambiar el nombre del usuario
     @action(detail=False, methods=['post'], url_path='update-username')
     def update_username(self, request):
-        print("Actualizando nombre de usuario")
-        
         # Obtener el token desde el encabezado de la solicitud
         token = request.headers.get('Authorization')  # 'Authorization' con 'A' mayúscula
         
@@ -83,14 +78,10 @@ class UserViewSet(viewsets.ModelViewSet):
         except Token.DoesNotExist:
             raise AuthenticationFailed("Token inválido o no encontrado")
         
-        print(request.data)
-        
         # Ahora validamos el nuevo nombre de usuario
         serializer = ChangeUsernameSerializer(data=request.data, context={'request': request})
-        print(serializer)
     
         if serializer.is_valid():
-            print("Datos válidos")
             new_username = serializer.validated_data['username']
             
             # Actualizar el nombre de usuario
@@ -146,97 +137,7 @@ class InversorProduccionView(APIView):
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-class InversorProduccionEstadisticasView(APIView):
-    def get(self, request, *args, **kwargs):
-        # Obtener el ID del inversor de los parámetros de la solicitud
-        inversor_id = request.query_params.get('inversor_id')
-        if not inversor_id:
-            return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            # Obtener el inversor por ID
-            inversor = Inversor.objects.get(pk=inversor_id)
 
-            # Agrupar las producciones por hora y calcular estadísticas agregadas
-            estadisticas_por_hora = inversor.obtener_MinMaxProm_producciones()
-
-            # Serializar producciones completas
-            producciones = inversor.obtener_producciones()
-
-            serializer = ProduccionSerializer(producciones, many=True)
-
-            # Crear respuesta
-            response_data = {
-                'nombre_inversor': inversor.nombre,  # Nombre del inversor
-                'producciones': serializer.data,  # Producciones completas
-                'estadisticas_por_hora': list(estadisticas_por_hora)  # Estadísticas agrupadas por hora
-            }
-
-            return Response(response_data, status=status.HTTP_200_OK)
-        
-        except Inversor.DoesNotExist:
-            return Response({"error": "No se encontró el inversor"}, status=status.HTTP_404_NOT_FOUND)
-        
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-class InversorProduccionHoraView(APIView):
-    def get(self, request, *args, **kwargs):
-        # Obtener el ID del inversor y la hora de los parámetros de la solicitud
-        inversor_id = request.query_params.get('inversor_id')
-        hora = request.query_params.get('hora')
-
-        if not inversor_id:
-            return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            inversor = Inversor.objects.get(pk=inversor_id)
-            horasdas = inversor.obtener_MinMaxProm_producciones_hora(hora)
-            producciones = inversor.obtener_producciones_hora(hora)
-            serializer = ProduccionSerializer(producciones, many=True)
-
-            response_data = {
-                'nombre_inversor': inversor.nombre, 
-                'producciones': serializer.data,
-                'minimo': producciones.aggregate(minimo=Min('cantidad'))['minimo'], # Obtener el valor mínimo
-                'maximo': producciones.aggregate(maximo=Max('cantidad'))['maximo'], # Obtener el valor máximo
-                'promedio': producciones.aggregate(promedio=Avg('cantidad'))['promedio'], # Obtener el promedio
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-        
-        except Inversor.DoesNotExist:
-            return Response({"error": "No se encontró el inversor"}, status=status.HTTP_404_NOT_FOUND)
-        
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-class InversorMinMaxHoraView(APIView):
-    def get(self, request, *args, **kwargs):
-        # Obtener el ID del inversor y la hora de los parámetros de la solicitud
-        inversor_id = request.query_params.get('inversor_id')
-        hora = request.query_params.get('hora')
-        print(f"inversor_id: {inversor_id}, hora: {hora}")
-
-        if not inversor_id:
-            return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            inversor = Inversor.objects.get(pk=inversor_id)
-            producciones = inversor.obtener_producciones_hora(hora)
-
-            response_data = {
-                'nombre_inversor': inversor.nombre, 
-                'minimo': producciones.aggregate(minimo=Min('cantidad'))['minimo'], # Obtener el valor mínimo
-                'maximo': producciones.aggregate(maximo=Max('cantidad'))['maximo'], # Obtener el valor máximo
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-        
-        except Inversor.DoesNotExist:
-            return Response({"error": "No se encontró el inversor"}, status=status.HTTP_404_NOT_FOUND)
-        
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class VariableLinguisticaHoraView(APIView):
     def get(self, request, *args, **kwargs):
@@ -320,75 +221,6 @@ class VariableLinguisticaHoraView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
      
-class InversorProduccionGradoPertenenciaView(APIView): 
-    def get(self, request, *args, **kwargs):
-        # Obtener el ID del inversor de los parámetros de la solicitud
-        inversor_id = request.query_params.get('inversor_id')
-
-        print(f"inversor_id: {inversor_id}")
-        
-        if not inversor_id:
-            return Response({"error": "Se requiere el parámetro 'inversor_id'"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            # Obtener el inversor
-            inversor = Inversor.objects.get(pk=inversor_id)
-            
-            # Obtener las estadísticas por hora del inversor
-            estadisticas_por_hora = inversor.obtener_MinMaxProm_producciones()
-            
-            # Obtener las producciones del inversor
-            producciones = inversor.obtener_producciones()
-            
-            TLlist = []
-
-            # Iterar sobre cada producción
-            for produccion in producciones:
-                # Extraer el número de la hora (remover el prefijo "H")
-                hora_num = int(produccion.Hora.replace('H', ''))
-                
-                # Buscar las estadísticas correspondientes para esa hora
-                estadisticas_hora = next(
-                    (e for e in estadisticas_por_hora if e['hora_num'] == hora_num), 
-                    None
-                )
-                
-                # Verificar si se encontraron estadísticas para la hora actual
-                if estadisticas_hora:
-                    # Obtener los términos lingüísticos basados en los valores mínimos y máximos de esa hora
-                    TLbaja, TLmedia, TLalta = obtenerPercepcionComputacionalPrimerGrado(
-                        estadisticas_hora['cantidad_minima'], 
-                        estadisticas_hora['cantidad_maxima']
-                    )
-                    
-                    # Calcular los grados de pertenencia
-                    pertenencia_baja = calcular_pertenencia_baja(produccion.cantidad, TLbaja)
-                    pertenencia_media = calcular_pertenencia_media(produccion.cantidad, TLmedia)
-                    pertenencia_alta = calcular_pertenencia_alta(produccion.cantidad, TLalta)
-                    
-
-                    # Agregar los datos al listado final
-                    TLlist.append({
-                        'Dia': produccion.Dia,
-                        'Hora': produccion.Hora,
-                        'cantidad': produccion.cantidad,
-                        'pertenencia': {
-                            'baja': round(pertenencia_baja, 2),
-                            'media': round(pertenencia_media, 2),
-                            'alta': round(pertenencia_alta, 2)
-                        }
-                    })
-                else:
-                    print(f"No se encontraron estadísticas para la hora: {produccion.Hora}")
-            
-            return Response(TLlist, status=status.HTTP_200_OK)
-        
-        except Inversor.DoesNotExist:
-            return Response({"error": "No se encontró el inversor"}, status=status.HTTP_404_NOT_FOUND)
-        
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 @api_view(['POST'])
 def login(request):
     user = get_object_or_404(User, username=request.data['username'])

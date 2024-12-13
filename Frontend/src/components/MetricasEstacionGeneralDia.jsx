@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMetricasEstacionGeneralDia } from "../api/estadisticas.api"; // Cambié la función a "getMetricasEstacionGeneralDia"
+import { getMetricasEstacionGeneralDia } from "../api/estadisticas.api"; 
 
 export function MetricasEstacionGeneralDia({ estacionId, anio, mes, dia }) {
     const [metricas, setMetricas] = useState([]);
@@ -20,7 +20,7 @@ export function MetricasEstacionGeneralDia({ estacionId, anio, mes, dia }) {
             }
             loadMetricas();
         }
-    }, [estacionId, anio, mes, dia]); // Ahora la dependencia es el "dia"
+    }, [estacionId, anio, mes, dia]); 
 
     if (!metricas) {
         return (

@@ -33,11 +33,8 @@ export function AuthProvider({ children }) {
 }
 
 export async function reloadUserStorage({ id }) {
-  console.log('id: ', id);
-
   try {
     const data = await getUser(id); // Esperar a que la promesa se resuelva
-    console.log('reloadUserStorage', data);
 
     // Actualizar la información del usuario en el localStorage
     localStorage.setItem('user', JSON.stringify(data));

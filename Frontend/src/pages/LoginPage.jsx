@@ -15,7 +15,6 @@ export function LoginPage() {
        const response = await login(username, password);
 
        if (response.success) {
-           console.log('Login exitoso', response.user);
            navigate('/inversores');
        } else {
            setError('Credenciales incorrectas');

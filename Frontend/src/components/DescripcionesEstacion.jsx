@@ -15,7 +15,6 @@ export function DescripcionesEstacion({ estacion, anio, mes }) {
                 setError(""); // Limpiar errores anteriores
                 try {
                     const data = await getDescripcionesEstacion(estacion, anio, mes);
-                    console.log(data);
                     setDescripciones(data);
                 } catch (error) {
                     setError("Hubo un error al cargar las descripciones.");

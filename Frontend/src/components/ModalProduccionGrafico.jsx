@@ -62,13 +62,13 @@ export function ModalProduccionGrafico({ nombreInv, mes, anio, horaSeleccionada,
             <div 
                 className="modal-backdrop fade show"
                 style={{
-                    backgroundColor: "rgba(0, 0, 0, 0.8)",  // Fondo oscuro
+                    backgroundColor: "rgba(0, 0, 0, 0.8)",  
                     position: "fixed", 
                     top: 0, 
                     left: 0, 
                     width: "100%", 
                     height: "100%",
-                    zIndex: 1040,  // Asegúrate de que esté detrás del modal
+                    zIndex: 1040, 
                 }}
             ></div>
 

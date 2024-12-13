@@ -10,7 +10,7 @@ export function ProduccionInversorPage() {
     const [mesesDisponibles, setMesesDisponibles] = useState([]);
     const [selectedInversor, setSelectedInversor] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
-    const [selectedMes, setSelectedMes] = useState(""); // Se mantiene el selector de mes
+    const [selectedMes, setSelectedMes] = useState(""); 
     const [mensajeError, setMensajeError] = useState("");
     const [mostrar, setMostrar] = useState(false);
     const [isAccordionOpen, setIsAccordionOpen] = useState(true);
@@ -67,10 +67,10 @@ export function ProduccionInversorPage() {
 
     const handleSearch = () => {
         if (isFormValid) {
-            setSearchParams({ inversor: selectedInversor, anio: selectedAnio, mes: selectedMes }); // Actualizar parámetros de búsqueda
+            setSearchParams({ inversor: selectedInversor, anio: selectedAnio, mes: selectedMes }); 
             setMostrar(true);
-            setIsAccordionOpen(false); // Cierra el acordeón cuando se hace clic en "Buscar"
-            setMensajeError(""); // Limpiar mensajes de error
+            setIsAccordionOpen(false); 
+            setMensajeError(""); 
         } else {
             setMensajeError("Por favor, seleccione todos los campos.");
         }
@@ -94,7 +94,7 @@ export function ProduccionInversorPage() {
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-4">
                         <li className="breadcrumb-item">
-                            <Link to="/dashboard">Dashboard</Link>
+                            <Link to="/editar-perfil">Perfil</Link>
                         </li>
                         <li className="breadcrumb-item">
                             <Link to="/percepciones-primer-grado">Producciones</Link>
@@ -203,7 +203,7 @@ export function ProduccionInversorPage() {
                                                 className={`btn ${isFormValid ? 'btn-success' : 'btn-secondary'} w-100`}
                                                 onClick={handleSearch}
                                                 disabled={!isFormValid}
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }}  
                                             >
                                                 Buscar
                                             </button>

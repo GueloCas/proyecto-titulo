@@ -6,10 +6,6 @@ import ErrorPage from './pages/ErrorPage.jsx';  // Página para manejar errores
 import { EstacionesPage } from "./pages/EstacionesPage";
 import { InversoresPage } from "./pages/InversoresPage";
 import { ProduccionInversorPage } from "./pages/ProduccionInversorPage";
-import { ProduccionGraficoPage } from "./pages/ProduccionGraficoPage";
-import { ProduccionGradosPage } from "./pages/ProduccionGradosPage";
-import { ProduccionEstadisticasPage } from "./pages/ProduccionEstadisticasPage";
-import ProduccionVLPage from "./pages/ProduccionVLPage";
 import { PercepcionesSegundoGradoDiaHoraPage } from "./pages/PercepcionesSegundoGradoDiaHoraPage";
 import { PercepcionesSegundoGradoDiaPage } from "./pages/PercepcionesSegundoGradoDiaPage";
 import { PercepcionesSegundoGradoPage } from "./pages/PercepcionesSegundoGradoPage.jsx";
@@ -65,22 +61,6 @@ const router = createBrowserRouter([
       {
         path: "/producciones/inversor",
         element: <ProduccionInversorPage />,
-      },
-      {
-        path: "/inversor/:id/produccion/grafico",
-        element: <ProduccionGraficoPage />,
-      },
-      {
-        path: "/ProduccionInversor/VLinguisticas",
-        element: <ProduccionVLPage />,
-      },
-      {
-        path: "/ProduccionInversor/Estadisticas/:id",
-        element: <ProduccionEstadisticasPage />,
-      },
-      {
-        path: "/ProduccionInversor/Grados/:id",
-        element: <ProduccionGradosPage />,
       },
       {
         path: "/estadisticas/metricas-estacion",

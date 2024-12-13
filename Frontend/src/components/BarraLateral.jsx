@@ -50,6 +50,9 @@ export function BarraLateral() {
                             ></i>
                         </button>
                     </div>
+                    <button className="btn text-light topbar-toggler more">
+                        <i className="bi bi-three-dots-vertical" style={{ fontSize: '20px' }}></i>
+                    </button>
                 </div>
             </div>
             <div className="sidebar-wrapper scrollbar scrollbar-inner">
@@ -205,14 +208,6 @@ export function BarraLateral() {
                             <Link to="/informes">
                                 <i className="bi bi-file-text-fill"></i>
                                 <p>Informes</p>
-                            </Link>
-                        </li>
-
-                        {/* Inicio */}
-                        <li className="nav-item mt-auto">
-                            <Link to="/">
-                                <i className="bi bi-house-fill"></i>
-                                <p>Ir a Inicio</p>
                             </Link>
                         </li>
                     </ul>

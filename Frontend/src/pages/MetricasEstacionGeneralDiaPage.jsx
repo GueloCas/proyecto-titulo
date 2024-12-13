@@ -11,12 +11,12 @@ export function MetricasEstacionGeneralDiaPage() {
     const [diasDisponibles, setDiasDisponibles] = useState([]);
     const [selectedEstacion, setSelectedEstacion] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
-    const [selectedMes, setSelectedMes] = useState(""); // Se mantiene el selector de mes
-    const [selectedDia, setSelectedDia] = useState(""); // Selección del día (1-31)
+    const [selectedMes, setSelectedMes] = useState(""); 
+    const [selectedDia, setSelectedDia] = useState(""); 
     const [mensajeError, setMensajeError] = useState("");
     const [mostrarMetricas, setMostrarMetricas] = useState(false);
     const [isAccordionOpen, setIsAccordionOpen] = useState(true);
-    const [searchParams, setSearchParams] = useState(null); // Nuevo estado para los parámetros de búsqueda
+    const [searchParams, setSearchParams] = useState(null); 
     const [urlParams, setUrlParams] = useSearchParams();
 
     useEffect(() => {
@@ -86,10 +86,10 @@ export function MetricasEstacionGeneralDiaPage() {
 
     const handleSearch = () => {
         if (isFormValid) {
-            setSearchParams({ estacion: selectedEstacion, anio: selectedAnio, mes: selectedMes, dia: selectedDia }); // Actualizar parámetros de búsqueda
+            setSearchParams({ estacion: selectedEstacion, anio: selectedAnio, mes: selectedMes, dia: selectedDia }); 
             setMostrarMetricas(true);
-            setIsAccordionOpen(false); // Cierra el acordeón cuando se hace clic en "Buscar"
-            setMensajeError(""); // Limpiar mensajes de error
+            setIsAccordionOpen(false); 
+            setMensajeError(""); 
         } else {
             setMensajeError("Por favor, seleccione todos los campos.");
         }
@@ -107,7 +107,7 @@ export function MetricasEstacionGeneralDiaPage() {
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-4">
                         <li className="breadcrumb-item">
-                            <Link to="/dashboard">Dashboard</Link>
+                            <Link to="/editar-perfil">Perfil</Link>
                         </li>
                         <li className="breadcrumb-item">
                             <Link to="/informes">Metricas Estación</Link>
@@ -149,7 +149,7 @@ export function MetricasEstacionGeneralDiaPage() {
                                             <label className="form-label">Estación</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }} 
                                                 value={selectedEstacion}
                                                 onChange={(e) => handleEstacionChange(e.target.value)}
                                             >
@@ -166,7 +166,7 @@ export function MetricasEstacionGeneralDiaPage() {
                                             <label className="form-label">Año</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }} 
                                                 value={selectedAnio}
                                                 onChange={(e) => handleAnioChange(e.target.value)}
                                                 disabled={!aniosDisponibles.length}
@@ -184,7 +184,7 @@ export function MetricasEstacionGeneralDiaPage() {
                                             <label className="form-label">Mes</label>
                                             <select
                                                 className="form-select"
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }} 
                                                 value={selectedMes}
                                                 onChange={(e) => handleMesChange(e.target.value)}
                                                 disabled={!mesesDisponibles.length}
@@ -221,7 +221,7 @@ export function MetricasEstacionGeneralDiaPage() {
                                                 className={`btn ${isFormValid ? 'btn-success' : 'btn-secondary'} w-100`}
                                                 onClick={handleSearch}
                                                 disabled={!isFormValid}
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }} 
                                             >
                                                 Buscar
                                             </button>

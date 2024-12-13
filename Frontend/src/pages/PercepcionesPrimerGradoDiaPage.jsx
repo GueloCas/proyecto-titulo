@@ -11,8 +11,8 @@ export function PercepcionesPrimerGradoDiaPage() {
     const [diasDisponibles, setDiasDisponibles] = useState([]);
     const [selectedInversor, setSelectedInversor] = useState("");
     const [selectedAnio, setSelectedAnio] = useState("");
-    const [selectedMes, setSelectedMes] = useState(""); // Se mantiene el selector de mes
-    const [selectedDia, setSelectedDia] = useState(""); // Selección del día (1-31)
+    const [selectedMes, setSelectedMes] = useState(""); 
+    const [selectedDia, setSelectedDia] = useState(""); 
     const [mensajeError, setMensajeError] = useState("");
     const [mostrar, setMostrar] = useState(false);
     const [isAccordionOpen, setIsAccordionOpen] = useState(true);
@@ -83,10 +83,10 @@ export function PercepcionesPrimerGradoDiaPage() {
 
     const handleSearch = () => {
         if (isFormValid) {
-            setSearchParams({ inversor: selectedInversor, anio: selectedAnio, mes: selectedMes, dia: selectedDia }); // Actualizar parámetros de búsqueda
+            setSearchParams({ inversor: selectedInversor, anio: selectedAnio, mes: selectedMes, dia: selectedDia }); 
             setMostrar(true);
-            setIsAccordionOpen(false); // Cierra el acordeón cuando se hace clic en "Buscar"
-            setMensajeError(""); // Limpiar mensajes de error
+            setIsAccordionOpen(false); 
+            setMensajeError(""); 
         } else {
             setMensajeError("Por favor, seleccione todos los campos.");
         }
@@ -110,7 +110,7 @@ export function PercepcionesPrimerGradoDiaPage() {
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-4">
                         <li className="breadcrumb-item">
-                            <Link to="/dashboard">Dashboard</Link>
+                            <Link to="/editar-perfil">Perfil</Link>
                         </li>
                         <li className="breadcrumb-item">
                             <Link to="/percepciones-primer-grado">Percepciones 1°</Link>
@@ -237,7 +237,7 @@ export function PercepcionesPrimerGradoDiaPage() {
                                                 className={`btn ${isFormValid ? 'btn-success' : 'btn-secondary'} w-100`}
                                                 onClick={handleSearch}
                                                 disabled={!isFormValid}
-                                                style={{ width: '200px' }}  // Definir el ancho aquí
+                                                style={{ width: '200px' }}  
                                             >
                                                 Buscar
                                             </button>

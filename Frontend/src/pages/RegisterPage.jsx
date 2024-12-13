@@ -15,7 +15,6 @@ export function RegisterPage() {
        const response = await register(username, email, password);
 
        if (response.success) {
-           console.log('Registro exitoso', response.user);
            navigate('/inversores');
        } else {
            setError('Error al registrar. Inténtalo de nuevo.');

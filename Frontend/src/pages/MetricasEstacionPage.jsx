@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Card } from "../components/Card";
 
 const cardData = [
@@ -29,6 +29,18 @@ const cardData = [
 ];
 
 export function MetricasEstacionPage() {
+  const location = useLocation();
+
+  // Función para obtener el valor del parámetro 'estacion' de la URL
+  const searchParams = new URLSearchParams(location.search);
+  const estacionId = searchParams.get("estacion");
+
+  // Actualizamos las URLs si 'estacion' existe
+  const updatedCardData = cardData.map((card) => ({
+    ...card,
+    to: estacionId ? `${card.to}?estacion=${estacionId}` : card.to,
+  }));
+
   return (
     <div className="container">
       <div className="page-inner">
@@ -38,16 +50,16 @@ export function MetricasEstacionPage() {
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-4">
             <li className="breadcrumb-item">
-              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/editar-perfil">Perfil</Link>
             </li>
             <li className="breadcrumb-item active" aria-current="page">
-              Metricas Estación
+              Métricas Estación
             </li>
           </ol>
         </nav>
 
         <div className="row">
-          {cardData.map((card, index) => (
+          {updatedCardData.map((card, index) => (
             <Card key={index} {...card} />
           ))}
         </div>

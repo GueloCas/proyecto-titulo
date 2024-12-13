@@ -29,6 +29,12 @@ const GuiaSubirArchivo = () => {
       title: 'Formato del nombre de la estación para archivos CSV',
       imageUrl: '../Formato CSV nombre de estacion.png',
       text: 'El nombre del archivo CSV será el nombre de estación.',
+      buttonText: 'Siguiente'
+    },
+    {
+      title: 'Como actualizar los datos',
+      imageUrl: '../Formato Excel DATOS.png',
+      text: 'Para actualizar los datos de una estación, vuelve a subir el archivo necesario de la estación, pero con los nuevos valores. Los datos se sobreescribirán.',
       buttonText: 'Finalizar'
     }
   ];
@@ -46,18 +52,18 @@ const GuiaSubirArchivo = () => {
             src={pages[pageIndex].imageUrl} 
             alt="Contenido" 
             style={{
-              width: '70%', // Ajusta el ancho
-              height: 'auto', // Mantiene la proporción de la imagen
+              width: '70%', 
+              height: 'auto', 
               marginBottom: '15px'
             }}
           />
           <p style={{
-            wordWrap: 'break-word',   // Asegura el salto de palabra
-            whiteSpace: 'normal',     // Asegura que el texto salte de línea cuando sea necesario
-            marginBottom: '15px',     // Espaciado entre párrafos
-            fontSize: '16px',         // Tamaño de texto ajustable
-            lineHeight: '1.6',        // Espaciado entre líneas para mejorar la legibilidad
-            color: '#333',            // Color de texto (ajustable según el diseño)
+            wordWrap: 'break-word',   
+            whiteSpace: 'normal',    
+            marginBottom: '15px',     
+            fontSize: '16px',        
+            lineHeight: '1.6',       
+            color: '#333',            
             }}>
             {pages[pageIndex].text}
           </p>

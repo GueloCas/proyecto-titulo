@@ -43,21 +43,12 @@ const AgregarExcelForm = () => {
 
     const formData = new FormData();
     formData.append("file", selectedFile);
-    console.log("Archivo seleccionado:", selectedFile);
 
     if (user) {
-      console.log("Usuario:", user);
       formData.append("user", JSON.stringify(user)); // Convierte `user` en una cadena JSON
     }
 
-    // Verificar el contenido del FormData
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-
     setLoading(true);
-
-
 
     try {
       const fileType = selectedFile.type;
@@ -89,8 +80,6 @@ const AgregarExcelForm = () => {
       setSelectedFile(null);
     
       const responseData = response.data.data;
-
-      console.log("Respuesta del servidor:", responseData);
     
       // Preparar información para cada sección
       const nuevosInversores = responseData.nuevos_inversores.map((inv) => `<li>${inv}</li>`).join("") || "<p>Ninguno</p>";

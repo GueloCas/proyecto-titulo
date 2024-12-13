@@ -215,7 +215,6 @@ class ObtenerPercepcionesPrimerGradoDiaView(APIView):
                 
                 if produccion:
                     estadisticas_hora = inversor.obtener_MinMaxProm_producciones_hora(anio, mes, hora_str).first()
-                    print (estadisticas_hora)
 
                     if estadisticas_hora:
                         # Obtener los términos lingüísticos basados en los valores mínimos y máximos de esa hora

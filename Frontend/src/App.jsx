@@ -4,7 +4,6 @@ import { useAuth } from "./context/AuthContext";
 
 function App() {
   const { user } = useAuth();
-  console.log(user);
   const navigate = useNavigate(); // Usar navigate para redirigir
 
   useEffect(() => {

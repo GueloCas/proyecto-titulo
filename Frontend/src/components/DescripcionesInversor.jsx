@@ -7,7 +7,7 @@ import { determinarClaseCPEstacion, getClassAndContent, getClassAndContentToolti
 export function DescripcionesInversor({ inversor, anio, mes }) {
     const [descripciones, setDescripciones] = useState(null);
     const [error, setError] = useState("");
-    const tablaRef = useRef(null); // Usamos useRef para referenciar la tabla
+    const tablaRef = useRef(null);
 
     let chart;
 
@@ -26,7 +26,7 @@ export function DescripcionesInversor({ inversor, anio, mes }) {
             }
         }
         loadDescripciones();
-    }, [inversor, anio, mes]); // Actualizar al cambiar cualquiera de los parámetros
+    }, [inversor, anio, mes]);
 
     useEffect(() => {
         if (descripciones) {

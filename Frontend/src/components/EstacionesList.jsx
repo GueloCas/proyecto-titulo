@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { deleteEstacion, getEstacionesByUser } from "../api/estacion.api";
 import { Link, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 export function EstacionesList() {
   const [estaciones, setEstaciones] = useState([]);
@@ -100,26 +99,18 @@ export function EstacionesList() {
                       >
                         Ver Inversores
                       </Link>
-                      <div className="btn-group">
-                        <button type="button" className="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                          Ver Estadísticas
-                        </button>
-                        <ul className="dropdown-menu" style={{ position: 'absolute', zIndex: '1050' }}>
-                          <li><a className="dropdown-item" href={`estadisticas/metricas-estacion/general-dia?estacion=${estacion.id}`}>Métricas Diarias</a></li>
-                          <li><a className="dropdown-item" href={`estadisticas/metricas-estacion/general-mes?estacion=${estacion.id}`}>Métricas Mensuales</a></li>
-                          <li><a className="dropdown-item" href={`estadisticas/metricas-estacion/hora-dia?estacion=${estacion.id}`}>Métricas Diarias por Hora</a></li>
-                          <li><a className="dropdown-item" href={`estadisticas/metricas-estacion/hora-mes?estacion=${estacion.id}`}>Métricas Mensuales por Hora</a></li>
-                        </ul>
-                      </div>
-                      <div className="btn-group">
-                        <button type="button" className="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                          Ver Percepciones
-                        </button>
-                        <ul className="dropdown-menu" style={{ position: 'absolute', zIndex: '1050' }}>
-                          <li><a className="dropdown-item" href={`percepciones-segundo-grado/dia?estacion=${estacion.id}`}>2° por Día</a></li>
-                          <li><a className="dropdown-item" href={`percepciones-segundo-grado/dia-hora?estacion=${estacion.id}`}>2° por Día y Hora</a></li>
-                        </ul>
-                      </div>
+                      <Link
+                        to={`/estadisticas/metricas-estacion?estacion=${estacion.id}`}
+                        className="btn btn-secondary text-light rounded-3"
+                      >
+                        Ver Estadisticas
+                      </Link>
+                      <Link
+                        to={`/percepciones-segundo-grado?estacion=${estacion.id}`}
+                        className="btn btn-info text-light rounded-3"
+                      >
+                        Ver Percepciones
+                      </Link>
                       <Link
                         to={`/resumenes/resumenes-estacion?estacion=${estacion.id}`}
                         className="btn btn-warning text-light rounded-3"

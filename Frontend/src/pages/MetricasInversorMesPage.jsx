@@ -67,10 +67,10 @@ export function MetricasInversorMesPage() {
 
     const handleSearch = () => {
         if (isFormValid) {
-            setSearchParams({ inversor: selectedInversor, anio: selectedAnio, mes: selectedMes }); // Actualizar parámetros de búsqueda
+            setSearchParams({ inversor: selectedInversor, anio: selectedAnio, mes: selectedMes }); 
             setMostrarMetricas(true);
-            setIsAccordionOpen(false); // Cierra el acordeón cuando se hace clic en "Buscar"
-            setMensajeError(""); // Limpiar mensajes de error
+            setIsAccordionOpen(false); 
+            setMensajeError(""); 
         } else {
             setMensajeError("Por favor, seleccione todos los campos.");
         }
@@ -88,7 +88,7 @@ export function MetricasInversorMesPage() {
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-4">
                         <li className="breadcrumb-item">
-                            <Link to="/dashboard">Dashboard</Link>
+                            <Link to="/editar-perfil">Perfil</Link>
                         </li>
                         <li className="breadcrumb-item">
                             <Link to="/informes">Metricas Inversor</Link>

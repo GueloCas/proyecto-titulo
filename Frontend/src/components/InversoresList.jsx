@@ -103,23 +103,18 @@ export function InversoresList() {
                       >
                         Ver Producción
                       </Link>
-                      <div className="btn-group">
-                        <button type="button" className="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                          Ver Estadísticas
-                        </button>
-                        <ul className="dropdown-menu" style={{ position: 'absolute', zIndex: '1050' }}>
-                          <li><a className="dropdown-item" href={`estadisticas/metricas-inversor/mes?inversor=${inversor.id}`}>Métricas Mensuales</a></li>
-                        </ul>
-                      </div>
-                      <div className="btn-group">
-                        <button type="button" className="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                          Ver Percepciones
-                        </button>
-                        <ul className="dropdown-menu" style={{ position: 'absolute', zIndex: '1050' }}>
-                          <li><a className="dropdown-item" href={`percepciones-primer-grado/dia?inversor=${inversor.id}`}>1° por Día</a></li>
-                          <li><a className="dropdown-item" href={`percepciones-primer-grado/hora?inversor=${inversor.id}`}>1° por Hora</a></li>
-                        </ul>
-                      </div>
+                      <Link
+                        to={`/estadisticas/metricas-inversor?inversor=${inversor.id}`}
+                        className="btn btn-secondary text-light rounded-3"
+                      >
+                        Ver Estadísticas
+                      </Link>
+                      <Link
+                        to={`/percepciones-primer-grado?inversor=${inversor.id}`}
+                        className="btn btn-info text-light rounded-3"
+                      >
+                        Ver Percepciones
+                      </Link>
                       <Link
                         to={`/resumenes/resumenes-inversor?inversor=${inversor.id}`}
                         className="btn btn-warning text-light rounded-3"

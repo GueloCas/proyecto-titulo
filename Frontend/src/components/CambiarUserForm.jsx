@@ -14,7 +14,6 @@ export function CambiarUserForm() {
     useEffect(() => {
         const fetchUser = async () => {
             const storedUser = JSON.parse(localStorage.getItem('user'));
-            console.log(storedUser);
             if (!storedUser) {
                 navigate('/login');
                 return;
