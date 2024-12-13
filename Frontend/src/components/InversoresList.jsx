@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { deleteInversor, getInversores, getInversoresByUser } from "../api/inversor.api";
 import { Link, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 export function InversoresList() {
   const [inversores, setInversores] = useState([]);

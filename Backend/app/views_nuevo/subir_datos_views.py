@@ -31,66 +31,124 @@ class ExcelUploadView(APIView):
                 return Response({"error": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
             xls = pd.ExcelFile(file)
+            response_data = {
+                "nuevos_inversores": [],
+                "nuevas_producciones": [],
+                "producciones_actualizadas": []
+            }
+
             for sheet_name in xls.sheet_names:
                 df = pd.read_excel(xls, sheet_name=sheet_name, header=None)
 
                 # Crear o recuperar la estación
-                estacion, _ = Estacion.objects.get_or_create(nombre=sheet_name, usuario=user)
-                producciones = []
+                estacion, created = Estacion.objects.get_or_create(nombre=sheet_name, usuario=user)
+
+                 # Agregar información de la estación creada/recuperada
+                if created:
+                    response_data["nueva_estacion"] = {"nombre": estacion.nombre, "mensaje": "Estación creada"}
+                else:
+                    response_data["nueva_estacion"] = {"nombre": estacion.nombre, "mensaje": "Estación ya existente"}
+
+                inversores_existentes = {
+                    inv.nombre: inv for inv in Inversor.objects.filter(estacion=estacion)
+                }
+                nuevos_inversores = []
+                nuevas_producciones = []
+                actualizaciones_producciones = []
+
+                # Diccionario para producciones existentes
+                producciones_dict = {
+                    (prod.inversor_id, prod.anio, prod.mes, prod.dia, prod.hora): prod
+                    for prod in Produccion.objects.filter(inversor__estacion=estacion)
+                }
 
                 for col_index in range(1, len(df.columns)):
                     nombre_inversor = df.iloc[0, col_index]
-                    inversor, _ = Inversor.objects.get_or_create(nombre=nombre_inversor, estacion=estacion)
+                    if nombre_inversor not in inversores_existentes:
+                        inversor = Inversor(nombre=nombre_inversor, estacion=estacion)
+                        nuevos_inversores.append(inversor)
+                        response_data["nuevos_inversores"].append(nombre_inversor)
+
+                # Guardar inversores nuevos y actualizar sus IDs
+                if nuevos_inversores:
+                    Inversor.objects.bulk_create(nuevos_inversores)
+                    # Recargar inversores para actualizar IDs
+                    inversores_existentes.update({
+                        inv.nombre: inv for inv in Inversor.objects.filter(estacion=estacion)
+                    })
+
+                # Procesar producciones ahora que todos los inversores tienen IDs
+                for col_index in range(1, len(df.columns)):
+                    nombre_inversor = df.iloc[0, col_index]
+                    inversor = inversores_existentes.get(nombre_inversor)
 
                     for row_index in range(1, len(df)):
                         valor = df.iloc[row_index, col_index]
                         if pd.notna(valor):
                             periodo = df.iloc[row_index, 0]
                             fecha, hora = periodo.split(', ')
-                            
-                            # Separar la fecha y convertir a enteros
                             input_dia = int(fecha.split('-')[0])
-                            input_mes = (fecha.split('-')[1])
+                            input_mes = fecha.split('-')[1]
                             input_anio = int(fecha.split('-')[2])
 
-                             # Convertir mes a número
-                            try:
-                                # Si el mes es un número directamente
-                                if input_mes.isdigit():
-                                    input_mes = int(input_mes)
-                                else:
-                                    # Convertir el mes a minúsculas y buscar en el diccionario
-                                    input_mes = meses_a_numero[input_mes.lower()]
-                            except KeyError:
-                                raise ValueError(f"Formato de mes no válido: {input_mes}")
-                            
-                            print("separado: ", fecha, input_dia, input_mes, input_anio)
-                            
-                            produccion = Produccion(
-                                fecha=fecha,
-                                hora=hora,
-                                cantidad=valor,
-                                inversor=inversor,
-                                anio=input_anio,  # Asignar valores enteros
-                                mes=input_mes,
-                                dia=input_dia
-                            )
-                            producciones.append(produccion)
+                            if input_mes.isdigit():
+                                input_mes = int(input_mes)
+                            else:
+                                input_mes = meses_a_numero.get(input_mes.lower(), None)
+                                if not input_mes:
+                                    raise ValueError(f"Formato de mes no válido: {input_mes}")
 
-                Produccion.objects.bulk_create(producciones)
+                            # Identificador de la producción
+                            key = (inversor.id, input_anio, input_mes, input_dia, hora)
 
-            return Response({"message": "Archivo Excel procesado correctamente"}, status=status.HTTP_200_OK)
+                            if key in producciones_dict:
+                                prod_existente = producciones_dict[key]
+                                prod_existente.cantidad = valor
+                                actualizaciones_producciones.append(prod_existente)
+                                response_data["producciones_actualizadas"].append({
+                                    "inversor": inversor.nombre,  # Nombre del inversor
+                                    "fecha": prod_existente.fecha,  # Fecha existente
+                                    "hora": prod_existente.hora,  # Hora existente
+                                    "cantidad": valor  # Nueva cantidad actualizada
+                                })
+                            else:
+                                nueva_produccion = Produccion(
+                                    fecha=fecha,
+                                    hora=hora,
+                                    cantidad=valor,
+                                    inversor=inversor,
+                                    anio=input_anio,
+                                    mes=input_mes,
+                                    dia=input_dia
+                                )
+                                nuevas_producciones.append(nueva_produccion)
+                                response_data["nuevas_producciones"].append({
+                                    "inversor": nombre_inversor,
+                                    "fecha": fecha,
+                                    "hora": hora,
+                                    "cantidad": valor
+                                })
+
+                # Bulk create y bulk update
+                if nuevas_producciones:
+                    Produccion.objects.bulk_create(nuevas_producciones)
+                if actualizaciones_producciones:
+                    Produccion.objects.bulk_update(actualizaciones_producciones, ['cantidad'])
+
+            return Response({
+                "message": "Archivo Excel procesado correctamente",
+                "data": response_data
+            }, status=status.HTTP_200_OK)
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 class CSVUploadView(APIView):
     def post(self, request, *args, **kwargs):
         # Obtener el archivo CSV enviado
         file = request.FILES.get('file')
-        user_json =request.POST.get('user')
+        user_json = request.POST.get('user')
 
         if not file:
             return Response({"error": "No se envió ningún archivo"}, status=status.HTTP_400_BAD_REQUEST)
@@ -139,36 +197,48 @@ class CSVUploadView(APIView):
 
             # Crear o recuperar la estación
             station_name = file.name.split('.')[0]
-            estacion, _ = Estacion.objects.get_or_create(nombre=station_name, usuario=user)
+            estacion, created = Estacion.objects.get_or_create(nombre=station_name, usuario=user)
+
+            response_data = {
+                "nuevas_producciones": [],
+                "producciones_actualizadas": [],
+                "nuevos_inversores": [],
+                "nueva_estacion": {
+                    "nombre": estacion.nombre,
+                    "mensaje": "Estación creada" if created else "Estación ya existente"
+                }
+            }
+
+            inversores = {}
+            for col_index in range(0, len(df.columns)):
+                nombre_inversor = df.iloc[0, col_index]
+                if pd.notna(nombre_inversor) and nombre_inversor.strip():
+                    inversor, created = Inversor.objects.get_or_create(nombre=nombre_inversor.strip(), estacion=estacion)
+                    inversores[col_index] = inversor
+                    if created:
+                        response_data["nuevos_inversores"].append(inversor.nombre)
+
+            # Obtener todas las producciones existentes de una vez y almacenarlas en un diccionario
+            producciones_existentes = {
+                (prod.inversor_id, prod.anio, prod.mes, prod.dia, prod.hora): prod
+                for prod in Produccion.objects.filter(inversor__estacion=estacion)
+            }
 
             producciones = []
-
-            # Obtener los nombres de los inversores reales de la primera fila
-            inversores = {}
-            for col_index in range(0, len(df.columns)):  # Comenzar desde la columna 2 porque las dos primeras son Fecha y Hora
-                nombre_inversor = df.iloc[0, col_index]  # Tomamos el nombre del inversor desde la primera fila
-                
-                # Validar que el nombre no esté vacío o sea NaN
-                if pd.notna(nombre_inversor) and nombre_inversor.strip():
-                    inversor, _ = Inversor.objects.get_or_create(nombre=nombre_inversor.strip(), estacion=estacion)
-                    inversores[col_index] = inversor
 
             for row_index in range(1, len(df)):
                 fecha = df.iloc[row_index, 0]
                 hora = df.iloc[row_index, 1]
 
-                # Separar la fecha y convertir a enteros
                 input_dia = int(fecha.split('-')[0])
                 input_mes = (fecha.split('-')[1])
                 input_anio = int(fecha.split('-')[2])
 
-                 # Convertir mes a número
+                # Convertir mes a número
                 try:
-                    # Si el mes es un número directamente
                     if input_mes.isdigit():
                         input_mes = int(input_mes)
                     else:
-                        # Convertir el mes a minúsculas y buscar en el diccionario
                         input_mes = meses_a_numero[input_mes.lower()]
                 except KeyError:
                     raise ValueError(f"Formato de mes no válido: {input_mes}")
@@ -177,22 +247,49 @@ class CSVUploadView(APIView):
                     valor = df.iloc[row_index, col_index]
                     if pd.notna(valor):
                         inversor = inversores.get(col_index - 2)
-                        if inversor:  # Validar que el inversor exista
-                            produccion = Produccion(
-                                fecha=fecha,
-                                hora=hora,
-                                cantidad=valor,
-                                inversor=inversor,
-                                anio=input_anio,  # Asignar valores enteros
-                                mes=input_mes,
-                                dia=input_dia
-                            )
-                            producciones.append(produccion)
+                        if inversor:
+                            # Verificar si la producción ya existe usando el diccionario
+                            key = (inversor.id, input_anio, input_mes, input_dia, hora)
+                            prod_existente = producciones_existentes.get(key)
+
+                            if prod_existente:
+                                # Si existe, actualizar la cantidad
+                                prod_existente.cantidad = valor
+                                response_data["producciones_actualizadas"].append({
+                                    "inversor": inversor.nombre,
+                                    "fecha": prod_existente.fecha,
+                                    "hora": prod_existente.hora,
+                                    "cantidad": valor
+                                })
+                            else:
+                                # Si no existe, crear una nueva producción
+                                nueva_produccion = Produccion(
+                                    fecha=fecha,
+                                    hora=hora,
+                                    cantidad=valor,
+                                    inversor=inversor,
+                                    anio=input_anio,
+                                    mes=input_mes,
+                                    dia=input_dia
+                                )
+                                producciones.append(nueva_produccion)
+                                response_data["nuevas_producciones"].append({
+                                    "inversor": inversor.nombre,
+                                    "fecha": fecha,
+                                    "hora": hora,
+                                    "cantidad": valor
+                                })
 
             # Guardar las producciones en la base de datos
-            Produccion.objects.bulk_create(producciones)
+            if producciones:
+                Produccion.objects.bulk_create(producciones)
+            if producciones_existentes:
+                Produccion.objects.bulk_update(producciones_existentes.values(), ['cantidad'])
 
-            return Response({"message": "Datos del archivo procesados correctamente"}, status=status.HTTP_200_OK)
+            return Response({
+                "message": "Datos del archivo procesados correctamente",
+                "data": response_data
+            }, status=status.HTTP_200_OK)
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

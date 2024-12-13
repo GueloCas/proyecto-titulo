@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { deleteEstacion, getEstacionesByUser } from "../api/estacion.api";
 import { Link, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 export function EstacionesList() {
   const [estaciones, setEstaciones] = useState([]);
