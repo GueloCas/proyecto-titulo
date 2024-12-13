@@ -24,13 +24,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'password']
     
-    def update(self, instance, validated_data):
-        # Manejar la contraseña solo si se proporciona
-        password = validated_data.pop('password', None)
-        if password:
-            instance.set_password(password)
-        return super().update(instance, validated_data)
-    
 class ChangePasswordSerializer(serializers.Serializer):
     current_password = serializers.CharField(write_only=True)
     new_password = serializers.CharField(write_only=True, min_length=8)
@@ -40,13 +33,15 @@ class ChangePasswordSerializer(serializers.Serializer):
         current_password = attrs.get('current_password')
         new_password = attrs.get('new_password')
         confirm_new_password = attrs.get('confirm_new_password')
+        print(attrs)
 
         # Verificar si las contraseñas coinciden
         if new_password != confirm_new_password:
             raise ValidationError("Las contraseñas no coinciden")
 
         # Obtener el token desde los datos de la solicitud
-        token = self.context.get('request').headers.get('authorization')
+        token = self.context.get('request').headers.get('Authorization')
+        print(token)
 
         if not token:
             raise ValidationError("Token no proporcionado")
@@ -65,6 +60,34 @@ class ChangePasswordSerializer(serializers.Serializer):
         # Asegurarse de que la nueva contraseña no sea igual a la actual
         if current_password == new_password:
             raise ValidationError("La nueva contraseña no puede ser igual a la actual")
+
+        return attrs
+    
+class ChangeUsernameSerializer(serializers.Serializer):
+    id = serializers.IntegerField(write_only=True)
+    username = serializers.CharField(write_only=True, min_length=3, max_length=150)
+
+    def validate(self, attrs):
+        user_id = attrs.get('id')
+        username = attrs.get('username')
+
+        # Verificar si el ID corresponde al usuario autenticado
+        token = self.context.get('request').headers.get('Authorization')  # 'Authorization' con 'A' mayúscula
+        if not token:
+            raise ValidationError("Token no proporcionado")
+
+        try:
+            user_token = Token.objects.get(key=token)
+            user = user_token.user
+        except Token.DoesNotExist:
+            raise ValidationError("Token inválido o no encontrado")
+
+        if user.id != user_id:
+            raise ValidationError("No tiene permiso para actualizar estos datos.")
+
+        # Verificar que el username no esté en uso
+        if User.objects.filter(username=username).exclude(id=user_id).exists():
+            raise ValidationError("Este nombre de usuario ya está en uso.")
 
         return attrs
 

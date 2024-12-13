@@ -6,3 +6,4 @@ export const createUser = (user) => api.post("user/", user).then((response) => r
 export const updateUser = (user) => api.put(`user/${user.id}/`, user).then((response) => response.data);
 export const deleteUser = (id) => api.delete(`user/${id}/`).then((response) => response.data);
 export const updatePassword = (passwordData) => api.post("user/change-password/",passwordData,).then((response) => response.data);
+export const updateUsername = (usernameData) => api.post("user/update-username/",usernameData,).then((response) => response.data);

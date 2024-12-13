@@ -27,13 +27,13 @@ export function LoginPage() {
    return (
        <div className="container d-flex justify-content-center align-items-center min-vh-100">
            <div className="col-12 col-md-6 col-lg-4">
-               <div className="card shadow-lg">
+               <div className="card shadow-lg" style={{ backgroundColor: '#1E3A5F' }}>
                    <div className="card-body">
-                       <h2 className="text-center mb-4">Iniciar sesión</h2>
+                       <h2 className="text-center mb-4 text-white">Iniciar sesión</h2>
                        {error && <div className="alert alert-danger">{error}</div>}
                        <LoginForm onLogin={handleLogin} loading={loading} />
                        <div className="text-center mt-3">
-                           <p>¿No tienes una cuenta? <Link to="/register">Regístrate</Link></p>
+                           <p className='text-white'>¿No tienes una cuenta? <Link to="/register">Regístrate</Link></p>
                        </div>
                    </div>
                </div>

@@ -16,8 +16,8 @@ const ErrorPage = () => {
 
   return (
     <div>
-      <h1>Oops!</h1>
-      <p>Sorry, un error inesperado a ocurrido.</p>
+      <h1>Error 404</h1>
+      <p>Página no encontrada</p>
     </div>
   );
 };

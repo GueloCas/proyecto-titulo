@@ -16,7 +16,7 @@ export function LoginForm({ onLogin, loading }) {
    return (
        <form onSubmit={handleSubmit}>
            <div className="mb-3">
-               <label htmlFor="username" className="form-label">Nombre de usuario</label>
+               <label htmlFor="username" className="form-label text-white">Nombre de usuario</label>
                <input
                    type="text"
                    className="form-control"
@@ -27,7 +27,7 @@ export function LoginForm({ onLogin, loading }) {
                />
            </div>
            <div className="mb-3">
-               <label htmlFor="password" className="form-label">Contraseña</label>
+               <label htmlFor="password" className="form-label text-white">Contraseña</label>
                <input
                    type="password"
                    className="form-control"
@@ -38,7 +38,7 @@ export function LoginForm({ onLogin, loading }) {
                />
            </div>
            <div className="d-grid gap-2">
-               <button type="submit" className="btn btn-primary" disabled={loading}>
+               <button type="submit" className="btn btn-warning" disabled={loading}>
                    {loading ? 'Cargando...' : 'Iniciar sesión'}
                </button>
            </div>

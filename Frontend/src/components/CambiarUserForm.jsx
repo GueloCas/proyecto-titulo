@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2"; // Importa SweetAlert2
-import { updateUser } from "../api/users.api";
+import { updateUsername } from "../api/users.api";
 import { reloadUserStorage } from "../context/AuthContext";
 
 export function CambiarUserForm() {
@@ -41,10 +41,11 @@ export function CambiarUserForm() {
         // Si el usuario confirma, procede con la actualización
         if (result.isConfirmed) {
 
-            const response = await updateUser({
+            const response = await updateUsername({
                 id: user.id,
                 username: data.username,
                 email: user.email,
+                password: user.password,
             });
 
             reloadUserStorage({ id: user.id });

@@ -1,6 +1,6 @@
 from .models import Inversor, Produccion, Estacion
 from django.contrib.auth.models import User # type: ignore
-from .serializer import InversorSerializer, ProduccionSerializer, UserSerializer, EstacionSerializer, ChangePasswordSerializer
+from .serializer import InversorSerializer, ProduccionSerializer, UserSerializer, EstacionSerializer, ChangePasswordSerializer, ChangeUsernameSerializer
 from rest_framework import viewsets, status # type: ignore
 from rest_framework.views import APIView # type: ignore
 from rest_framework.decorators import api_view, permission_classes, action# type: ignore
@@ -29,10 +29,12 @@ class ProduccionViewSet(viewsets.ModelViewSet):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
+    serializer_class = UserSerializer
 
     # Acción personalizada para cambiar la contraseña
     @action(detail=False, methods=['post'], url_path='change-password')
     def change_password(self, request):
+        print("Cambiando contraseña")
         # Obtener el token desde el cuerpo de la solicitud (o encabezado, según prefieras)
         token = request.headers.get('Authorization')  # O usa 'Authorization' en headers
         
@@ -44,7 +46,6 @@ class UserViewSet(viewsets.ModelViewSet):
             user_token = Token.objects.get(key=token)
             user = user_token.user  # Obtén el usuario asociado con el token
 
-            print(user)
         except Token.DoesNotExist:
             raise AuthenticationFailed("Token inválido o no encontrado")
 
@@ -55,12 +56,51 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
 
         if serializer.is_valid():
+            print("Datos válidos")
             new_password = serializer.validated_data['new_password']
             user.set_password(new_password)  # Establecer la nueva contraseña
             user.save()  # Guardar el usuario con la nueva contraseña
             return Response({"message": "Contraseña actualizada exitosamente"}, status=status.HTTP_200_OK)
-
+        
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Acción personalizada para cambiar el nombre del usuario
+    @action(detail=False, methods=['post'], url_path='update-username')
+    def update_username(self, request):
+        print("Actualizando nombre de usuario")
+        
+        # Obtener el token desde el encabezado de la solicitud
+        token = request.headers.get('Authorization')  # 'Authorization' con 'A' mayúscula
+        
+        if not token:
+            return Response({"detail": "Token no proporcionado"}, status=status.HTTP_400_BAD_REQUEST)
+    
+        try:
+            # Buscar el token en la base de datos
+            user_token = Token.objects.get(key=token)
+            user = user_token.user  # Obtén el usuario asociado con el token
+        except Token.DoesNotExist:
+            raise AuthenticationFailed("Token inválido o no encontrado")
+        
+        print(request.data)
+        
+        # Ahora validamos el nuevo nombre de usuario
+        serializer = ChangeUsernameSerializer(data=request.data, context={'request': request})
+        print(serializer)
+    
+        if serializer.is_valid():
+            print("Datos válidos")
+            new_username = serializer.validated_data['username']
+            
+            # Actualizar el nombre de usuario
+            user.username = new_username  # Establecer el nuevo nombre de usuario
+            user.save()  # Guardar los cambios en el usuario
+            
+            return Response({"message": "Nombre de usuario actualizado exitosamente"}, status=status.HTTP_200_OK)
+    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 class InversorProduccionView(APIView):
     def get(self, request, *args, **kwargs):
