@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { BarraLateral } from "../components/BarraLateral";
 import { Navegacion } from "../components/Navegacion";
